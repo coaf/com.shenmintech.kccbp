@@ -1,0 +1,715 @@
+package com.shenmintech.cbp.entity;
+
+import java.util.Date;
+
+public class User {
+    private String id;
+
+    private String invitecode;
+
+    private String loginname;
+
+    private String mobile;
+
+    private String password;
+
+    private Integer role;
+
+    private Byte enablemanualinput;
+
+    private String adress;
+
+    private String brithday;
+
+    private String medicare;
+
+    private String name;
+
+    private String nickname;
+
+    private String sex;
+
+    private String summary;
+
+    private String titles;
+
+    private String workplace;
+
+    private String section;
+
+    private Boolean sectionType;
+
+    private String healthhistoryid;
+
+    private String imageid;
+
+    private String equipmentid;
+
+    private Double sn;
+
+    private Double ew;
+
+    private String phonetype;
+
+    private Float bloodfat;
+
+    private Integer bloodpressureh;
+
+    private Integer bloodpressurel;
+
+    private Integer height;
+
+    private Float weight;
+
+    private Integer heartrate;
+
+    private Integer status;
+
+    private String openid;
+
+    private Long firsttrytime;
+
+    private String province;
+
+    private String city;
+
+    private String contact;
+
+    private String contactphone;
+
+    private Integer newuser;
+
+    private Integer trieddays;
+
+    private Long lasttrytime;
+
+    private Long lastfreepapertime;
+
+    private Integer medicinetype;
+
+    private Integer trynum;
+
+    private Integer eventkey;
+
+    private Integer smoke;
+
+    private Integer drink;
+
+    private Date createdate;
+
+    private Integer isbhuser;
+
+    private String wechatimgurl;
+
+    private Integer hba1c;
+
+    private Date hba1cupdatetime;
+
+    private Integer sourcechannel;
+
+    private String hospitalid;
+
+    private Integer groupid;
+
+    private String lastsessionid;
+
+    private String appversion;
+
+    private String qrcodeimgurl;
+
+    private Integer qrcodeseq;
+
+    private Integer teststatustranslated;
+
+    private Integer patienttype;
+
+    private Byte ishotline;
+
+    private Integer isTest;
+
+    private Byte isquitproject;
+
+    private String salename;
+
+    private String salemobile;
+
+    private Integer privilegecode;
+
+    private Integer plcode;
+
+    private String realmobile;
+
+    private Date registerdate;
+
+    private String usertype;
+
+    private String thirdpartyid;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getInvitecode() {
+        return invitecode;
+    }
+
+    public void setInvitecode(String invitecode) {
+        this.invitecode = invitecode;
+    }
+
+    public String getLoginname() {
+        return loginname;
+    }
+
+    public void setLoginname(String loginname) {
+        this.loginname = loginname;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
+    public Byte getEnablemanualinput() {
+        return enablemanualinput;
+    }
+
+    public void setEnablemanualinput(Byte enablemanualinput) {
+        this.enablemanualinput = enablemanualinput;
+    }
+
+    public String getAdress() {
+        return adress;
+    }
+
+    public void setAdress(String adress) {
+        this.adress = adress;
+    }
+
+    public String getBrithday() {
+        return brithday;
+    }
+
+    public void setBrithday(String brithday) {
+        this.brithday = brithday;
+    }
+
+    public String getMedicare() {
+        return medicare;
+    }
+
+    public void setMedicare(String medicare) {
+        this.medicare = medicare;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getTitles() {
+        return titles;
+    }
+
+    public void setTitles(String titles) {
+        this.titles = titles;
+    }
+
+    public String getWorkplace() {
+        return workplace;
+    }
+
+    public void setWorkplace(String workplace) {
+        this.workplace = workplace;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
+    }
+
+    public Boolean getSectionType() {
+        return sectionType;
+    }
+
+    public void setSectionType(Boolean sectionType) {
+        this.sectionType = sectionType;
+    }
+
+    public String getHealthhistoryid() {
+        return healthhistoryid;
+    }
+
+    public void setHealthhistoryid(String healthhistoryid) {
+        this.healthhistoryid = healthhistoryid;
+    }
+
+    public String getImageid() {
+        return imageid;
+    }
+
+    public void setImageid(String imageid) {
+        this.imageid = imageid;
+    }
+
+    public String getEquipmentid() {
+        return equipmentid;
+    }
+
+    public void setEquipmentid(String equipmentid) {
+        this.equipmentid = equipmentid;
+    }
+
+    public Double getSn() {
+        return sn;
+    }
+
+    public void setSn(Double sn) {
+        this.sn = sn;
+    }
+
+    public Double getEw() {
+        return ew;
+    }
+
+    public void setEw(Double ew) {
+        this.ew = ew;
+    }
+
+    public String getPhonetype() {
+        return phonetype;
+    }
+
+    public void setPhonetype(String phonetype) {
+        this.phonetype = phonetype;
+    }
+
+    public Float getBloodfat() {
+        return bloodfat;
+    }
+
+    public void setBloodfat(Float bloodfat) {
+        this.bloodfat = bloodfat;
+    }
+
+    public Integer getBloodpressureh() {
+        return bloodpressureh;
+    }
+
+    public void setBloodpressureh(Integer bloodpressureh) {
+        this.bloodpressureh = bloodpressureh;
+    }
+
+    public Integer getBloodpressurel() {
+        return bloodpressurel;
+    }
+
+    public void setBloodpressurel(Integer bloodpressurel) {
+        this.bloodpressurel = bloodpressurel;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    public Float getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Float weight) {
+        this.weight = weight;
+    }
+
+    public Integer getHeartrate() {
+        return heartrate;
+    }
+
+    public void setHeartrate(Integer heartrate) {
+        this.heartrate = heartrate;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getOpenid() {
+        return openid;
+    }
+
+    public void setOpenid(String openid) {
+        this.openid = openid;
+    }
+
+    public Long getFirsttrytime() {
+        return firsttrytime;
+    }
+
+    public void setFirsttrytime(Long firsttrytime) {
+        this.firsttrytime = firsttrytime;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getContactphone() {
+        return contactphone;
+    }
+
+    public void setContactphone(String contactphone) {
+        this.contactphone = contactphone;
+    }
+
+    public Integer getNewuser() {
+        return newuser;
+    }
+
+    public void setNewuser(Integer newuser) {
+        this.newuser = newuser;
+    }
+
+    public Integer getTrieddays() {
+        return trieddays;
+    }
+
+    public void setTrieddays(Integer trieddays) {
+        this.trieddays = trieddays;
+    }
+
+    public Long getLasttrytime() {
+        return lasttrytime;
+    }
+
+    public void setLasttrytime(Long lasttrytime) {
+        this.lasttrytime = lasttrytime;
+    }
+
+    public Long getLastfreepapertime() {
+        return lastfreepapertime;
+    }
+
+    public void setLastfreepapertime(Long lastfreepapertime) {
+        this.lastfreepapertime = lastfreepapertime;
+    }
+
+    public Integer getMedicinetype() {
+        return medicinetype;
+    }
+
+    public void setMedicinetype(Integer medicinetype) {
+        this.medicinetype = medicinetype;
+    }
+
+    public Integer getTrynum() {
+        return trynum;
+    }
+
+    public void setTrynum(Integer trynum) {
+        this.trynum = trynum;
+    }
+
+    public Integer getEventkey() {
+        return eventkey;
+    }
+
+    public void setEventkey(Integer eventkey) {
+        this.eventkey = eventkey;
+    }
+
+    public Integer getSmoke() {
+        return smoke;
+    }
+
+    public void setSmoke(Integer smoke) {
+        this.smoke = smoke;
+    }
+
+    public Integer getDrink() {
+        return drink;
+    }
+
+    public void setDrink(Integer drink) {
+        this.drink = drink;
+    }
+
+    public Date getCreatedate() {
+        return createdate;
+    }
+
+    public void setCreatedate(Date createdate) {
+        this.createdate = createdate;
+    }
+
+    public Integer getIsbhuser() {
+        return isbhuser;
+    }
+
+    public void setIsbhuser(Integer isbhuser) {
+        this.isbhuser = isbhuser;
+    }
+
+    public String getWechatimgurl() {
+        return wechatimgurl;
+    }
+
+    public void setWechatimgurl(String wechatimgurl) {
+        this.wechatimgurl = wechatimgurl;
+    }
+
+    public Integer getHba1c() {
+        return hba1c;
+    }
+
+    public void setHba1c(Integer hba1c) {
+        this.hba1c = hba1c;
+    }
+
+    public Date getHba1cupdatetime() {
+        return hba1cupdatetime;
+    }
+
+    public void setHba1cupdatetime(Date hba1cupdatetime) {
+        this.hba1cupdatetime = hba1cupdatetime;
+    }
+
+    public Integer getSourcechannel() {
+        return sourcechannel;
+    }
+
+    public void setSourcechannel(Integer sourcechannel) {
+        this.sourcechannel = sourcechannel;
+    }
+
+    public String getHospitalid() {
+        return hospitalid;
+    }
+
+    public void setHospitalid(String hospitalid) {
+        this.hospitalid = hospitalid;
+    }
+
+    public Integer getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(Integer groupid) {
+        this.groupid = groupid;
+    }
+
+    public String getLastsessionid() {
+        return lastsessionid;
+    }
+
+    public void setLastsessionid(String lastsessionid) {
+        this.lastsessionid = lastsessionid;
+    }
+
+    public String getAppversion() {
+        return appversion;
+    }
+
+    public void setAppversion(String appversion) {
+        this.appversion = appversion;
+    }
+
+    public String getQrcodeimgurl() {
+        return qrcodeimgurl;
+    }
+
+    public void setQrcodeimgurl(String qrcodeimgurl) {
+        this.qrcodeimgurl = qrcodeimgurl;
+    }
+
+    public Integer getQrcodeseq() {
+        return qrcodeseq;
+    }
+
+    public void setQrcodeseq(Integer qrcodeseq) {
+        this.qrcodeseq = qrcodeseq;
+    }
+
+    public Integer getTeststatustranslated() {
+        return teststatustranslated;
+    }
+
+    public void setTeststatustranslated(Integer teststatustranslated) {
+        this.teststatustranslated = teststatustranslated;
+    }
+
+    public Integer getPatienttype() {
+        return patienttype;
+    }
+
+    public void setPatienttype(Integer patienttype) {
+        this.patienttype = patienttype;
+    }
+
+    public Byte getIshotline() {
+        return ishotline;
+    }
+
+    public void setIshotline(Byte ishotline) {
+        this.ishotline = ishotline;
+    }
+
+    public Integer getIsTest() {
+        return isTest;
+    }
+
+    public void setIsTest(Integer isTest) {
+        this.isTest = isTest;
+    }
+
+    public Byte getIsquitproject() {
+        return isquitproject;
+    }
+
+    public void setIsquitproject(Byte isquitproject) {
+        this.isquitproject = isquitproject;
+    }
+
+    public String getSalename() {
+        return salename;
+    }
+
+    public void setSalename(String salename) {
+        this.salename = salename;
+    }
+
+    public String getSalemobile() {
+        return salemobile;
+    }
+
+    public void setSalemobile(String salemobile) {
+        this.salemobile = salemobile;
+    }
+
+    public Integer getPrivilegecode() {
+        return privilegecode;
+    }
+
+    public void setPrivilegecode(Integer privilegecode) {
+        this.privilegecode = privilegecode;
+    }
+
+    public Integer getPlcode() {
+        return plcode;
+    }
+
+    public void setPlcode(Integer plcode) {
+        this.plcode = plcode;
+    }
+
+    public String getRealmobile() {
+        return realmobile;
+    }
+
+    public void setRealmobile(String realmobile) {
+        this.realmobile = realmobile;
+    }
+
+    public Date getRegisterdate() {
+        return registerdate;
+    }
+
+    public void setRegisterdate(Date registerdate) {
+        this.registerdate = registerdate;
+    }
+
+    public String getUsertype() {
+        return usertype;
+    }
+
+    public void setUsertype(String usertype) {
+        this.usertype = usertype;
+    }
+
+    public String getThirdpartyid() {
+        return thirdpartyid;
+    }
+
+    public void setThirdpartyid(String thirdpartyid) {
+        this.thirdpartyid = thirdpartyid;
+    }
+}

@@ -1,0 +1,31 @@
+package com.shenmintech.cbp.controller.bean.req;
+
+import com.shenmintech.base.bean.BaseReqBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ApiModel
+public class Req4PostCourseBean extends BaseReqBean{
+	
+	@ApiModelProperty(value = "班级名称", required = true)
+	public String courseName;
+	
+	@ApiModelProperty(value = "所属公司", required = true)
+	public String companyFid;
+	
+	@ApiModelProperty(value = "所属导师", required = true)
+	public String teacherId;
+	
+	@ApiModelProperty(value = "课程类型", required = true)
+	public String courseTypeFid;
+	
+}

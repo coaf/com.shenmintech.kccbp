@@ -1,0 +1,79 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.ICourseBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetCourseBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetCourseTableBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetCourseTypeAndCompanyBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostCourseBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutCourseTableBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetCourseTableBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetCourseTypeAndCompanyBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutCourseTableBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/*
+ * 此课程相关接口基于导师后台操作
+ * 
+ */
+
+@Controller
+@Api(value = "后台导师操作的课程", description = "课程的相关操作--max")
+public class CourseController {
+
+  @Autowired
+  ICourseBiz iCourseBiz;
+
+  @PostMapping("/tkcCourse/post")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "导师创建新的班级", httpMethod = "POST", value = "添加新的班级（OK）")
+  public @ResponseBody Res4PostCourseBean postTKcCourse(
+      @ApiParam(required = true, value = "添加新的班级") @RequestBody Req4PostCourseBean req4PostCourseBean) {
+    return iCourseBiz.addCourse(req4PostCourseBean);
+  }
+
+  @PostMapping("/tkcCourse/get")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "导师分页查询属于自己的所有班级", httpMethod = "POST", value = "查询导师创建的班级（OK）")
+  public @ResponseBody Res4GetCourseBean getTKcCourse(
+      @ApiParam(required = true, value = "导师表的主键") @RequestBody Req4GetCourseBean req4GetCourseBean) {
+    return iCourseBiz.selectCourseById(req4GetCourseBean);
+  }
+
+  @PostMapping("/tkcCourseTypeAndTkcCompany/get")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "导师在添加/编辑班级时候需要查询课程的所有类型和公司，渲染下拉框", httpMethod = "POST", value = "查询班级的所有类型和公司（OK）")
+  public @ResponseBody Res4GetCourseTypeAndCompanyBean getCourseTypeAndCompany(
+      @ApiParam(required = true, value = "类型和公司对象") @RequestBody Req4GetCourseTypeAndCompanyBean req4GetCourseTypeAndCompanyBean) {
+    return iCourseBiz.selectCourseTypeAndCompanies();
+  }
+
+  @PostMapping("/tkcCourseTable/get")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "导师查看某个班的课表", httpMethod = "POST", value = "查看班级课表（OK）")
+  public @ResponseBody Res4GetCourseTableBean getTKcCourseTable(
+      @ApiParam(required = true, value = "类型和公司对象") @RequestBody Req4GetCourseTableBean req4GetCourseTableBean) {
+    return iCourseBiz.selectByCourseId(req4GetCourseTableBean);
+  }
+
+  @PostMapping("/tkcCourseTable/put")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "根据课程id修改某个班级的班级授课类型，备注和具体课表", httpMethod = "POST", value = "修改课程表（OK）")
+  public @ResponseBody Res4PutCourseTableBean putCourseTable(
+      @ApiParam(required = true, value = "修改班级的类型,备注和课表的对象") @RequestBody Req4PutCourseTableBean req4PutCourseTableBean) {
+    return iCourseBiz.updateCourseTableById(req4PutCourseTableBean);
+  }
+
+}

@@ -1,0 +1,24 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.biz.vo.res.Res4InitHomeworkVo;
+import com.shenmintech.cbp.controller.bean.req.Req4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetPushHomeworksBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPushHomeworksBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutPushHomeworkBean;
+
+public interface IHomeworkPushBiz {
+
+	public Res4GetPrePushHomeworkBean selectInitElement(Req4GetPrePushHomeworkBean req4GetPrePushHomeworkBean);
+	
+	public Res4PostPushHomeworkBean postPushHomework(Req4PostPushHomeworkBean req4PostPushHomeworkBean);
+	
+	public Res4GetPushHomeworksBean getPushHomeworks(Req4GetPushHomeworksBean req4GetPushHomeworksBean);
+	
+	public Res4PutPushHomeworkBean putPushHomework(Req4PutPushHomeworkBean req4PutPushHomeworkBean);
+	
+	public Res4InitHomeworkVo InitHomework(String studentId,String groupId);//教师后期将学生追加进小组的时候，重新初始化所有历史任务
+}

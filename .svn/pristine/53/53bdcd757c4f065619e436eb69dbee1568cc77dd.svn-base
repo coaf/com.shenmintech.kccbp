@@ -1,0 +1,17 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.stereotype.Controller;
+
+import io.swagger.annotations.Api;
+
+/**
+ * @author Allen 食物相关的API
+ *
+ */
+@Controller
+@Api(value = "食物", description = "食物相关API")
+public class FoodController {
+
+
+
+}

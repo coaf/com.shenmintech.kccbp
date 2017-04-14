@@ -1,0 +1,16 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.res.NetEasyRoomResponse;
+import com.shenmintech.cbp.controller.bean.res.NetEasyUserResponse;
+
+public interface IRoomAndVideoBiz {
+
+  NetEasyRoomResponse createNetEasyRoom(String accid, String name);
+
+  NetEasyUserResponse createAccoutAndAccid(String accid, String name);
+
+  NetEasyRoomResponse getAccoutAndAccidAndToken(String accid);
+
+
+
+}

@@ -1,0 +1,51 @@
+package com.shenmintech.cbp;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.stereotype.Service;
+
+import com.shenmintech.base.aspect.SessionAndAuthorityAspect;
+import com.shenmintech.base.aspect.WebLogAspect;
+ 
+
+/**
+ * Created by max on 2016/3/31.
+ */
+
+@EnableFeignClients
+@EnableEurekaClient
+@SuppressWarnings("deprecation")
+@ServletComponentScan
+@SpringBootApplication
+@MapperScan(basePackages = {"com.shenmintech.cbp.mapper"})
+@ImportResource({"classpath:config/spring/scheduler-ApplicationContext.xml"})
+@ComponentScan(basePackages = "com.shenmintech.*", excludeFilters = {@Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SessionAndAuthorityAspect.class,WebLogAspect.class})})
+public class ShenminKCApplication extends SpringBootServletInitializer{
+	public static void main(String[] args) {
+		ApplicationContext ctx = SpringApplication.run(ShenminKCApplication.class, args);
+		int i = ctx.getBeanDefinitionCount();
+		String[] beanNames1 = ctx.getBeanNamesForAnnotation(Service.class);
+		System.out.println("========="+i);
+		for (String str : beanNames1) System.out.println(str);
+		
+		String[] beanNames = ctx.getBeanDefinitionNames();
+		for (String str : beanNames) System.out.println("所有的beanName："+ str);
+	}
+
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(ShenminKCApplication.class);
+	}
+	
+	
+}

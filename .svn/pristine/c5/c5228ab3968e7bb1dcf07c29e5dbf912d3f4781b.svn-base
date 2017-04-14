@@ -1,0 +1,28 @@
+package com.shenmintech.cbp.service;
+
+import java.util.List;
+
+import com.shenmintech.cbp.biz.vo.res.PushHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetPushHomeworksVo;
+
+public interface IHomeworkPushService {
+
+	public void checkAddPushHomework(String homeworkId, String clazzId, List<String> groupIds, String pushFlag);
+	
+	public void addPushHomework(String teacherId,String homeworkId,String companyId,String courseId,List<String> groupIds,String clazzId ,String pushFlag,String remark);
+	
+	public void addHomeworkNow(String pushId ,String courseId,String homeworkId, List<String> studentIds);//即时推送课后作业
+	
+	public void addHomeworkBefore();
+	
+	public void addHomeworkAfter();
+	
+	public Res4GetPushHomeworksVo selectByTeacherIdPages(String teacherId, int pageNo, int rowsPerPage);
+	
+	public PushHomeworkVo selectById(String id);
+	
+	public void updateByIdSelective(PushHomeworkVo vo);
+	
+	public void insertRelations(List<String> studentIds,String pushId,String homeworkId,List<String> groupIds,String courseId);
+	
+}

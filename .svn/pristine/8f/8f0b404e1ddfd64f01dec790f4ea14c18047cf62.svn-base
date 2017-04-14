@@ -1,0 +1,30 @@
+package com.shenmintech.cbp.mapper;
+
+import com.shenmintech.cbp.entity.TKcRecord;
+import com.shenmintech.cbp.entity.TKcRecordExample;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface TKcRecordMapper {
+    int countByExample(TKcRecordExample example);
+
+    int deleteByExample(TKcRecordExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(TKcRecord record);
+
+    int insertSelective(TKcRecord record);
+
+    List<TKcRecord> selectByExample(TKcRecordExample example);
+
+    TKcRecord selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") TKcRecord record, @Param("example") TKcRecordExample example);
+
+    int updateByExample(@Param("record") TKcRecord record, @Param("example") TKcRecordExample example);
+
+    int updateByPrimaryKeySelective(TKcRecord record);
+
+    int updateByPrimaryKey(TKcRecord record);
+}

@@ -1,0 +1,23 @@
+package com.shenmintech.cbp.entity;
+
+public class UserWithBLOBs extends User {
+    private String expertise;
+
+    private String experience;
+
+    public String getExpertise() {
+        return expertise;
+    }
+
+    public void setExpertise(String expertise) {
+        this.expertise = expertise;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+}

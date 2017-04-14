@@ -1,0 +1,36 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Builder
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ApiModel("当前课程员工对象")
+public class Son4GetEmployeeBean {
+	
+	@ApiModelProperty(value = "用户ID", required = true)
+	public String userId;
+	
+	@ApiModelProperty(value = "员工ID", required = true)
+	public String employeeId;
+	
+	@ApiModelProperty(value = "小组ID", required = true)
+	public String groupId;
+	
+	@ApiModelProperty(value = "用户名", required = true)
+	public String userName;
+	
+	@ApiModelProperty(value = "用户手机号", required = true)
+	public String mobile;
+	
+	@ApiModelProperty(value = "最后登录时间时间", required = true)
+	public String registerDate;
+}

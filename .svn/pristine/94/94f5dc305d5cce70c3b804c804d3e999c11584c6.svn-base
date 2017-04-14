@@ -1,0 +1,9 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.ReqActionCountBean;
+import com.shenmintech.cbp.controller.bean.res.ResActionCountBean;
+
+public interface IActionBiz {
+
+	public ResActionCountBean patchRecordAccount4App(ReqActionCountBean reqActionCountBean);
+}

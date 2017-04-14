@@ -1,0 +1,104 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IActionBiz;
+import com.shenmintech.cbp.controller.bean.req.ReqUCACancelBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUCRCancelBean;
+import com.shenmintech.cbp.controller.bean.req.ReqULRCancelBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectArticleBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserLikeRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserPlayRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserReadArticleBean;
+import com.shenmintech.cbp.controller.bean.res.ResUCACancelBean;
+import com.shenmintech.cbp.controller.bean.res.ResUCRCancelBean;
+import com.shenmintech.cbp.controller.bean.res.ResULRCancelBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectArticleBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserLikeRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserPlayRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserReadArticleBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Api(value = "公用动作", description = "记录一切行为流水")
+@Controller
+public class ActionController {
+
+	@Autowired
+	IActionBiz iActionBiz;
+	
+	//用户收藏录播视频
+	@PostMapping("/user/collect/record")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户对录播视频收藏流水记录", httpMethod = "POST", value = "用户收藏一下录播视频（OK）")
+	public @ResponseBody ResUserCollectRecordBean postUCR(@ApiParam(required = true, value = "收藏录播视频入参对象") @RequestBody ReqUserCollectRecordBean reqUserCollectRecordBean){
+		return iActionBiz.postUCR(reqUserCollectRecordBean);
+	}
+	
+	//用户取消收藏录播视频
+	@PostMapping("/user/collect/record/cancel")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户取消收藏录播视频", httpMethod = "POST", value = "用户撤销对录播视频的收藏（OK）")
+	public @ResponseBody ResUCRCancelBean postUCRCancel(@ApiParam(required = true, value = "取消收藏录播视频入参对象") @RequestBody ReqUCRCancelBean reqUCRCancelBean){
+		return iActionBiz.postUCRCancel(reqUCRCancelBean);
+	}
+	
+	//用户播放录播视频
+	@PostMapping("/user/play/record")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户对录播视频播放流水记录", httpMethod = "POST", value = "用户播放一下录播视频（OK）")
+	public @ResponseBody ResUserPlayRecordBean postUPR(@ApiParam(required = true, value = "播放录播视频入参对象") @RequestBody ReqUserPlayRecordBean reqUserPlayRecordBean){
+		return iActionBiz.postUPR(reqUserPlayRecordBean);
+	}
+	
+	//用户点赞录播视频
+	@PostMapping("/user/like/record")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户对录播视频点赞流水记录", httpMethod = "POST", value = "用户点赞一下录播视频（OK）")
+	public @ResponseBody ResUserLikeRecordBean postULR(@ApiParam(required = true, value = "点赞录播视频入参对象") @RequestBody ReqUserLikeRecordBean reqUserLikeRecordBean){
+		return iActionBiz.postULR(reqUserLikeRecordBean);
+	}
+	
+	//用户取消点赞录播视频
+	@PostMapping("/user/like/record/cancel")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户取消对录播视频点赞", httpMethod = "POST", value = "用户取消点赞录播视频（OK）")
+	public @ResponseBody ResULRCancelBean postULRCancel(@ApiParam(required = true, value = "取消点赞录播视频入参对象") @RequestBody ReqULRCancelBean reqULRCancelBean){
+		return iActionBiz.postULRCancel(reqULRCancelBean);
+	}
+	
+	//用户收藏文章
+	@PostMapping("/user/collect/article")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户对文章收藏流水记录", httpMethod = "POST", value = "用户收藏一下文章（OK）")
+	public @ResponseBody ResUserCollectArticleBean postUCA(@ApiParam(required = true, value = "收藏文章入参对象") @RequestBody ReqUserCollectArticleBean reqUserCollectArticleBean){
+		return iActionBiz.postUCA(reqUserCollectArticleBean);
+	}
+	
+	//用户取消收藏文章
+	@PostMapping("/user/collect/article/cancel")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户取消对文章收藏", httpMethod = "POST", value = "用户取消收藏文章（OK）")
+	public @ResponseBody ResUCACancelBean postUCACancel(@ApiParam(required = true, value = "取消收藏文章入参对象") @RequestBody ReqUCACancelBean reqUCACancelBean){
+		return iActionBiz.postUCACancel(reqUCACancelBean);
+	}
+	
+	//用户阅读文章
+	@PostMapping("/user/read/article")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户对文章阅读流水记录", httpMethod = "POST", value = "用户阅读一下文章（OK）")
+	public @ResponseBody ResUserReadArticleBean postURA(@ApiParam(required = true, value = "阅读文章入参对象") @RequestBody ReqUserReadArticleBean reqUserReadArticleBean){
+		return iActionBiz.postURA(reqUserReadArticleBean);
+	}
+	
+}

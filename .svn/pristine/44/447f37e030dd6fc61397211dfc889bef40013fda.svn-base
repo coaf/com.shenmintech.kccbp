@@ -1,0 +1,31 @@
+package com.shenmintech.cbp.biz.vo.res;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Builder
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Son4GetPushHomeworksVo {
+	
+	public String id;
+	
+	public String companyFid;
+	
+	public String homeworkFid;
+	
+	public String courseFid;
+	
+	public String groupFids;
+	
+	public String clazzId;
+	
+	public String pushTimeTypeFid;
+	
+	public String remark;
+}

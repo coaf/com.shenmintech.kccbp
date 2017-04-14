@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: default
+  application:
+    name: shenmin-kc
+  cloud:
+    config:
+      label: master
+      discovery:
+        enabled: true
+        serviceId: configserver
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://user:8888@192.168.1.211:8761/eureka

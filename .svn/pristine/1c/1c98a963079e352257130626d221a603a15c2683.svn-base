@@ -1,0 +1,65 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.entity.TToolAccount;
+import com.shenmintech.cbp.entity.TToolAccountExample;
+import com.shenmintech.cbp.mapper.TToolAccountMapper;
+import com.shenmintech.cbp.service.ITToolAccountService;
+
+@Service
+@Transactional
+public class TToolAccountServiceImpl implements ITToolAccountService {
+
+	@Autowired
+	TToolAccountMapper tToolAccountMapper;
+	
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Override
+	public void addAccount(String activeId, String passiveId, String actionId,String remark) {
+		TToolAccount account = new TToolAccount();
+		account.setId(idWorkerTemplate.generateId());
+		account.setActiveId(activeId);
+		account.setPassiveId(passiveId);
+		account.setActionId(actionId);
+		account.setRemark(remark);
+		account.setStatus(0);
+		tToolAccountMapper.insertSelective(account);
+	}
+
+	@Override
+	public int countOfActionByPassiveId(String passiveId, String actionId) {
+		TToolAccountExample example = new TToolAccountExample();
+		example.or().andStatusNotEqualTo(-1).andPassiveIdEqualTo(passiveId).andActionIdEqualTo(actionId);
+		return tToolAccountMapper.countByExample(example);
+	}
+
+	@Override
+	public void clearAccount(String activeId, String passiveId, String actionId) {
+		TToolAccountExample tToolAccountExample = new TToolAccountExample();
+		tToolAccountExample.or().andStatusNotEqualTo(-1).andActiveIdEqualTo(activeId).andPassiveIdEqualTo(passiveId).andActionIdEqualTo(actionId);
+		TToolAccount account = new TToolAccount();
+		account.setStatus(-1);
+		tToolAccountMapper.updateByExampleSelective(account, tToolAccountExample);
+	}
+
+	@Override
+	public List<String> searchPassiveIds(String activeId, String actionId) {
+		TToolAccountExample tToolAccountExample = new TToolAccountExample();
+		tToolAccountExample.or().andStatusNotEqualTo(-1).andActiveIdEqualTo(activeId).andActionIdEqualTo(actionId);
+		List<TToolAccount> accounts = tToolAccountMapper.selectByExample(tToolAccountExample);
+		if(null!=accounts && 0<accounts.size()) return accounts.stream().map(n->n.getPassiveId()).distinct().collect(Collectors.toList());
+		return new ArrayList<>();
+	}
+	
+	
+}

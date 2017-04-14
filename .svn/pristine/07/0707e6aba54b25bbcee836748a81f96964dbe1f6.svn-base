@@ -1,0 +1,18 @@
+package com.shenmintech.cbp.controller.bean.req;
+
+import com.shenmintech.base.bean.BaseReqBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@ApiModel
+public class Req4GetCourseBean extends BaseReqBean {
+
+  @ApiModelProperty(value = "教师ID", required = true, example = "1994136499485641")
+  public String teacherId;
+
+}

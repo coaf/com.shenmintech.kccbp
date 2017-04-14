@@ -1,0 +1,166 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.text.ParseException;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IRollingPictureBiz;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostRollingPicVo;
+import com.shenmintech.cbp.controller.bean.req.Req4PostRollingPicBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostRollingPicBean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IRollingPictureService;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@SuppressWarnings("static-access")
+public class RollingPictureBizImpl implements IRollingPictureBiz {
+
+	@Autowired
+	IRollingPictureService iRollingPictureService;
+	
+	@Override
+	public Res4PostRollingPicBean postRollingPic(Req4PostRollingPicBean req4PostRollingPicBean) {
+		Res4PostRollingPicBean resBean = new Res4PostRollingPicBean();
+		
+		String rollingPicName = req4PostRollingPicBean.getRollingPicName();
+		if(StringUtil.isBlank(rollingPicName)){
+			resBean.setError(-1);
+			resBean.setMsg("rollingPicName不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String renderType = req4PostRollingPicBean.getRenderType();
+		if(StringUtil.isAnyBlank(renderType)){
+			resBean.setError(-1);
+			resBean.setMsg("renderType不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String pubCourseName ="";
+		String preStartTime ="";
+		Date preStime = new Date();
+		String renderUrl ="";
+		switch (renderType) {
+		case "0"://公开课
+			pubCourseName = req4PostRollingPicBean.getPubCourseName();
+			if(StringUtil.isBlank(pubCourseName)){
+				resBean.setError(-1);
+				resBean.setMsg("公开课的课名pubCourseName不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			preStartTime = req4PostRollingPicBean.getPreStartTime();
+			if(StringUtil.isBlank(preStartTime)){
+				resBean.setError(-1);
+				resBean.setMsg("公开课的开课时间preStartTime不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			try {
+				preStime = DateUtil.parse(preStartTime, DateUtil.DATETYPE_10);
+			} catch (ParseException e) {
+				resBean.setError(-1);
+				resBean.setMsg("公开课的开课时间preStartTime格式有误，必须是yyyy-MM-dd HH:mm");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			break;
+		case "1"://链接
+			renderUrl = req4PostRollingPicBean.getRenderUrl();
+			if(StringUtil.isBlank(renderUrl)){
+				resBean.setError(-1);
+				resBean.setMsg("跳转renderUrl不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			break;
+		default:
+			resBean.setError(-1);
+			resBean.setMsg("renderType只能是0直播公开课，1链接");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String remark = req4PostRollingPicBean.getRemark();//备注信息
+		
+		String hisIndex = req4PostRollingPicBean.getHisIndex();
+		if(StringUtil.isBlank(hisIndex)){
+			resBean.setError(-1);
+			resBean.setMsg("hisIndex不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(!Constants.l1234.contains(hisIndex)){
+			resBean.setError(-1);
+			resBean.setMsg("hisIndex必须是1/2/3/4");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String picId = req4PostRollingPicBean.getPicId();
+		if(StringUtil.isBlank(picId)){
+			resBean.setError(-1);
+			resBean.setMsg("picId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String status = req4PostRollingPicBean.getStatus();
+		if(StringUtil.isBlank(status)){
+			resBean.setError(-1);
+			resBean.setMsg("status不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(!"0".equals(status) && !"1".equals(status)){
+			resBean.setError(-1);
+			resBean.setMsg("status必须为0或者1");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String operatorUserId = req4PostRollingPicBean.getOperatorUserId();
+		Req4PostRollingPicVo rollingPicVo = new Req4PostRollingPicVo().builder()
+				.rollingPicName(rollingPicName)
+				.renderType(Integer.parseInt(renderType))
+				.pubCourseName(pubCourseName)
+				.preStartTime(preStime)
+				.renderUrl(renderUrl)
+				.remark(remark)
+				.hisIndex(Integer.parseInt(hisIndex))
+				.picId(picId)
+				.status(0)
+				.operatorUserId(operatorUserId)
+				.build();
+		
+		try {
+			iRollingPictureService.addRollingPic(rollingPicVo);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		} catch (Exception e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.getMessage());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+}

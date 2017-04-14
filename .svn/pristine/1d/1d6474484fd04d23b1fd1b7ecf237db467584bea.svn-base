@@ -1,0 +1,33 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IAuthBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetTeacherBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetTeacherBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Api(value = "用户登录等相关", description = "登录api--max")
+@Controller
+public class AuthController {
+
+	@Autowired
+	IAuthBiz iAuthBiz;
+	
+	@PostMapping("/auth/login")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "轻币后台登录接口", httpMethod = "POST", value = "教师登录（OK）")
+	public @ResponseBody Res4GetTeacherBean login(@ApiParam(required = true, value = "用户登录信息") @RequestBody Req4GetTeacherBean req4GetTeacherBean){
+		return iAuthBiz.loginTeacher(req4GetTeacherBean);
+	}
+	
+}

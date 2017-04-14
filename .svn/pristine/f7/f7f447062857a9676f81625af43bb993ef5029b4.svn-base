@@ -1,0 +1,108 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.ICourse4AppBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetCourseBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppPostHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppPostHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppPostHomeworkWorkCardBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/*
+ * 此接口相关操作基于app端用户请求
+ * 
+ */
+
+@Controller
+@Api(value = "用户操作的课程", description = "课程的相关操作")
+public class Course4AppController {
+
+	@Autowired
+	ICourse4AppBiz iCourse4AppBiz;
+
+	@PostMapping("/tkcCourse4App/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户获取其所有的课程，以将要上课的时间排序", httpMethod = "POST", value = "查询课程（OK）")
+	public @ResponseBody Res4AppGetCourseBean getTKcCourseByUid(
+			@ApiParam(required = true, value = "用户ID对象") @RequestBody Req4AppGetCourseBean req4AppGetCourseBean) {
+		return iCourse4AppBiz.selectByUserId(req4AppGetCourseBean);
+	}
+
+	@PostMapping("/tkcHomeworkStudentRelation/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户获取其所有课程最新各类的任务", httpMethod = "POST", value = "查询不同课程的任务列表（OK）")
+	public @ResponseBody Res4AppGetHomeworkStudentRelationBean getTKcHomeworkStudentRelationByUid(
+			@ApiParam(required = true, value = "用户ID对象") @RequestBody Req4AppGetHomeworkStudentRelationBean req4AppGetHomeworkStudentRelationBean) {
+		return iCourse4AppBiz.selectHomeworkStudentRelationByUserId(req4AppGetHomeworkStudentRelationBean);
+	}
+
+	@PostMapping("/tkcHomeworkStudentRelation/homeworkPicTxt/relationId/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户查看图文类型任务", httpMethod = "POST", value = "查询具体图文任务详情")
+	public @ResponseBody Res4AppGetHomeworkPicTxtBean getTKcHomeworkStudentRelationByRelationId(
+			@ApiParam(required = true, value = "具体某个任务id对象") @RequestBody Req4AppGetHomeworkPicTxtBean req4AppGetHomeworkPicTxtBean) {
+		return iCourse4AppBiz.selectHomeworkPicTxtByRelationId(req4AppGetHomeworkPicTxtBean);
+	}
+
+	@PostMapping("/tkcHomeworkStudentRelation/homeworkSignCard/relationId/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户查看打卡类型任务", httpMethod = "POST", value = "查询具体打卡任务详情")
+	public @ResponseBody Res4AppGetHomeworkSignCardBean getTKcHomeworkStudentRelationByRelationId2(
+			@ApiParam(required = true, value = "具体某个任务id对象") @RequestBody Req4AppGetHomeworkSignCardBean req4AppGetHomeworkPicTxtBean) {
+		return iCourse4AppBiz.selectHomeworkSignCardByRelationId(req4AppGetHomeworkPicTxtBean);
+	}
+
+	@PostMapping("/tkcHomeworkStudentRelation/homeworkWorkCard/relationId/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户查看卡片类型任务", httpMethod = "POST", value = "查询具体卡片类任务详情")
+	public @ResponseBody Res4AppGetHomeworkWorkCardBean getTKcHomeworkStudentRelationByRelationId3(
+			@ApiParam(required = true, value = "具体某个任务id对象") @RequestBody Req4AppGetHomeworkWorkCardBean req4AppGetHomeworkPicTxtBean) {
+		return iCourse4AppBiz.selectHomeworkWorkCardByRelationId(req4AppGetHomeworkPicTxtBean);
+	}
+
+	@PostMapping("/tkcHomeworkPicTxt/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户提交图文类型任务", httpMethod = "POST", value = "提交类型1（图文）任务")
+	public @ResponseBody Res4AppPostHomeworkPicTxtBean postHomeworkPicTxt(
+			@ApiParam(required = true, value = "图文任务对象") @RequestBody Req4AppPostHomeworkPicTxtBean req4AppPostHomeworkPicTxtBean) {
+		return iCourse4AppBiz.addHomeworkPicTxt(req4AppPostHomeworkPicTxtBean);
+	}
+
+	@PostMapping("/tkcHomeworkSignCard/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户提交打卡类型任务", httpMethod = "POST", value = "提交类型2（打卡）任务")
+	public @ResponseBody Res4AppPostHomeworkSignCardBean postHomeworkSignCard(
+			@ApiParam(required = true, value = "打卡任务对象") @RequestBody Req4AppPostHomeworkSignCardBean req4AppPostHomeworkSignCardBean) {
+		return iCourse4AppBiz.addHomeworkSignCard(req4AppPostHomeworkSignCardBean);
+	}
+
+	@PostMapping("/tkcHomeworkWorkCard/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户提交任务卡类型任务", httpMethod = "POST", value = "提交类型3（任务卡）任务")
+	public @ResponseBody Res4AppPostHomeworkWorkCardBean postHomeworkWorkCard(
+			@ApiParam(required = true, value = "打卡任务对象") @RequestBody Req4AppPostHomeworkWorkCardBean req4AppPostHomeworkWorkCardBean) {
+		return iCourse4AppBiz.addHomeworkWorkCard(req4AppPostHomeworkWorkCardBean);
+	}
+}

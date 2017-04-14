@@ -1,0 +1,280 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IEmployeeBiz;
+import com.shenmintech.cbp.biz.vo.res.CompanyVo;
+import com.shenmintech.cbp.biz.vo.res.Res4AddUserVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetEmployeeVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetGroupVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetUserVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetEmployeeVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetGroupVo;
+import com.shenmintech.cbp.biz.vo.res.StudentVo;
+import com.shenmintech.cbp.controller.bean.req.Req4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostEmployeeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostUEStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Reas4PostUEStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostEmployeeBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetGroup1Bean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.ICourseService;
+import com.shenmintech.cbp.service.IEmpolyeeService;
+import com.shenmintech.cbp.service.IGroupService;
+import com.shenmintech.cbp.service.IStudentService;
+import com.shenmintech.cbp.service.IUserService;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class EmployeeBizImpl implements IEmployeeBiz {
+
+	@Autowired
+	IEmpolyeeService iEmpolyeeService;
+	
+	@Autowired
+	IGroupService iGroupService;
+	
+	@Autowired
+	IStudentService iStudentService;
+	
+	@Autowired
+	IUserService iUserService;
+	
+	@Autowired
+	ICourseService iCourseService;
+	
+	@Override
+	public Res4GetEmployeeBean getByComIdAndCouIdPages(Req4GetEmployeeBean req4GetEmployeeBean) {
+		Res4GetEmployeeBean res4GetEmployeeBean = new Res4GetEmployeeBean();
+		
+		String courseId = req4GetEmployeeBean.getCourseId();
+		int pageNo = -1==req4GetEmployeeBean.getPageNo()?1:req4GetEmployeeBean.getPageNo();
+		int rowsPerPage = -1==req4GetEmployeeBean.getPageNo()?99999:req4GetEmployeeBean.getRowsPerPage();
+		
+		Res4GetGroupVo res4GetGroupVo = new Res4GetGroupVo();//获取当前课程的所有小组
+		try {
+			res4GetGroupVo = iGroupService.selectByIdPages(courseId, 1, 99999);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetEmployeeBean.setError(-1);
+			res4GetEmployeeBean.setMsg(e.msg);
+			res4GetEmployeeBean.setSuccess(false);
+			return res4GetEmployeeBean;
+		}
+		List<Son4GetGroupVo> son4GetGroupVos = res4GetGroupVo.getGroupVos();
+		List<Son4GetGroup1Bean> son4GetGroup1Beans = new ArrayList<>();
+		Iterator<Son4GetGroupVo> it = son4GetGroupVos.iterator();
+		while (it.hasNext()) {
+			Son4GetGroup1Bean son4GetGroup1Bean = new Son4GetGroup1Bean();
+			Son4GetGroupVo son4GetGroupVo = it.next();
+			BeanUtils.copyProperties(son4GetGroupVo, son4GetGroup1Bean);
+			son4GetGroup1Beans.add(son4GetGroup1Bean);
+		}
+		
+		
+		List<String> groupIds = new ArrayList<>();//获取当前课程的所有小组
+		try {
+			groupIds = iGroupService.getGroupIdsByCourseId(courseId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetEmployeeBean.setError(-1);
+			res4GetEmployeeBean.setMsg(e.msg);
+			res4GetEmployeeBean.setSuccess(false);
+			return res4GetEmployeeBean;
+		}
+		
+		Res4GetEmployeeVo res4GetEmployeeVo = new Res4GetEmployeeVo();//获取当前课程对应公司的所有雇员
+		try {
+			res4GetEmployeeVo = iEmpolyeeService.selectByCompanyId(pageNo,rowsPerPage,courseId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetEmployeeBean.setError(-1);
+			res4GetEmployeeBean.setMsg(e.msg);
+			res4GetEmployeeBean.setSuccess(false);
+			return res4GetEmployeeBean;
+		}
+		int recordCount = res4GetEmployeeVo.getRecordCount();
+		List<Son4GetEmployeeVo> son4GetEmployeeVos = res4GetEmployeeVo.getList();
+		Iterator<Son4GetEmployeeVo> iterator = son4GetEmployeeVos.iterator();
+		List<Son4GetEmployeeBean> employeeList = new ArrayList<>();//组织雇员列表
+		while(iterator.hasNext()){
+			Son4GetEmployeeBean son4GetEmployeeBean = new Son4GetEmployeeBean();
+			Son4GetEmployeeVo son4GetEmployeeVo = iterator.next();
+			String employeeId = son4GetEmployeeVo.getEmployeeId();
+			son4GetEmployeeBean.setEmployeeId(employeeId);
+			StudentVo studentVo =new StudentVo();
+			try {
+				studentVo = iStudentService.searchByEmployeeIdAndGroupIds(employeeId, groupIds);
+			} catch (ApplicationException e) {
+				log.error("context", e);
+				res4GetEmployeeBean.setError(-1);
+				res4GetEmployeeBean.setMsg(e.msg);
+				res4GetEmployeeBean.setSuccess(false);
+				return res4GetEmployeeBean;
+			}
+			son4GetEmployeeBean.setStudentId(studentVo.getStudentId());
+			son4GetEmployeeBean.setGroupId(studentVo.getGroupId());
+			son4GetEmployeeBean.setWeightLossTotal("");
+			son4GetEmployeeBean.setDietaryRecord("");
+			son4GetEmployeeBean.setDailyBudget("");
+			son4GetEmployeeBean.setWeightLossPercentage("");
+			son4GetEmployeeBean.setWeightLossWeek("");
+			son4GetEmployeeBean.setBMI("");
+			son4GetEmployeeBean.setFollowRecord("");
+			String userId = son4GetEmployeeVo.getUserId();
+			Res4GetUserVo res4GetUserVo = new Res4GetUserVo();
+			try {
+				res4GetUserVo = iUserService.selectByUserId(userId);
+			} catch (ApplicationException e) {
+				res4GetEmployeeBean.setError(-1);
+				res4GetEmployeeBean.setMsg(e.msg);
+				res4GetEmployeeBean.setSuccess(false);
+				return res4GetEmployeeBean;
+			} catch (Exception e) {
+				res4GetEmployeeBean.setError(-1);
+				res4GetEmployeeBean.setMsg(e.getMessage());
+				res4GetEmployeeBean.setSuccess(false);
+				return res4GetEmployeeBean;
+			}
+			son4GetEmployeeBean.setUserId(userId);
+			
+			String userName = res4GetUserVo.getUserName();
+			son4GetEmployeeBean.setUserName(null==userName?"":userName);
+			
+			String mobile = res4GetUserVo.getUserMobile();
+			son4GetEmployeeBean.setMobile(null==mobile?"":mobile);
+			
+			Date registerDate = res4GetUserVo.getRegisterDate();
+			String registerDateStr = "";
+			if(null!=registerDate) registerDateStr = DateUtil.format(registerDate, DateUtil.DATETYPE_4);
+			son4GetEmployeeBean.setRegisterDate(registerDateStr);
+			
+			employeeList.add(son4GetEmployeeBean);
+		}
+		res4GetEmployeeBean.setEmployeeList(employeeList);
+		res4GetEmployeeBean.setGroupList(son4GetGroup1Beans);
+		res4GetEmployeeBean.setError(0);
+		res4GetEmployeeBean.setMsg("SUCCESS");
+		res4GetEmployeeBean.setSuccess(true);
+		res4GetEmployeeBean.setPageNo(pageNo);
+		res4GetEmployeeBean.setRecordCount(recordCount);
+		res4GetEmployeeBean.setPageSumCount((recordCount+rowsPerPage-1)/rowsPerPage);
+		return res4GetEmployeeBean;
+	}
+
+	@Override
+	public Res4PostEmployeeBean addEmployee(Req4PostEmployeeBean req4PostEmployeeBean) {
+		Res4PostEmployeeBean res4PostEmployeeBean = new Res4PostEmployeeBean();
+		
+		String userId = req4PostEmployeeBean.getUserId();
+		String companyId = req4PostEmployeeBean.getCompanyId();
+		if(StringUtil.checkBlank(userId,companyId)){
+			res4PostEmployeeBean.setError(-1);
+			res4PostEmployeeBean.setMsg("userId,companyId不能为空");
+			res4PostEmployeeBean.setSuccess(false);
+			return res4PostEmployeeBean;
+		}
+		String empolyeeId = "";
+		try {
+			empolyeeId = iEmpolyeeService.addEmpolyee(userId, companyId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PostEmployeeBean.setError(-1);
+			res4PostEmployeeBean.setMsg(e.msg);
+			res4PostEmployeeBean.setSuccess(false);
+			return res4PostEmployeeBean;
+		}
+		res4PostEmployeeBean.setEmployeeId(empolyeeId);
+		res4PostEmployeeBean.setError(0);
+		res4PostEmployeeBean.setMsg("SUCCESS");
+		res4PostEmployeeBean.setSuccess(true);
+		return res4PostEmployeeBean;
+	}
+
+	@Override
+	public Reas4PostUEStudentBean addUserEmployeeStudent(Req4PostUEStudentBean req4PostUEStudentBean) {
+		Reas4PostUEStudentBean bean = new Reas4PostUEStudentBean();
+		String userName = req4PostUEStudentBean.getUserName();
+		String mobile = req4PostUEStudentBean.getMobile();
+		String sex = req4PostUEStudentBean.getSex();
+		String weight = req4PostUEStudentBean.getWeight();
+		String height = req4PostUEStudentBean.getHeight();
+		String birthday = req4PostUEStudentBean.getBirthday();
+		String courseId = req4PostUEStudentBean.getCourseId();
+		String groupId = req4PostUEStudentBean.getGroupId();
+		String calUnit = req4PostUEStudentBean.getCalUnit();
+		String email = req4PostUEStudentBean.getEmail();
+		if(StringUtil.checkBlank(userName,mobile,sex,weight,height,birthday,courseId,groupId,calUnit,email)){
+			bean.setError(-1);
+			bean.setMsg("userName,mobile,sex,weight,height,birthday,courseId,groupId,calUnit,email不能为空");
+			bean.setSuccess(false);
+			return bean;
+		}
+		if(!StringUtil.isMobile(mobile)){
+			bean.setError(-1);
+			bean.setMsg("mobile必须为手机号："+mobile);
+			bean.setSuccess(false);
+			return bean;
+		}
+		if(!"0".equals(sex) && !"1".equals(sex)){
+			bean.setError(-1);
+			bean.setMsg("sex必须为0女/1男："+sex);
+			bean.setSuccess(false);
+			return bean;
+		}
+		if(!"0".equals(calUnit) && !"1".equals(calUnit)){
+			bean.setError(-1);
+			bean.setMsg("calUnit必须为0轻币/1大卡："+calUnit);
+			bean.setSuccess(false);
+			return bean;
+		}
+		if(!StringUtil.isEmail(email)){
+			bean.setError(-1);
+			bean.setMsg("email格式必须合法："+email);
+			bean.setSuccess(false);
+			return bean;
+		}
+		
+		Res4AddUserVo vo = iUserService.addUser(mobile, mobile, userName, mobile.substring(mobile.length()-6,mobile.length()));
+		if("0".equals(vo.getFlag())){
+			bean.setError(-1);
+			bean.setMsg("添加用户失败（调用用户模块）");
+			bean.setSuccess(false);
+			return bean;
+		}
+		
+		String userId = vo.getUserId();
+		CompanyVo companyVo = iCourseService.selectCompanyBelongByCourseId(courseId);
+		String companyId = companyVo.getCompanyId();
+		String employeeId = "";
+		
+		try {
+			iStudentService.addEmployeeAndStudent(userId, companyId, employeeId, groupId);
+		} catch (ApplicationException e) {
+			log.info("本地员工表/学生表添加员工数据/学生数据失败，但是调用用户模块添加用户已经成功，请用户使用扫码方式进行添加员工，并让导师进行分组");
+			bean.setError(-1);
+			bean.setMsg("本地员工表/学生表添加员工数据/学生数据失败，但是调用用户模块添加用户已经成功，请用户使用扫码方式进行添加员工，并让导师进行分组:"+e.msg);
+			bean.setSuccess(false);
+			return bean;
+		}
+		
+		bean.setError(0);
+		bean.setMsg("SUCCESS");
+		bean.setSuccess(true);
+		return bean;
+	}
+
+}

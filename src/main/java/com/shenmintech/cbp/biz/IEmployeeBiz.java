@@ -1,0 +1,21 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.Req4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetUserNtesBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostEmployeeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostUEStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Reas4PostUEStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetUserNtesBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostEmployeeBean;
+
+public interface IEmployeeBiz {
+
+  public Res4GetEmployeeBean getByComIdAndCouIdPages(Req4GetEmployeeBean req4GetEmployeeBean);
+
+  public Res4PostEmployeeBean addEmployee(Req4PostEmployeeBean req4PostEmployeeBean);
+
+  public Reas4PostUEStudentBean addUserEmployeeStudent(Req4PostUEStudentBean req4PostUEStudentBean);
+
+  public Res4GetUserNtesBean getNtesDataByUserId(Req4GetUserNtesBean req4GetUserNtesBean);
+}

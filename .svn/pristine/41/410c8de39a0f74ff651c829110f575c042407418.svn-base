@@ -1,0 +1,15 @@
+package com.shenmintech.cbp.template;
+/*package com.shenmin.cbp.template;
+
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@FeignClient(
+		name = "XXX"
+		)
+@RequestMapping("/XX")
+public interface IdWorkerTemplate {
+	@RequestMapping(method = RequestMethod.GET, value = "/XX")
+    String get();
+}*/

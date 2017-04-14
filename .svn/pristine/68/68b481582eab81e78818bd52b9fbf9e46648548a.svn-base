@@ -1,0 +1,389 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.vo.res.HomeWorkTypesVo;
+import com.shenmintech.cbp.biz.vo.res.HomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.RelationVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetHomeworkTypeVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetHomeworkTypeVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetHomeworkVo;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkSignCardVoBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkWorkCardVoBean;
+import com.shenmintech.cbp.entity.PagingExample;
+import com.shenmintech.cbp.entity.TKcHomework;
+import com.shenmintech.cbp.entity.TKcHomeworkCardSelection;
+import com.shenmintech.cbp.entity.TKcHomeworkCardSelectionExample;
+import com.shenmintech.cbp.entity.TKcHomeworkExample;
+import com.shenmintech.cbp.entity.TKcHomeworkPicTxt;
+import com.shenmintech.cbp.entity.TKcHomeworkPicTxtExample;
+import com.shenmintech.cbp.entity.TKcHomeworkSignCard;
+import com.shenmintech.cbp.entity.TKcHomeworkSignCardExample;
+import com.shenmintech.cbp.entity.TKcHomeworkStudentRelation;
+import com.shenmintech.cbp.entity.TKcHomeworkStudentRelationExample;
+import com.shenmintech.cbp.entity.TKcHomeworkType;
+import com.shenmintech.cbp.entity.TKcHomeworkTypeExample;
+import com.shenmintech.cbp.entity.TKcHomeworkWorkCard;
+import com.shenmintech.cbp.entity.TKcHomeworkWorkCardExample;
+import com.shenmintech.cbp.entity.TKcTeacher;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcHomeworkCardSelectionMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkPicTxtMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkSignCardMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkStudentRelationMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkTypeMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkWorkCardMapper;
+import com.shenmintech.cbp.mapper.TKcTeacherMapper;
+import com.shenmintech.cbp.service.IHomeWorkService;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.DateUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+public class HomeWorkServiceImpl implements IHomeWorkService {
+
+  @Autowired
+  TKcHomeworkTypeMapper tKcHomeworkTypeMapper;
+
+  @Autowired
+  TKcTeacherMapper tKcTeacherMapper;
+
+  @Autowired
+  TKcHomeworkMapper tKcHomeworkMapper;
+
+  @Autowired
+  IdWorkerTemplate idWorkerTemplate;
+
+  @Autowired
+  TKcHomeworkStudentRelationMapper tKcHomeworkStudentRelationMapper;
+
+  @Autowired
+  TKcHomeworkPicTxtMapper tKcHomeworkPicTxtMapper;
+
+  @Autowired
+  TKcHomeworkWorkCardMapper tKcHomeworkWorkCardMapper;
+
+  @Autowired
+  TKcHomeworkSignCardMapper tKcHomeworkSignCardMapper;
+
+  @Autowired
+  TKcHomeworkCardSelectionMapper tKcHomeworkCardSelectionMapper;
+
+  @Override
+  public Res4GetHomeworkTypeVo selectHomeworkType() {
+    Res4GetHomeworkTypeVo res4GetHomeworkTypeVo = new Res4GetHomeworkTypeVo();
+    TKcHomeworkTypeExample example = new TKcHomeworkTypeExample();
+    example.or().andStatusNotEqualTo(-1);
+    List<TKcHomeworkType> homeworkTypes = tKcHomeworkTypeMapper.selectByExample(example);
+    Iterator<TKcHomeworkType> it = homeworkTypes.iterator();
+    List<Son4GetHomeworkTypeVo> homeworkTypeVos = new ArrayList<>();
+    while (it.hasNext()) {
+      TKcHomeworkType homeworkType = it.next();
+      String typeId = homeworkType.getId();
+      String typeName = homeworkType.getTypeName();
+      Son4GetHomeworkTypeVo son4GetHomeworkTypeVo =
+          Son4GetHomeworkTypeVo.builder().homeWorkTypeId(typeId).typeName(typeName).build();
+      homeworkTypeVos.add(son4GetHomeworkTypeVo);
+    }
+    res4GetHomeworkTypeVo.setHomeworkTypeVos(homeworkTypeVos);
+    return res4GetHomeworkTypeVo;
+  }
+
+  @Override
+  public void add(String teacherId, String workName, String typeId, String describe) {
+    TKcTeacher teacher = tKcTeacherMapper.selectByPrimaryKey(teacherId);
+    if (null == teacher) throw new ApplicationException(Constants.META_STATUS_CODE_D1,
+        "添加课程失败:t_kc_teacher中没有id为" + teacherId + "的记录", Constants.BLANKSTR);
+    TKcHomeworkType homeworkType = tKcHomeworkTypeMapper.selectByPrimaryKey(typeId);
+    if (null == homeworkType) throw new ApplicationException(Constants.META_STATUS_CODE_D1,
+        "添加课程失败:t_kc_homeworktype中没有id为" + typeId + "的记录", Constants.BLANKSTR);
+    TKcHomework homework = new TKcHomework();
+    String id = idWorkerTemplate.generateId();
+    homework.setId(id);
+    homework.setTeacherFid(teacherId);
+    homework.setWorkName(workName);
+    homework.setWorkTypeFid(typeId);
+    homework.setWorkDescribe(describe);
+    homework.setStatus(0);
+    try {
+      tKcHomeworkMapper.insertSelective(homework);
+    } catch (Exception e) {
+      log.error("context", e);
+      throw new ApplicationException(Constants.META_STATUS_CODE_D1, "添加任务失败", Constants.BLANKSTR);
+    }
+  }
+
+  @SuppressWarnings("static-access")
+  @Override
+  public Res4GetHomeworkVo selectByTeacherIdPages(String teacherId, int pageNo, int rowsPerPage) {
+    Res4GetHomeworkVo res4GetHomeworkVo = new Res4GetHomeworkVo();
+    TKcHomeworkExample homeworkExample = new TKcHomeworkExample();
+    homeworkExample.or().andStatusNotEqualTo(-1).andTeacherFidEqualTo(teacherId);
+    int recordCount = tKcHomeworkMapper.countByExample(homeworkExample);
+    PagingExample pagingExample = new PagingExample(pageNo, rowsPerPage);
+    homeworkExample.setPagingExample(pagingExample);
+    List<TKcHomework> homeworks = tKcHomeworkMapper.selectByExample(homeworkExample);
+    Iterator<TKcHomework> it = homeworks.iterator();
+    List<Son4GetHomeworkVo> homeworkTypeVos = new ArrayList<>();
+    while (it.hasNext()) {
+      TKcHomework homework = it.next();
+      String homeworkName = homework.getWorkName();
+      String homeworkTypeId = homework.getWorkTypeFid();
+      String describe = homework.getWorkDescribe();
+      Date createDate = homework.getCreateTime();
+      Son4GetHomeworkVo son4GetHomeworkVo = new Son4GetHomeworkVo().builder()
+          .homeworkId(homework.getId()).homeworkName(null == homeworkName ? "" : homeworkName)
+          .homeworkTypeId(null == homeworkTypeId ? "" : homeworkTypeId)
+          .describe(null == describe ? "" : describe).createTime(createDate).build();
+      homeworkTypeVos.add(son4GetHomeworkVo);
+    }
+    res4GetHomeworkVo.setHomeworkTypeVos(homeworkTypeVos);
+    res4GetHomeworkVo.setRecordCount(recordCount);
+    return res4GetHomeworkVo;
+  }
+
+  @Override
+  public void deleteById(String workId) {
+    TKcHomework homework = tKcHomeworkMapper.selectByPrimaryKey(workId);
+    if (null == homework) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"删除任务失败:t_kc_homework中没有id为" + workId + "的记录", Constants.BLANKSTR);
+    int status = homework.getStatus();
+    if (-1 == status) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"删除任务失败:t_kc_homework中没有id为" + workId + "的记录已经被删除，不可重复删除", Constants.BLANKSTR);
+    TKcHomeworkExample example = new TKcHomeworkExample();
+    example.or().andIdEqualTo(workId).andStatusEqualTo(0);
+    TKcHomework curHomework = new TKcHomework();
+    curHomework.setStatus(-1);
+    int i = tKcHomeworkMapper.updateByExampleSelective(curHomework, example);
+    if(i!=1) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"初始状态id为"+workId+"的课后作业数量不存在或者不唯一,删除失败", Constants.BLANKSTR);
+  }
+
+  @Override
+  public void updateById(String workId, String workName, String typeId, String describe) {
+    TKcHomework homework = tKcHomeworkMapper.selectByPrimaryKey(workId);
+    if (null == homework) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新任务失败:t_kc_homework中没有id为" + workId + "的记录", Constants.BLANKSTR);
+    TKcHomeworkType homeworkType = tKcHomeworkTypeMapper.selectByPrimaryKey(typeId);
+    if (null == homeworkType) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新课程失败:t_kc_homeworktype中没有id为" + typeId + "的记录", Constants.BLANKSTR);
+    TKcHomeworkExample example = new TKcHomeworkExample();
+    example.or().andIdEqualTo(workId).andStatusEqualTo(0);
+    TKcHomework curHomework = new TKcHomework();
+    curHomework.setWorkName(workName);
+    curHomework.setWorkTypeFid(typeId);
+    curHomework.setWorkDescribe(describe);
+    int i = tKcHomeworkMapper.updateByExampleSelective(curHomework, example);
+    if(i!=1) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"初始状态id为"+workId+"的课后作业数量不存在或者不唯一,修改失败", Constants.BLANKSTR);
+  }
+
+  @Override
+  public List<HomeWorkTypesVo> getHomeWorkTypesByIds(List<String> list) {
+    List<HomeWorkTypesVo> workTypesVos = new ArrayList<>();
+    TKcHomeworkTypeExample example = new TKcHomeworkTypeExample();
+    example.or().andStatusNotEqualTo(-1).andIdIn(list);
+    List<TKcHomeworkType> tKcHomeworkTypes = tKcHomeworkTypeMapper.selectByExample(example);
+    Iterator<TKcHomeworkType> it = tKcHomeworkTypes.iterator();
+    while (it.hasNext()) {
+      HomeWorkTypesVo homeWorkTypesVo = new HomeWorkTypesVo();
+      TKcHomeworkType homeworkType = it.next();
+      String id = homeworkType.getId();
+      String name = homeworkType.getTypeName();
+      homeWorkTypesVo.setId(id);
+      homeWorkTypesVo.setTypeName(null == name ? "" : name);
+      workTypesVos.add(homeWorkTypesVo);
+    }
+    return workTypesVos;
+  }
+
+  @Override
+  public List<RelationVo> selectHomeworksByStudentIds(String id) {
+    List<RelationVo> list = new ArrayList<>();
+    Date nowTime = new Date();
+    TKcHomeworkStudentRelationExample example = new TKcHomeworkStudentRelationExample();
+    example.or().andStatusNotEqualTo(-1).andStudentFidEqualTo(id);// 课后任务可以推送至公司，班级，小组任意一个层面，但是最终是根据小组来排查计算的,目前还是把所有的任务都查出来
+    example.setOrderByClause("create_time desc");
+    List<TKcHomeworkStudentRelation> relations = tKcHomeworkStudentRelationMapper.selectByExample(example);
+    Iterator<TKcHomeworkStudentRelation> it = relations.iterator();
+    while (it.hasNext()) {
+      RelationVo relationVo = new RelationVo();// 当前作业
+      TKcHomeworkStudentRelation relation = it.next();
+      String relaId = relation.getId();
+      relationVo.setRelationId(relaId);
+      String homeworkId = relation.getHomeworkFid();
+      TKcHomework homework = tKcHomeworkMapper.selectByPrimaryKey(homeworkId);
+      String workName = homework.getWorkName();
+      relationVo.setRelationName(workName);
+
+      String homeworkTypeId = homework.getWorkTypeFid();
+      relationVo.setHomeworkTypeId(homeworkTypeId);
+      TKcHomeworkType homeworkType = tKcHomeworkTypeMapper.selectByPrimaryKey(homeworkTypeId);
+      relationVo.setHomeworkTypeName(homeworkType.getTypeName());
+
+      Integer status = homework.getStatus();
+      relationVo.setStatusFlag(status.toString());
+      StringBuffer describe = new StringBuffer("");// 作业状态
+      if (0 == status) {
+        Date createDate = homework.getCreateTime();// 创建时间
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(createDate);
+        cal.add(Calendar.DATE, 7);//默认7天完成作业
+        Date endTime = cal.getTime();
+        long[] deltaTimes = DateUtil.getDistanceTimes(nowTime, endTime);
+        describe.append("还剩  ");
+        if (0l != deltaTimes[0]) {
+          describe.append(deltaTimes[0]).append("天");
+        }
+        if (0l != deltaTimes[1]) {
+          describe.append(deltaTimes[1]).append("小时");
+        }
+        if (0l != deltaTimes[2]) {
+          describe.append(deltaTimes[2]).append("分");
+        }
+        if (0l != deltaTimes[3]) {
+          describe.append(deltaTimes[3]).append("秒");
+        }
+      } else if (1 == status) {
+        describe.append("已完成");
+      }
+      relationVo.setRemainDescribe(describe.toString());
+      list.add(relationVo);
+    }
+    return list;
+  }
+
+  @Override
+  public List<TKcHomeworkPicTxt> selectHomeworkPicTxtByRaleationId(String id) {
+    TKcHomeworkPicTxtExample example = new TKcHomeworkPicTxtExample();
+    example.or().andStatusNotEqualTo(-1).andHomeworkStudentRelationFidEqualTo(id);
+    example.setOrderByClause("create_time desc");
+    List<TKcHomeworkPicTxt> results = tKcHomeworkPicTxtMapper.selectByExample(example);
+    return results;
+  }
+
+  @Override
+  public List<TKcHomeworkWorkCard> selecHomeworkWorkCardByRaleationId(String id) {
+    TKcHomeworkWorkCardExample example = new TKcHomeworkWorkCardExample();
+    example.or().andStatusNotEqualTo(-1).andHomeworkStudentRelationFidEqualTo(id);
+    example.setOrderByClause("remark1");
+    List<TKcHomeworkWorkCard> results = tKcHomeworkWorkCardMapper.selectByExample(example);
+    return results;
+  }
+
+  @Override
+  public List<TKcHomeworkSignCard> selecHomeworkSignCardByRaleationId(String id) {
+    TKcHomeworkSignCardExample example = new TKcHomeworkSignCardExample();
+    example.or().andStatusNotEqualTo(-1).andHomeworkStudentRelationFidEqualTo(id);
+    example.setOrderByClause("create_time desc");
+    List<TKcHomeworkSignCard> results = tKcHomeworkSignCardMapper.selectByExample(example);
+    return results;
+  }
+
+  @Override
+  public void updateTKcHomeworkPicTxt(TKcHomeworkPicTxt bean) {
+    TKcHomeworkPicTxtExample example = new TKcHomeworkPicTxtExample();
+    example.or().andStatusNotEqualTo(-1).andIdEqualTo(bean.getId());
+    List<TKcHomeworkPicTxt> results = tKcHomeworkPicTxtMapper.selectByExample(example);
+    if (results.size() < 0) {
+      throw new ApplicationException("-1", "primary id is error", Constants.BLANKSTR);
+    }
+    TKcHomeworkPicTxt entity = results.get(0);
+    entity.setContent(bean.getContent());
+    entity.setPicId(bean.getPicId());
+    try {
+      tKcHomeworkPicTxtMapper.updateByPrimaryKey(entity);
+    } catch (Exception e) {
+      log.error("context", e);
+      throw new ApplicationException(Constants.META_STATUS_CODE_D1, "更新任务失败", Constants.BLANKSTR);
+    }
+  }
+
+  @Override
+  public void updateTKcHomeworkWorkCard(
+      Req4AppPostHomeworkWorkCardBean req4AppPostHomeworkWorkCardBean) {
+    try {
+      Iterator<Req4AppPostHomeworkWorkCardVoBean> it = req4AppPostHomeworkWorkCardBean.getList().iterator();
+      Date now = new Date();
+      while (it.hasNext()) {
+        Req4AppPostHomeworkWorkCardVoBean req = it.next();
+        TKcHomeworkWorkCard workCard = tKcHomeworkWorkCardMapper.selectByPrimaryKey(req.getId());
+        workCard.setSelections(req.getSelections());
+        workCard.setUpdateTime(now);
+        workCard.setCurrentWeekTarget(req.getCurrentWeekTarget());
+        workCard.setCurrentWeekResult(req.getCurrentWeekResult());
+        tKcHomeworkWorkCardMapper.updateByPrimaryKey(workCard);
+      }
+    } catch (Exception e) {
+      log.error("context", e);
+      throw new ApplicationException(Constants.META_STATUS_CODE_D1, "更新任务失败", Constants.BLANKSTR);
+    }
+  }
+
+  @Override
+  public void updateTKcHomeworkSignCard(Req4AppPostHomeworkSignCardBean req4AppPostHomeworkSignCardBean) {
+    try {
+      Iterator<Req4AppPostHomeworkSignCardVoBean> it = req4AppPostHomeworkSignCardBean.getList().iterator();
+      Date now = new Date();
+      while (it.hasNext()) {
+        Req4AppPostHomeworkSignCardVoBean req = it.next();
+        TKcHomeworkSignCard signCard = new TKcHomeworkSignCard();
+        signCard.setId(req.getId());
+        signCard.setBreakfastFlag(req.getBreakfastFlag());
+        signCard.setLunchFlag(req.getLunchFlag());
+        signCard.setSupperFlag(req.getSupperFlag());
+        signCard.setDrinkWater(req.getDrinkWater());
+        signCard.setUpdateTime(now);
+        tKcHomeworkSignCardMapper.updateByPrimaryKeySelective(signCard);
+      }
+    } catch (Exception e) {
+      log.error("context", e);
+      throw new ApplicationException(Constants.META_STATUS_CODE_D1, "更新任务失败", Constants.BLANKSTR);
+    }
+  }
+
+  @Override
+  public String selectNameById(String id) {
+    TKcHomework homework = tKcHomeworkMapper.selectByPrimaryKey(id);
+    if (null == homework) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"未找到id=" + id + "的课后任务", Constants.BLANKSTR);
+    return homework.getWorkName();
+  }
+
+  @Override
+  public HomeworkVo selectById(String id) {
+    TKcHomework homework = tKcHomeworkMapper.selectByPrimaryKey(id);
+    if (null == homework) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"未找到id=" + id + "的课后任务", Constants.BLANKSTR);
+    HomeworkVo vo = new HomeworkVo();
+    BeanUtils.copyProperties(homework, vo);
+    return vo;
+  }
+
+  @Override
+  public TKcHomework selectHomeWorkByRelationId(String relationId) {
+    TKcHomeworkStudentRelation tRelation = tKcHomeworkStudentRelationMapper.selectByPrimaryKey(relationId);
+    if (null == tRelation) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"未找到id=" + relationId + "的课后任务", Constants.BLANKSTR);
+    TKcHomework homework = tKcHomeworkMapper.selectByPrimaryKey(tRelation.getHomeworkFid());
+    if (null == homework) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"未找到id=" + tRelation.getId() + "的课后任务", Constants.BLANKSTR);
+    return homework;
+  }
+
+  @Override
+  public List<TKcHomeworkCardSelection> selectSelection() {
+    TKcHomeworkCardSelectionExample example = new TKcHomeworkCardSelectionExample();
+    example.or().andStatusNotEqualTo(-1);
+    List<TKcHomeworkCardSelection> list = tKcHomeworkCardSelectionMapper.selectByExample(example);
+    return list;
+  }
+
+}

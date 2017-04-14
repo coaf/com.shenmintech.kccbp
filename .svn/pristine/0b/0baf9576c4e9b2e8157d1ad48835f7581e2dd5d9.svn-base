@@ -1,0 +1,346 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.vo.res.HSRelationVo;
+import com.shenmintech.cbp.biz.vo.res.HomeworkStudentRelationVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetUserRelationsVo;
+import com.shenmintech.cbp.biz.vo.res.StudentVo;
+import com.shenmintech.cbp.biz.vo.res.UserRelationVo;
+import com.shenmintech.cbp.entity.PagingExample;
+import com.shenmintech.cbp.entity.TKcEmployee;
+import com.shenmintech.cbp.entity.TKcEmployeeExample;
+import com.shenmintech.cbp.entity.TKcGroup;
+import com.shenmintech.cbp.entity.TKcGroupExample;
+import com.shenmintech.cbp.entity.TKcHomeworkStudentRelation;
+import com.shenmintech.cbp.entity.TKcHomeworkStudentRelationExample;
+import com.shenmintech.cbp.entity.TKcStudent;
+import com.shenmintech.cbp.entity.TKcStudentExample;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcEmployeeMapper;
+import com.shenmintech.cbp.mapper.TKcGroupMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkStudentRelationMapper;
+import com.shenmintech.cbp.mapper.TKcStudentMapper;
+import com.shenmintech.cbp.service.IEmpolyeeService;
+import com.shenmintech.cbp.service.IHomeworkPushService;
+import com.shenmintech.cbp.service.IStudentService;
+import com.shenmintech.cbp.service.model.EmpAndNtesModel;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+public class StudentServiceImpl implements IStudentService {
+	
+	@Autowired
+	TKcGroupMapper tKcGroupMapper;
+	
+	@Autowired
+	TKcStudentMapper tKcStudentMapper;
+	
+	@Autowired
+	TKcEmployeeMapper tKcEmployeeMapper;
+	
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Autowired
+	TKcHomeworkStudentRelationMapper tKcHomeworkStudentRelationMapper;
+	
+	@Autowired
+	IEmpolyeeService iEmpolyeeService;
+	
+	@Autowired
+	IStudentService iStudentService;
+	
+	@Autowired
+	IHomeworkPushService iHomeworkPushService;
+	
+	@Override
+	public String add(String employeeId, String groupId) {
+		String studentId = "";
+		
+		TKcEmployee employee = tKcEmployeeMapper.selectByPrimaryKey(employeeId);
+		if(null == employee || -1 == employee.getStatus()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加学生失败:t_kc_employee中不存在id为"+employeeId+"的记录",Constants.BLANKSTR);
+		if(StringUtil.isBlank(employee.getUserId()) || StringUtil.isBlank(employee.getCompanyFid())) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_employee中id为"+employeeId+"的记录存在数据缺失，请联系技术排查",Constants.BLANKSTR);
+		
+		TKcGroup group = tKcGroupMapper.selectByPrimaryKey(groupId);
+		if(null == group || -1 == group.getStatus()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加学生失败:t_kc_group中不存在id为"+groupId+"的记录",Constants.BLANKSTR);
+		String courseId = group.getCourseFid();
+		if(StringUtil.isBlank(courseId)) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_group中id为"+groupId+"的记录存在数据缺失，请联系技术排查",Constants.BLANKSTR);
+		
+		TKcGroupExample groupExample = new TKcGroupExample();
+		groupExample.or().andStatusNotEqualTo(-1).andCourseFidEqualTo(courseId);
+		List<TKcGroup> groups = tKcGroupMapper.selectByExample(groupExample);
+		List<String> groupIdList = groups.stream().map(n->n.getId()).collect(Collectors.toList());
+		
+		TKcStudentExample studentExample = new TKcStudentExample();
+		studentExample.or().andEmployeeFidEqualTo(employeeId).andGroupFidIn(groupIdList);//查看当前这个员工在这个课程的所有小组里面有没有添加过
+		List<TKcStudent> students = tKcStudentMapper.selectByExample(studentExample);
+		if(0==students.size()){//新添加
+			TKcStudent student = new TKcStudent();
+			studentId = idWorkerTemplate.generateId();
+			student.setId(studentId);
+			student.setEmployeeFid(employeeId);
+			student.setGroupFid(groupId);
+			student.setStatus(0);
+			tKcStudentMapper.insertSelective(student);
+			
+		}else if(1==students.size()){
+			TKcStudent student = students.get(0);
+			Integer status = student.getStatus();
+			if(-1 == status){
+				TKcStudent curStudent = new TKcStudent();
+				curStudent.setId(student.getId());
+				curStudent.setGroupFid(groupId);
+				curStudent.setStatus(0);
+				tKcStudentMapper.updateByPrimaryKeySelective(curStudent);
+				studentId = student.getId();
+			}else throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加学生失败:脏数据！t_kc_student中employeeId为"+employeeId+",courseId为"+courseId+"的记录找到1条，其状态status不为-1，status："+status+"，请求助技术部排查垃圾数据",Constants.BLANKSTR);
+		}else throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加学生失败:脏数据！t_kc_student中employeeId为"+employeeId+",courseId为"+courseId+"的记录找到多条，请联系技术部排查垃圾数据",Constants.BLANKSTR);
+		
+		try {//初始化任务
+			iHomeworkPushService.initHomework(studentId, groupId);
+		} catch (ApplicationException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		}
+		
+		return studentId;
+	}
+
+	@Override
+	public void deleteById(String id) {
+		TKcStudent student = new TKcStudent();
+		student.setId(id);
+		student.setStatus(-1);
+		int delCount = tKcStudentMapper.updateByPrimaryKeySelective(student);
+		if(1!=delCount) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"移除学生失败:脏数据！t_kc_student中Id为"+id+"的学生记录不唯一或不存在，请联系技术部排查垃圾数据",Constants.BLANKSTR);
+		
+		try {//清空任务
+			iHomeworkPushService.cleanHomework(id);
+		} catch (ApplicationException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		}
+		
+	}
+
+	@Override
+	public void updateById(String groupId, String studentId) {
+		TKcGroup group = tKcGroupMapper.selectByPrimaryKey(groupId);
+		if(null == group || -1 == group.getStatus()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"转移学生失败:t_kc_group中不存在id为"+groupId+"的记录",Constants.BLANKSTR);
+		String toGroupBelong = group.getCourseFid();//要转移到小组的课程归属
+		
+		TKcStudent toStudent = tKcStudentMapper.selectByPrimaryKey(studentId);
+		if(null == toStudent) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_student脏数据，学员"+studentId+" 未查到，不能转移小组！",Constants.BLANKSTR);
+		String BeforeGroupId = toStudent.getGroupFid();
+		TKcGroup beforeGroup = tKcGroupMapper.selectByPrimaryKey(BeforeGroupId);
+		String beforeGroupBelong = beforeGroup.getCourseFid();
+		if(!toGroupBelong.equals(beforeGroupBelong)) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"学员只能在同一课程内的小组之间进行转移",Constants.BLANKSTR);
+		
+		TKcStudent student = new TKcStudent();
+		student.setId(studentId);
+		student.setGroupFid(groupId);
+		int updateCount = tKcStudentMapper.updateByPrimaryKeySelective(student);
+		if(1!=updateCount) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"转移学生失败:脏数据！t_kc_student中Id为"+studentId+"的学生记录不唯一或不存在，请联系技术部排查垃圾数据",Constants.BLANKSTR);
+		
+		try {//清空原先小组任务，并且添加当前小组的任务
+			iHomeworkPushService.cleanAndInit(studentId, groupId);
+		} catch (ApplicationException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		}
+		
+	}
+
+	@Override
+	public int countByGroupIds(List<String> groupIds) {
+		int i = 0;
+		if(groupIds.size()>0){
+			TKcStudentExample example = new TKcStudentExample();
+			example.or().andStatusNotEqualTo(-1).andGroupFidIn(groupIds);
+			i = tKcStudentMapper.countByExample(example);
+		}
+		return i;
+	}
+
+	@SuppressWarnings("static-access")
+	@Override
+	public StudentVo searchByEmployeeIdAndGroupIds(String employeeId, List<String> groupIds) {
+		StudentVo studentVo = new StudentVo().builder()
+				.studentId("")
+				.groupId("")
+				.build();
+		TKcStudentExample kcStudentExample = new TKcStudentExample();
+		kcStudentExample.or().andStatusNotEqualTo(-1).andEmployeeFidEqualTo(employeeId).andGroupFidIn(groupIds);
+		List<TKcStudent> students = tKcStudentMapper.selectByExample(kcStudentExample);
+		if(0==students.size()){
+		}else if(1==students.size()){
+			TKcStudent student = students.get(0);
+			String groupId = student.getGroupFid();
+			String studentId = student.getId();
+			studentVo.setGroupId(groupId);
+			studentVo.setStudentId(studentId);
+		}else{
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,"数据有误:学生在同一个课程的两个小组内，请联系技术部相关人员修正脏数据",Constants.BLANKSTR);
+		}
+		return studentVo;
+	}
+
+	@Override
+	public List<String> selectByEmployeeId(String employeeId) {
+		TKcStudentExample example = new TKcStudentExample();
+		example.or().andStatusNotEqualTo(-1).andEmployeeFidEqualTo(employeeId);
+		List<TKcStudent> tKcStudents = tKcStudentMapper.selectByExample(example);
+		if(0==tKcStudents.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"表t_kc_student中未找到employeeId="+employeeId+"的学生",Constants.BLANKSTR);
+		return tKcStudents.stream().map(n->n.getId()).collect(Collectors.toList());
+	}
+
+	@Override
+	public HomeworkStudentRelationVo selectHomeworkStudentTrlationByTaskId(String taskId, int pageNo, int rowsPerPage) {
+		HomeworkStudentRelationVo vo = new HomeworkStudentRelationVo();
+		TKcHomeworkStudentRelationExample example = new TKcHomeworkStudentRelationExample();
+		example.or().andStatusNotEqualTo(-1).andTaskFidEqualTo(taskId);
+		int recordCount = tKcHomeworkStudentRelationMapper.countByExample(example);//总数
+		PagingExample pagingExample = new PagingExample(pageNo, rowsPerPage);
+		example.setPagingExample(pagingExample);
+		List<TKcHomeworkStudentRelation> relations = tKcHomeworkStudentRelationMapper.selectByExample(example);
+		Iterator<TKcHomeworkStudentRelation> it = relations.iterator();
+		List<HSRelationVo> voList = new ArrayList<>();
+		while (it.hasNext()) {
+			HSRelationVo hsRelationVo = new HSRelationVo();
+			TKcHomeworkStudentRelation relation = it.next();
+			String id = relation.getId();
+			hsRelationVo.setRelationId(id);
+			String studentId = relation.getStudentFid();
+			hsRelationVo.setStudentId(studentId);
+			String remark1 = relation.getRemark1();
+			hsRelationVo.setRemark1(remark1);
+			voList.add(hsRelationVo);
+		}
+		vo.setList(voList);
+		vo.setRecordCount(recordCount);
+		return vo;
+	}
+
+	@Override
+	public void addEmployeeAndStudent(String userId, String companyId, String groupId,String userName,String employeeNo) {
+		EmpAndNtesModel model = new EmpAndNtesModel();
+		try {//加员工
+			log.info("===========开始添加员工");
+			model = iEmpolyeeService.addEmpolyee(userId, companyId,userName,employeeNo);
+			log.info("===========添加员工结束");
+		} catch (ApplicationException e) {
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,e.msg,Constants.BLANKSTR);
+		} catch (Exception e) {
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,e.getMessage(),Constants.BLANKSTR);
+		}
+		
+		try {//加学生(包含初始化任务)
+			log.info("===========开始添加学员");
+			iStudentService.add(model.getEmployeeId(), groupId);
+			log.info("===========添加员工结束");
+		} catch (ApplicationException e) {
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,e.msg,Constants.BLANKSTR);
+		} catch (Exception e) {
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,e.getMessage(),Constants.BLANKSTR);
+		}
+		
+	}
+
+	@SuppressWarnings("static-access")
+	@Override
+	public Res4GetUserRelationsVo selectRelationsByUserId(String userId) {
+		Res4GetUserRelationsVo vo = new Res4GetUserRelationsVo();
+		List<UserRelationVo> vos = new ArrayList<>();
+		
+		/**搜索相关同事的用户id**/
+		TKcEmployeeExample example = new TKcEmployeeExample();
+		example.or().andStatusNotEqualTo(-1).andUserIdEqualTo(userId);
+		List<TKcEmployee> employeee = tKcEmployeeMapper.selectByExample(example);
+		if(null==employeee||0==employeee.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"用户："+userId+"未扫码加入任何公司",Constants.BLANKSTR);
+		if(1<employeee.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"用户："+userId+"加入了多家公司，存在脏数据，请联系db进行排查",Constants.BLANKSTR);
+		String companyId = employeee.get(0).getCompanyFid();
+		
+		TKcEmployeeExample example3 = new TKcEmployeeExample();
+		example3.or().andStatusNotEqualTo(-1).andCompanyFidEqualTo(companyId);
+		List<TKcEmployee> empls = tKcEmployeeMapper.selectByExample(example3);
+		if(null==empls||0==empls.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"用户："+userId+"所在公司没有其他员工加入",Constants.BLANKSTR);
+		List<String> employeeUIds = empls.stream().map(TKcEmployee::getUserId).collect(Collectors.toList());
+		
+		UserRelationVo vo3 = new UserRelationVo().builder()
+				.relationCode(3)
+				.relationName("同事")
+				.relationIds(employeeUIds)
+				.build();
+		
+		/**搜索同小组同学的用户id（包括自己）**/
+		String employeeId = employeee.get(0).getId();
+		TKcStudentExample example2 = new TKcStudentExample();
+		example2.or().andStatusNotEqualTo(-1).andEmployeeFidEqualTo(employeeId);
+		List<TKcStudent> students = tKcStudentMapper.selectByExample(example2);//当前这个雇员加入了n个小组，产生了n个学生对象
+		if(null==students||0==students.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"用户："+userId+"未入组任何课程",Constants.BLANKSTR);
+		List<String> groupIds = students.stream().map(TKcStudent::getGroupFid).distinct().collect(Collectors.toList());//当前员工加入了这些小组
+		List<String> matesUIds = this.selectByGroupIds(groupIds);
+		
+		UserRelationVo vo1 = new UserRelationVo().builder()
+				.relationCode(1)
+				.relationName("同组")
+				.relationIds(matesUIds)
+				.build();
+		
+		/**搜索自己所在课程下的所有学生的用户id**/
+		TKcGroupExample example6 = new TKcGroupExample();
+		example6.or().andStatusNotEqualTo(-1).andIdIn(groupIds);
+		List<TKcGroup> groups = tKcGroupMapper.selectByExample(example6);
+		List<String> courseIds = groups.stream().map(TKcGroup::getCourseFid).distinct().collect(Collectors.toList());
+		
+		TKcGroupExample example7 = new TKcGroupExample();
+		example7.or().andStatusNotEqualTo(-1).andCourseFidIn(courseIds);
+		List<TKcGroup> tkcGroups = tKcGroupMapper.selectByExample(example7);
+		List<String> tkcGroupIds = tkcGroups.stream().map(TKcGroup::getId).collect(Collectors.toList());//当前员工加入了这些小组
+		List<String> courseUIds = this.selectByGroupIds(tkcGroupIds);
+		
+		UserRelationVo vo2 = new UserRelationVo().builder()
+				.relationCode(2)
+				.relationName("同课程")
+				.relationIds(courseUIds)
+				.build();
+		
+		vos.add(vo3);
+		vos.add(vo1);
+		vos.add(vo2);
+		vo.setVo(vos);
+		return vo;
+	}
+	
+	public List<String> selectByGroupIds(List<String> groupIds){//传入groupIds,传出在这些小组下的所有用户ID
+		TKcStudentExample example4 = new TKcStudentExample();
+		example4.or().andStatusNotEqualTo(-1).andGroupFidIn(groupIds);
+		List<TKcStudent> groupStudents = tKcStudentMapper.selectByExample(example4);
+		List<String> employeeeIds = groupStudents.stream().map(TKcStudent::getEmployeeFid).collect(Collectors.toList());
+		TKcEmployeeExample example5 = new TKcEmployeeExample();
+		example5.or().andStatusNotEqualTo(-1).andIdIn(employeeeIds);
+		List<TKcEmployee> empList = tKcEmployeeMapper.selectByExample(example5);
+		List<String> cStudentUIds = empList.stream().map(TKcEmployee::getUserId).collect(Collectors.toList());
+		return cStudentUIds;
+	}
+	
+	
+
+}

@@ -1,0 +1,26 @@
+package com.shenmintech.crm;
+
+import java.text.ParseException;
+
+import org.joda.time.DateTime;
+import org.junit.Test;
+
+/*@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SandwichApplication.class,initializers = ConfigFileApplicationContextInitializer.class )
+@WebAppConfiguration*/
+public class QuickSort {
+	@Test
+	public void test() throws ParseException  {
+		
+		DateTime date = new DateTime();
+		
+		String weekOfDay1 = date.minusWeeks(1).dayOfWeek().withMinimumValue().toString("yyyy-MM-dd");//上周第一天
+		String weekOfDay7 = date.minusWeeks(3).dayOfWeek().withMaximumValue().toString("yyyy-MM-dd");//上周最后一天
+		System.out.println(weekOfDay1+"|"+weekOfDay7);
+		
+		
+		
+		
+	}
+
+}

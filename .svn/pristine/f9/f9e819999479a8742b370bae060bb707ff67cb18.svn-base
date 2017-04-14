@@ -1,0 +1,34 @@
+package com.shenmintech.cbp.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+
+/**
+ * 接口访问错误信息加载类
+ * 
+ * @author pengzhiheng
+ *
+ */
+@Data
+@Component
+@ConfigurationProperties(locations = "classpath:error-msg.yml", prefix = "httpErrorMsg")
+public class HttpErrorMsg {
+
+	private AddCompany addCompany;
+
+	/**
+	 * 公司创建异常
+	 * @author max
+	 */
+	@Data
+	public static class AddCompany {
+		private Integer codeFail; // 业务异常
+		private String msgFail;// 业务异常信息
+	}
+	
+	
+
+}

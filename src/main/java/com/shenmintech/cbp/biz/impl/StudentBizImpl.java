@@ -1,0 +1,408 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.base.template.HttpRestTemplate;
+import com.shenmintech.cbp.biz.IStudentBiz;
+import com.shenmintech.cbp.biz.vo.RelationFlag;
+import com.shenmintech.cbp.biz.vo.res.HSRelationVo;
+import com.shenmintech.cbp.biz.vo.res.HomeworkStudentRelationVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetUserRelationsVo;
+import com.shenmintech.cbp.biz.vo.res.UserRelationVo;
+import com.shenmintech.cbp.config.HttpErrorMsg;
+import com.shenmintech.cbp.controller.bean.req.Req4DelStudentBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetUserInfoBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetUserRelationIds;
+import com.shenmintech.cbp.controller.bean.req.Req4PostStudentBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutStudentBean;
+import com.shenmintech.cbp.controller.bean.res.BasicInfo;
+import com.shenmintech.cbp.controller.bean.res.CalAndDistributeSuggest;
+import com.shenmintech.cbp.controller.bean.res.HisClassMates;
+import com.shenmintech.cbp.controller.bean.res.HisCoWorker;
+import com.shenmintech.cbp.controller.bean.res.HisCourseMates;
+import com.shenmintech.cbp.controller.bean.res.PushedHomework;
+import com.shenmintech.cbp.controller.bean.res.Res4DelStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetUserInfoBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetUserRelationIds;
+import com.shenmintech.cbp.controller.bean.res.Res4PostStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutStudentBean;
+import com.shenmintech.cbp.controller.bean.res.WeightBMI;
+import com.shenmintech.cbp.entity.TKcEmployee;
+import com.shenmintech.cbp.entity.TKcStudent;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcEmployeeMapper;
+import com.shenmintech.cbp.mapper.TKcStudentMapper;
+import com.shenmintech.cbp.service.IStudentService;
+import com.shenmintech.cbp.service.model.DailyDietBudgetModel;
+import com.shenmintech.cbp.service.model.PangUserDetail;
+import com.shenmintech.cbp.service.model.QueryUserDetailForPangRespBean;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.GsonUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@RefreshScope
+@SuppressWarnings("static-access")
+public class StudentBizImpl implements IStudentBiz {
+
+  @Autowired
+  IStudentService iStudentService;
+
+  @Autowired
+  TKcStudentMapper tKcStudentMapper;
+
+  @Autowired
+  TKcEmployeeMapper tKcEmployeeMapper;
+
+  @Autowired
+  HttpRestTemplate httpRestTemplate;
+
+  @Autowired
+  HttpErrorMsg httpErrorMsg;
+
+  // 调用动态模块查询用户身体，饮食等指标
+  @Value("${shenmin-dynamic.dynamic.queryDailyDietBudget}")
+  private String queryDailyDietBudgetURL;
+
+  // 查询吃不胖用户详细信息
+  @Value("${shenmin-authority.account.queryUserDetailForPang}")
+  private String queryUserDetailForPangURL;
+
+  @Override
+  public Res4PostStudentBean addStudent(Req4PostStudentBean req4PostStudentBean) {
+    Res4PostStudentBean resBean = new Res4PostStudentBean();
+    String employeeId = req4PostStudentBean.getEmployeeId();
+    String groupId = req4PostStudentBean.getGroupId();
+    if (StringUtil.checkBlank(employeeId, groupId)) {
+      log.error("employeeId,groupId不能为空");
+      resBean.setError(httpErrorMsg.getPostTKcStudent().variMiss.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getPostTKcStudent().variMiss.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    String studentId = Constants.BLANKSTR;
+    try {
+      studentId = iStudentService.add(employeeId, groupId);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      resBean.setError(httpErrorMsg.getPostTKcStudent().sysInnerExc.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getPostTKcStudent().sysInnerExc.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    resBean.setStudentId(studentId);
+    resBean.setError(0);
+    resBean.setMsg(Constants.SUCCESS);
+    resBean.setSuccess(true);
+    return resBean;
+  }
+
+  @Override
+  public Res4DelStudentBean deleteById(Req4DelStudentBean req4DelStudentBean) {
+    Res4DelStudentBean resBean = new Res4DelStudentBean();
+    String studentId = req4DelStudentBean.getStudentId();
+    if (StringUtil.isBlank(studentId)) {
+      log.error("studentId不能为空");
+      resBean.setError(httpErrorMsg.getDeleteTKcStudent().variMiss.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getDeleteTKcStudent().variMiss.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    try {
+      iStudentService.deleteById(studentId);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      resBean.setError(httpErrorMsg.getDeleteTKcStudent().sysInnerExc.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getDeleteTKcStudent().sysInnerExc.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    resBean.setError(0);
+    resBean.setMsg(Constants.SUCCESS);
+    resBean.setSuccess(true);
+    return resBean;
+  }
+
+  @Override
+  public Res4PutStudentBean updateById(Req4PutStudentBean req4PutStudentBean) {
+    Res4PutStudentBean resBean = new Res4PutStudentBean();
+
+    String groupId = req4PutStudentBean.getGroupId();
+    String studentId = req4PutStudentBean.getStudentId();
+    if (StringUtil.checkBlank(groupId, studentId)) {
+      log.error("groupId,studentId不能为空");
+      resBean.setError(httpErrorMsg.getPutTKcStudent().variMiss.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getPutTKcStudent().variMiss.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    try {
+      iStudentService.updateById(groupId, studentId);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      resBean.setError(httpErrorMsg.getPutTKcStudent().sysInnerExc.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getPutTKcStudent().sysInnerExc.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    resBean.setError(0);
+    resBean.setMsg(Constants.SUCCESS);
+    resBean.setSuccess(true);
+    return resBean;
+  }
+
+  @Override
+  public Res4GetHomeworkStudentRelationBean selectByTaskId(
+      Req4GetHomeworkStudentRelationBean req4GetHomeworkStudentRelationBean) {
+    Res4GetHomeworkStudentRelationBean resBean = new Res4GetHomeworkStudentRelationBean();
+
+    String taskId = req4GetHomeworkStudentRelationBean.getTaskId();
+    if (StringUtil.checkBlank(taskId)) {
+      log.error("taskId不能为空");
+      resBean.setError(httpErrorMsg.getGetTKcHSRelation().variMiss.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getGetTKcHSRelation().variMiss.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    int pageNo = -1 == req4GetHomeworkStudentRelationBean.getPageNo()
+        ? 1
+        : req4GetHomeworkStudentRelationBean.getPageNo();
+    int rowsPerPage = -1 == req4GetHomeworkStudentRelationBean.getPageNo()
+        ? 99999
+        : req4GetHomeworkStudentRelationBean.getRowsPerPage();
+
+    HomeworkStudentRelationVo resVo =
+        iStudentService.selectHomeworkStudentTrlationByTaskId(taskId, pageNo, rowsPerPage);
+    List<HSRelationVo> relationVos = resVo.getList();
+    Iterator<HSRelationVo> it = relationVos.iterator();
+    List<PushedHomework> list = new ArrayList<>();
+    while (it.hasNext()) {
+      HSRelationVo hsRelationVo = it.next();
+      String relationId = hsRelationVo.getRelationId();
+      String studentId = hsRelationVo.getStudentId();
+      TKcStudent student = tKcStudentMapper.selectByPrimaryKey(studentId);
+      if (null == student) {
+        log.error("t_kc_student中不存在id为" + studentId + "的学生");
+        resBean.setError(httpErrorMsg.getGetTKcHSRelation().sysInnerExc.getCodeFail());
+        resBean.setMsg(httpErrorMsg.getGetTKcHSRelation().sysInnerExc.getMsgFail());
+        resBean.setSuccess(false);
+        return resBean;
+      }
+      String empId = student.getEmployeeFid();
+      if (StringUtil.isBlank(empId)) {
+        log.error("t_kc_student中id为" + studentId + "的学生的员工号为空");
+        resBean.setError(httpErrorMsg.getGetTKcHSRelation().sysInnerExc.getCodeFail());
+        resBean.setMsg(httpErrorMsg.getGetTKcHSRelation().sysInnerExc.getMsgFail());
+        resBean.setSuccess(false);
+        return resBean;
+      }
+      TKcEmployee emp = tKcEmployeeMapper.selectByPrimaryKey(empId);
+      if (null == emp) {
+        log.error("t_kc_employee中不存在id为" + empId + "的雇员");
+        resBean.setError(httpErrorMsg.getGetTKcHSRelation().sysInnerExc.getCodeFail());
+        resBean.setMsg(httpErrorMsg.getGetTKcHSRelation().sysInnerExc.getMsgFail());
+        resBean.setSuccess(false);
+        return resBean;
+      }
+      String remark1 = hsRelationVo.getRemark1();
+      PushedHomework pushedHomework =
+          new PushedHomework().builder().relationId(relationId).studentName(emp.getRealName())
+              .finishedTime(StringUtil.isBlank(remark1) ? Constants.BLANKSTR : remark1).build();
+      list.add(pushedHomework);
+    }
+    int recordCount = resVo.getRecordCount();
+    resBean.setError(0);
+    resBean.setMsg(Constants.SUCCESS);
+    resBean.setSuccess(true);
+    resBean.setPageNo(pageNo);
+    resBean.setRecordCount(recordCount);
+    resBean.setPageSumCount((recordCount + rowsPerPage - 1) / rowsPerPage);
+    resBean.setList(list);
+    return resBean;
+  }
+
+  @Override
+  public Res4GetUserRelationIds selectRelationsByUserId(
+      Req4GetUserRelationIds req4GetUserRelationIds) {
+    Res4GetUserRelationIds resBean = new Res4GetUserRelationIds();
+    String userId = req4GetUserRelationIds.getUserId();
+    if (StringUtil.checkBlank(userId)) {
+      log.error("userId不能为空");
+      resBean.setError(httpErrorMsg.getGetTUserRelation().variMiss.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getGetTUserRelation().variMiss.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+
+    Res4GetUserRelationsVo resVo = new Res4GetUserRelationsVo();
+    try {
+      resVo = iStudentService.selectRelationsByUserId(userId);
+    } catch (ApplicationException e) {
+      log.error(e.msg);
+      resBean.setError(httpErrorMsg.getGetTUserRelation().sysInnerExc.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getGetTUserRelation().sysInnerExc.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+
+    Iterator<UserRelationVo> it = resVo.getVo().iterator();
+    while (it.hasNext()) {
+      UserRelationVo vo = it.next();
+      int code = vo.getRelationCode();
+      if (code == RelationFlag.CLASSMATES.getCode()) {
+        HisClassMates hisClassMates = new HisClassMates();
+        List<String> ids1 = vo.getRelationIds();
+        hisClassMates.setClassMates(ids1);
+        resBean.setHisClassMates(hisClassMates);
+      } else if (code == RelationFlag.COURSEMATES.getCode()) {
+        HisCourseMates hisCourseMates = new HisCourseMates();
+        List<String> ids2 = vo.getRelationIds();
+        hisCourseMates.setCourseMates(ids2);
+        resBean.setHisCourseMates(hisCourseMates);
+      } else if (code == RelationFlag.COWORKER.getCode()) {
+        HisCoWorker hisCoWorker = new HisCoWorker();
+        List<String> ids3 = vo.getRelationIds();
+        hisCoWorker.setCoWorkers(ids3);
+        resBean.setHisCoWorker(hisCoWorker);
+      }
+    }
+    resBean.setError(0);
+    resBean.setMsg(Constants.SUCCESS);
+    resBean.setSuccess(true);
+    return resBean;
+  }
+
+  @Override
+  public Res4GetUserInfoBean selectUserInfo(Req4GetUserInfoBean req4GetUserInfo) {
+    Res4GetUserInfoBean resBean = new Res4GetUserInfoBean();
+
+    String employeeId = req4GetUserInfo.getEmployeeId();
+    if (StringUtil.checkBlank(employeeId)) {
+      log.error("employeeId不能为空");
+      resBean.setError(httpErrorMsg.getGetTUserInfo().variMiss.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getGetTUserInfo().variMiss.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+
+    TKcEmployee tKcEmployee = tKcEmployeeMapper.selectByPrimaryKey(employeeId);
+    String employeeNo = tKcEmployee.getEmployeeNo();
+    String realName = tKcEmployee.getRealName();
+    String userId = tKcEmployee.getUserId();
+    Map<String, Object> map1 = new HashMap<>();
+    map1.put("userId", userId);
+    String reqSpace1 = GsonUtil.gson.toJson(map1);
+    String resSpace1 = httpRestTemplate.postForObject(queryUserDetailForPangURL, reqSpace1);
+    QueryUserDetailForPangRespBean picAndNicknameBean =
+        GsonUtil.gson.fromJson(resSpace1, QueryUserDetailForPangRespBean.class);
+    if (0 != picAndNicknameBean.getError()) {
+      log.error("调用用户模块失败:resSpace1=" + resSpace1);
+      resBean.setError(httpErrorMsg.getGetTUserInfo().moduleTransExc.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getGetTUserInfo().moduleTransExc.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+    PangUserDetail pangUserDetail = picAndNicknameBean.getPangUserDetail();
+    int sex = pangUserDetail.getSex();
+    String sexStr = 1 == sex ? "男" : "女";
+    String heatUnit = pangUserDetail.getHeatUnit();
+    String calUnit = "0".equals(heatUnit) ? "轻币" : "大卡";
+    String mobile = pangUserDetail.getMobile();
+    String email = pangUserDetail.getEmail();
+
+    BasicInfo basicInfo =
+        new BasicInfo().builder().employeeId(employeeId).employeeNo(employeeNo).realName(realName)
+            .memberType("普通会员").sex(sexStr).calUnit(calUnit).mobile(mobile).email(email).build();
+
+    double currentWeight = pangUserDetail.getCurrentWeight();
+    double height = pangUserDetail.getHeight();
+    double weight = pangUserDetail.getWeight();
+    double bmiiii = ((10000 * weight) / (height * height));
+    double bmi = new BigDecimal(bmiiii).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
+    String bmiDescribe = "(--)";
+    if (0.0 < bmi && bmi < 18.5) {
+      bmiDescribe = "(过轻)";
+    } else if (bmi >= 18.5 && bmi < 25) {
+      bmiDescribe = "(正常)";
+    } else if (bmi >= 25 && bmi < 28) {
+      bmiDescribe = "(过重)";
+    } else if (bmi >= 28 && bmi < 32) {
+      bmiDescribe = "(肥胖)";
+    } else if (bmi >= 32) {
+      bmiDescribe = "(非常肥胖)";
+    }
+    String bmiStr = new StringBuffer().append(bmi).append(bmiDescribe).toString();
+
+    String minHealthWeight = String.valueOf((18.5 / 10000) * height * height);
+    String maxHealthWeight = String.valueOf((24 / 10000) * height * height);
+    String healthWeightBetween =
+        new StringBuffer().append(minHealthWeight).append("~").append(maxHealthWeight).toString();
+    String initWeight = new StringBuffer().append(weight).toString();
+
+    WeightBMI weightBMI =
+        new WeightBMI().builder().bmiStr(bmiStr).healthWeightBetween(healthWeightBetween)
+            .currentWeight(String.valueOf(currentWeight)).initWeight(initWeight).build();
+
+    Map<String, Object> map3 = new HashMap<>();
+    map3.put("userId", userId);
+    String reqSpace3 = GsonUtil.gson.toJson(map3);
+    String resSpace3 = httpRestTemplate.postForObject(queryDailyDietBudgetURL, reqSpace3);
+    DailyDietBudgetModel dailyDietBudgetModel =
+        GsonUtil.gson.fromJson(resSpace3, DailyDietBudgetModel.class);
+    if (0 != dailyDietBudgetModel.getError()) {
+      log.error("调用动态模块失败:resSpace3=" + resSpace3);
+      resBean.setError(httpErrorMsg.getGetTUserInfo().moduleTransExc.getCodeFail());
+      resBean.setMsg(httpErrorMsg.getGetTUserInfo().moduleTransExc.getMsgFail());
+      resBean.setSuccess(false);
+      return resBean;
+    }
+
+    int surplusBudgetToday = dailyDietBudgetModel.getSurplusBudgetToday();
+    int minBreakfastRecommendations = dailyDietBudgetModel.getMinBreakfastRecommendations();
+    int maxBreakfastRecommendations = dailyDietBudgetModel.getMaxBreakfastRecommendations();
+    int minLunchRecommendations = dailyDietBudgetModel.getMinLunchRecommendations();
+    int maxLunchRecommendations = dailyDietBudgetModel.getMaxLunchRecommendations();
+    int minDinnerRecommendations = dailyDietBudgetModel.getMinDinnerRecommendations();
+    int maxDinnerRecommendations = dailyDietBudgetModel.getMaxDinnerRecommendations();
+    int minSnackRecommendations = dailyDietBudgetModel.getMinSnackRecommendations();
+    int maxSnackRecommendations = dailyDietBudgetModel.getMaxSnackRecommendations();
+
+    String dailyIntake = new StringBuffer().append(surplusBudgetToday).toString();
+    String breakfastSuggest = new StringBuffer().append(minBreakfastRecommendations).append("~")
+        .append(maxBreakfastRecommendations).toString();
+    String lubchSuggest = new StringBuffer().append(minLunchRecommendations).append("~")
+        .append(maxLunchRecommendations).toString();
+    String supperSuggest = new StringBuffer().append(minDinnerRecommendations).append("~")
+        .append(maxDinnerRecommendations).toString();
+    String addSuggest = new StringBuffer().append(minSnackRecommendations).append("~")
+        .append(maxSnackRecommendations).toString();
+
+    CalAndDistributeSuggest calAndDistributeSuggest = new CalAndDistributeSuggest().builder()
+        .dailyIntake(dailyIntake).breakfastSuggest(breakfastSuggest).lubchSuggest(lubchSuggest)
+        .supperSuggest(supperSuggest).addSuggest(addSuggest).build();
+
+    resBean.setBasicInfo(basicInfo);
+    resBean.setWeightBMI(weightBMI);
+    resBean.setCalAndDistributeSuggest(calAndDistributeSuggest);
+    resBean.setError(0);
+    resBean.setMsg(Constants.SUCCESS);
+    resBean.setSuccess(true);
+    return resBean;
+  }
+
+}

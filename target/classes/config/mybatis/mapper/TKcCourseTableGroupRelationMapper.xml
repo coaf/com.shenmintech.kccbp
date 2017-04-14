@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shenmintech.cbp.mapper.TKcCourseTableGroupRelationMapper">
+	<resultMap id="BaseResultMap"
+		type="com.shenmintech.cbp.entity.TKcCourseTableGroupRelation">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="group_fid" property="groupFid" jdbcType="VARCHAR" />
+		<result column="course_table_fid" property="courseTableFid"
+			jdbcType="VARCHAR" />
+		<result column="pre_start_time" property="preStartTime"
+			jdbcType="TIMESTAMP" />
+		<result column="pre_end_time" property="preEndTime" jdbcType="TIMESTAMP" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="ntes_room_id" property="ntesRoomId" jdbcType="VARCHAR" />
+		<result column="ntes_room_name" property="ntesRoomName"
+			jdbcType="VARCHAR" />
+		<result column="ntes_rtmp_pull_url" property="ntesRtmpPullUrl"
+			jdbcType="VARCHAR" />
+		<result column="ntes_http_pull_url" property="ntesHttpPullUrl"
+			jdbcType="VARCHAR" />
+		<result column="ntes_push_url" property="ntesPushUrl" jdbcType="VARCHAR" />
+		<result column="remark1" property="remark1" jdbcType="VARCHAR" />
+		<result column="remark2" property="remark2" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, group_fid, course_table_fid, pre_start_time,
+		pre_end_time,
+		create_time, update_time,
+		status, ntes_room_id,
+		ntes_room_name, ntes_rtmp_pull_url, ntes_http_pull_url,
+		ntes_push_url,
+		remark1, remark2
+	</sql>
+	<select id="selectByExample" resultMap="BaseResultMap"
+		parameterType="com.shenmintech.cbp.entity.TKcCourseTableGroupRelationExample">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from t_kc_course_table_group_relation
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_kc_course_table_group_relation
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from
+		t_kc_course_table_group_relation
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteByExample"
+		parameterType="com.shenmintech.cbp.entity.TKcCourseTableGroupRelationExample">
+		delete from t_kc_course_table_group_relation
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert"
+		parameterType="com.shenmintech.cbp.entity.TKcCourseTableGroupRelation">
+		insert into t_kc_course_table_group_relation (id,
+		group_fid,
+		course_table_fid,
+		pre_start_time, pre_end_time, create_time,
+		update_time, status, ntes_room_id,
+		ntes_room_name, ntes_rtmp_pull_url,
+		ntes_http_pull_url,
+		ntes_push_url, remark1, remark2
+		)
+		values
+		(#{id,jdbcType=VARCHAR}, #{groupFid,jdbcType=VARCHAR},
+		#{courseTableFid,jdbcType=VARCHAR},
+		#{preStartTime,jdbcType=TIMESTAMP}, #{preEndTime,jdbcType=TIMESTAMP},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP},
+		#{status,jdbcType=INTEGER}, #{ntesRoomId,jdbcType=VARCHAR},
+		#{ntesRoomName,jdbcType=VARCHAR}, #{ntesRtmpPullUrl,jdbcType=VARCHAR},
+		#{ntesHttpPullUrl,jdbcType=VARCHAR},
+		#{ntesPushUrl,jdbcType=VARCHAR},
+		#{remark1,jdbcType=VARCHAR}, #{remark2,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective"
+		parameterType="com.shenmintech.cbp.entity.TKcCourseTableGroupRelation">
+		insert into t_kc_course_table_group_relation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="groupFid != null">
+				group_fid,
+			</if>
+			<if test="courseTableFid != null">
+				course_table_fid,
+			</if>
+			<if test="preStartTime != null">
+				pre_start_time,
+			</if>
+			<if test="preEndTime != null">
+				pre_end_time,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="ntesRoomId != null">
+				ntes_room_id,
+			</if>
+			<if test="ntesRoomName != null">
+				ntes_room_name,
+			</if>
+			<if test="ntesRtmpPullUrl != null">
+				ntes_rtmp_pull_url,
+			</if>
+			<if test="ntesHttpPullUrl != null">
+				ntes_http_pull_url,
+			</if>
+			<if test="ntesPushUrl != null">
+				ntes_push_url,
+			</if>
+			<if test="remark1 != null">
+				remark1,
+			</if>
+			<if test="remark2 != null">
+				remark2,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="groupFid != null">
+				#{groupFid,jdbcType=VARCHAR},
+			</if>
+			<if test="courseTableFid != null">
+				#{courseTableFid,jdbcType=VARCHAR},
+			</if>
+			<if test="preStartTime != null">
+				#{preStartTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="preEndTime != null">
+				#{preEndTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="ntesRoomId != null">
+				#{ntesRoomId,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesRoomName != null">
+				#{ntesRoomName,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesRtmpPullUrl != null">
+				#{ntesRtmpPullUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesHttpPullUrl != null">
+				#{ntesHttpPullUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesPushUrl != null">
+				#{ntesPushUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="remark1 != null">
+				#{remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="remark2 != null">
+				#{remark2,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="countByExample"
+		parameterType="com.shenmintech.cbp.entity.TKcCourseTableGroupRelationExample"
+		resultType="java.lang.Integer">
+		select count(*) from t_kc_course_table_group_relation
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update t_kc_course_table_group_relation
+		<set>
+			<if test="record.id != null">
+				id = #{record.id,jdbcType=VARCHAR},
+			</if>
+			<if test="record.groupFid != null">
+				group_fid = #{record.groupFid,jdbcType=VARCHAR},
+			</if>
+			<if test="record.courseTableFid != null">
+				course_table_fid =
+				#{record.courseTableFid,jdbcType=VARCHAR},
+			</if>
+			<if test="record.preStartTime != null">
+				pre_start_time =
+				#{record.preStartTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.preEndTime != null">
+				pre_end_time = #{record.preEndTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.createTime != null">
+				create_time = #{record.createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.updateTime != null">
+				update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.status != null">
+				status = #{record.status,jdbcType=INTEGER},
+			</if>
+			<if test="record.ntesRoomId != null">
+				ntes_room_id = #{record.ntesRoomId,jdbcType=VARCHAR},
+			</if>
+			<if test="record.ntesRoomName != null">
+				ntes_room_name = #{record.ntesRoomName,jdbcType=VARCHAR},
+			</if>
+			<if test="record.ntesRtmpPullUrl != null">
+				ntes_rtmp_pull_url =
+				#{record.ntesRtmpPullUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="record.ntesHttpPullUrl != null">
+				ntes_http_pull_url =
+				#{record.ntesHttpPullUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="record.ntesPushUrl != null">
+				ntes_push_url = #{record.ntesPushUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark1 != null">
+				remark1 = #{record.remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark2 != null">
+				remark2 = #{record.remark2,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update t_kc_course_table_group_relation
+		set id =
+		#{record.id,jdbcType=VARCHAR},
+		group_fid =
+		#{record.groupFid,jdbcType=VARCHAR},
+		course_table_fid =
+		#{record.courseTableFid,jdbcType=VARCHAR},
+		pre_start_time =
+		#{record.preStartTime,jdbcType=TIMESTAMP},
+		pre_end_time =
+		#{record.preEndTime,jdbcType=TIMESTAMP},
+		create_time =
+		#{record.createTime,jdbcType=TIMESTAMP},
+		update_time =
+		#{record.updateTime,jdbcType=TIMESTAMP},
+		status =
+		#{record.status,jdbcType=INTEGER},
+		ntes_room_id =
+		#{record.ntesRoomId,jdbcType=VARCHAR},
+		ntes_room_name =
+		#{record.ntesRoomName,jdbcType=VARCHAR},
+		ntes_rtmp_pull_url =
+		#{record.ntesRtmpPullUrl,jdbcType=VARCHAR},
+		ntes_http_pull_url =
+		#{record.ntesHttpPullUrl,jdbcType=VARCHAR},
+		ntes_push_url =
+		#{record.ntesPushUrl,jdbcType=VARCHAR},
+		remark1 =
+		#{record.remark1,jdbcType=VARCHAR},
+		remark2 =
+		#{record.remark2,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective"
+		parameterType="com.shenmintech.cbp.entity.TKcCourseTableGroupRelation">
+		update t_kc_course_table_group_relation
+		<set>
+			<if test="groupFid != null">
+				group_fid = #{groupFid,jdbcType=VARCHAR},
+			</if>
+			<if test="courseTableFid != null">
+				course_table_fid = #{courseTableFid,jdbcType=VARCHAR},
+			</if>
+			<if test="preStartTime != null">
+				pre_start_time = #{preStartTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="preEndTime != null">
+				pre_end_time = #{preEndTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="ntesRoomId != null">
+				ntes_room_id = #{ntesRoomId,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesRoomName != null">
+				ntes_room_name = #{ntesRoomName,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesRtmpPullUrl != null">
+				ntes_rtmp_pull_url = #{ntesRtmpPullUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesHttpPullUrl != null">
+				ntes_http_pull_url = #{ntesHttpPullUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="ntesPushUrl != null">
+				ntes_push_url = #{ntesPushUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="remark1 != null">
+				remark1 = #{remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="remark2 != null">
+				remark2 = #{remark2,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey"
+		parameterType="com.shenmintech.cbp.entity.TKcCourseTableGroupRelation">
+		update t_kc_course_table_group_relation
+		set group_fid =
+		#{groupFid,jdbcType=VARCHAR},
+		course_table_fid =
+		#{courseTableFid,jdbcType=VARCHAR},
+		pre_start_time =
+		#{preStartTime,jdbcType=TIMESTAMP},
+		pre_end_time =
+		#{preEndTime,jdbcType=TIMESTAMP},
+		create_time =
+		#{createTime,jdbcType=TIMESTAMP},
+		update_time =
+		#{updateTime,jdbcType=TIMESTAMP},
+		status = #{status,jdbcType=INTEGER},
+		ntes_room_id = #{ntesRoomId,jdbcType=VARCHAR},
+		ntes_room_name =
+		#{ntesRoomName,jdbcType=VARCHAR},
+		ntes_rtmp_pull_url =
+		#{ntesRtmpPullUrl,jdbcType=VARCHAR},
+		ntes_http_pull_url =
+		#{ntesHttpPullUrl,jdbcType=VARCHAR},
+		ntes_push_url =
+		#{ntesPushUrl,jdbcType=VARCHAR},
+		remark1 = #{remark1,jdbcType=VARCHAR},
+		remark2 = #{remark2,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+	<insert id="insertList" parameterType="java.util.List">
+		insert into t_kc_course_table_group_relation
+		(id,group_fid,course_table_fid,status) values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id},#{item.groupFid},#{item.courseTableFid},#{item.status})
+		</foreach>
+	</insert>
+</mapper>

@@ -1,0 +1,102 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.base.template.HttpRestTemplate;
+import com.shenmintech.base.util.MD5Util;
+import com.shenmintech.cbp.biz.IAuthBiz;
+import com.shenmintech.cbp.client.model.LoginWithPasswordReq;
+import com.shenmintech.cbp.controller.bean.req.Req4GetTeacherBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetTeacherBean;
+import com.shenmintech.cbp.entity.TKcTeacher;
+import com.shenmintech.cbp.entity.TKcTeacherExample;
+import com.shenmintech.cbp.mapper.TKcTeacherMapper;
+import com.shenmintech.cbp.service.model.LoginWithPasswordResp;
+import com.shenmintech.common.util.GsonUtil;
+import com.shenmintech.common.util.StringUtil;
+
+@Component
+@SuppressWarnings("static-access")
+public class IAuthBizImpl implements IAuthBiz{
+
+	@Autowired
+	HttpRestTemplate httpRestTemplate;
+	
+	@Autowired
+	TKcTeacherMapper tKcTeacherMapper;
+	
+	@Override
+	public Res4GetTeacherBean loginTeacher(Req4GetTeacherBean req4GetTeacherBean) {
+		Res4GetTeacherBean resBean = new Res4GetTeacherBean();
+		String loginName = req4GetTeacherBean.getLoginName();
+		String passWord = req4GetTeacherBean.getPassWord();
+		if(StringUtil.checkBlank(loginName,passWord)){
+			resBean.setError(-1);
+			resBean.setMsg("loginName,passWord不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String pwMd5Str = MD5Util.GetMD5Code(passWord);
+		LoginWithPasswordReq loginWithPasswordReq = new LoginWithPasswordReq().builder()
+				.loginName(loginName)
+				.password(pwMd5Str)
+				.build();
+		String reqStr = GsonUtil.gson.toJson(loginWithPasswordReq);
+		String resStr = httpRestTemplate.postForObject("http://shenmin-authority/authority/loginWithPassword", reqStr);
+		LoginWithPasswordResp loginWithPasswordResp = GsonUtil.gson.fromJson(resStr, LoginWithPasswordResp.class);
+		int error = loginWithPasswordResp.getError();
+		if(1==error){
+			resBean.setError(-1);
+			resBean.setMsg("系统异常");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(2==error){
+			resBean.setError(-1);
+			resBean.setMsg("没有该平台登录权限");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(6==error){
+			resBean.setError(-1);
+			resBean.setMsg("无效的用户名或密码");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String userId = loginWithPasswordResp.getUserId();
+		String picId = loginWithPasswordResp.getPictureId();
+		String sessionId = loginWithPasswordResp.getSessionid();
+		
+		TKcTeacherExample example = new TKcTeacherExample();
+		example.or().andStatusNotEqualTo(-1).andUserIdEqualTo(userId);
+		List<TKcTeacher> list = tKcTeacherMapper.selectByExample(example);
+		if(0==list.size()){
+			resBean.setError(-1);
+			resBean.setMsg("用户未注册为老师");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(1<list.size()){
+			resBean.setError(-1);
+			resBean.setMsg("注册老师的数量不唯一，脏数据");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		TKcTeacher teacher = list.get(0);
+		
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		resBean.setUserId(userId);
+		resBean.setTeacherId(teacher.getId());
+		resBean.setNickname(teacher.getNickName());
+		resBean.setNtesAccid(teacher.getNtesAccid());
+		resBean.setNtesToken(teacher.getNtesToken());
+		resBean.setPictureId(picId);
+		resBean.setSessionid(sessionId);
+		return resBean;
+	}
+
+}

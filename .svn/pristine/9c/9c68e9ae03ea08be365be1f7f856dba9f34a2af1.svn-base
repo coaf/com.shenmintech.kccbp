@@ -1,0 +1,94 @@
+package com.shenmintech.cbp.biz.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IActionBiz;
+import com.shenmintech.cbp.config.HttpAction;
+import com.shenmintech.cbp.config.HttpErrorMsg;
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserLikeRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserPlayRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserLikeRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserPlayRecordBean;
+import com.shenmintech.cbp.service.ITToolAccountService;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class ActionBizImpl implements IActionBiz {
+
+	@Autowired
+	HttpErrorMsg httpErrorMsg;
+	
+	@Autowired
+	HttpAction httpAction;
+	
+	@Autowired
+	ITToolAccountService iTToolAccountService;
+	
+	@Override
+	public ResUserCollectRecordBean postUCR(ReqUserCollectRecordBean reqUserCollectRecordBean){
+		ResUserCollectRecordBean resBean = new ResUserCollectRecordBean();
+		String userId = reqUserCollectRecordBean.getUserId();
+		String recordId = reqUserCollectRecordBean.getRecordId();
+		String remark = reqUserCollectRecordBean.getRemark();
+		
+		if(StringUtil.checkBlank(userId,recordId)){
+			log.error("userId,recordId不能为空");
+			resBean.setError(httpErrorMsg.getPostUCR().variMiss.getCodeFail());
+			resBean.setMsg(httpErrorMsg.getPostUCR().variMiss.getMsgFail());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		iTToolAccountService.addAccount(userId, recordId, httpAction.getCbpModule().getCollectRecordVideo(),remark);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public ResUserPlayRecordBean postUPR(ReqUserPlayRecordBean reqUserPlayRecordBean) {
+		ResUserPlayRecordBean resBean = new ResUserPlayRecordBean();
+		String userId = reqUserPlayRecordBean.getUserId();
+		String recordId = reqUserPlayRecordBean.getRecordId();
+		String remark = reqUserPlayRecordBean.getRemark();
+		if(StringUtil.checkBlank(userId,recordId)){
+			log.error("userId,recordId不能为空");
+			resBean.setError(httpErrorMsg.getPostUPR().variMiss.getCodeFail());
+			resBean.setMsg(httpErrorMsg.getPostUPR().variMiss.getMsgFail());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		iTToolAccountService.addAccount(userId, recordId, httpAction.getCbpModule().getPlayRecordVideo(),remark);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public ResUserLikeRecordBean postULR(ReqUserLikeRecordBean reqUserLikeRecordBean) {
+		ResUserLikeRecordBean resBean = new ResUserLikeRecordBean();
+		String userId = reqUserLikeRecordBean.getUserId();
+		String recordId = reqUserLikeRecordBean.getRecordId();
+		String remark = reqUserLikeRecordBean.getRemark();
+		if(StringUtil.checkBlank(userId,recordId)){
+			log.error("userId,recordId不能为空");
+			resBean.setError(httpErrorMsg.getPostULR().variMiss.getCodeFail());
+			resBean.setMsg(httpErrorMsg.getPostULR().variMiss.getMsgFail());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		iTToolAccountService.addAccount(userId, recordId, httpAction.getCbpModule().getLikeRecordVideo(),remark);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+	
+}

@@ -1,0 +1,46 @@
+package com.shenmintech.cbp.controller.bean.req;
+
+import com.shenmintech.base.bean.BaseReqBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ApiModel
+public class Req4PostRollingPicBean extends BaseReqBean{
+
+	@ApiModelProperty(value = "轮播图名称", required = true)
+	public String rollingPicName;
+	
+	@ApiModelProperty(value = "轮播图跳转类型:0直播公开课，1链接", required = true)
+	public String renderType;
+	
+	@ApiModelProperty(value = "公开课名称", required = false)
+	public String pubCourseName;
+	
+	@ApiModelProperty(value = "开课时间", required = false)
+	public String preStartTime;
+	
+	@ApiModelProperty(value = "跳转地址", required = false)
+	public String renderUrl;
+	
+	@ApiModelProperty(value = "备注信息", required = true)
+	public String remark;
+	
+	@ApiModelProperty(value = "顺序标志", required = true)
+	public String hisIndex;
+	
+	@ApiModelProperty(value = "图片ID", required = true)
+	public String picId;
+	
+	@ApiModelProperty(value = "状态:0打开，1关闭", required = true)
+	public String status;
+	
+}

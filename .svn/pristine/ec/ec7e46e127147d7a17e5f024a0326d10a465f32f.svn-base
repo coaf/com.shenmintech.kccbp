@@ -1,0 +1,106 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IHomeworkPushBiz;
+import com.shenmintech.cbp.biz.vo.res.CourseVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetComVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Sons4GetComVo;
+import com.shenmintech.cbp.controller.bean.req.Req4GetPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Company;
+import com.shenmintech.cbp.controller.bean.res.Course;
+import com.shenmintech.cbp.controller.bean.res.Homework;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPushHomeworkBean;
+import com.shenmintech.cbp.service.ICompanyService;
+import com.shenmintech.cbp.service.ICourseService;
+import com.shenmintech.cbp.service.IHomeWorkService;
+import com.shenmintech.common.util.StringUtil;
+
+@Component
+public class HomeworkPushBizImpl implements IHomeworkPushBiz {
+	
+	@Autowired
+	IHomeWorkService iHomeWorkService;
+	
+	@Autowired
+	ICompanyService iCompanyService;
+	
+	@Autowired
+	ICourseService iCourseService;
+	
+	@SuppressWarnings("static-access")
+	@Override
+	public Res4GetPushHomeworkBean selectInitElement(Req4GetPushHomeworkBean req4GetPushHomeworkBean) {
+		Res4GetPushHomeworkBean res4GetPushHomeworkBean = new Res4GetPushHomeworkBean();
+		
+		String teacherId = req4GetPushHomeworkBean.getTeacherId();//教师的id
+		if(StringUtil.isBlank(teacherId)){
+			res4GetPushHomeworkBean.setError(-1);
+			res4GetPushHomeworkBean.setMsg("teacherId不能为空");
+			res4GetPushHomeworkBean.setSuccess(false);
+			return res4GetPushHomeworkBean;
+		}
+		
+		List<Homework> homeworks = new ArrayList<>();
+		Res4GetHomeworkVo homeworkVo = iHomeWorkService.selectByTeacherIdPages(teacherId, 1, 99999);
+		List<Son4GetHomeworkVo> homeworkVos = homeworkVo.getHomeworkTypeVos();
+		Iterator<Son4GetHomeworkVo> it = homeworkVos.iterator();
+		while (it.hasNext()) {
+			Son4GetHomeworkVo vo = it.next();
+			String homeworkId = vo.getHomeworkId();
+			String homeworkName = vo.getHomeworkName();
+			Homework homework = new Homework().builder()
+					.homeworkId(homeworkId)
+					.homeworkName(homeworkName)
+					.build();
+			homeworks.add(homework);
+		}
+		res4GetPushHomeworkBean.setHomeworks(homeworks);
+		
+		List<Company> companies = new ArrayList<>();
+		Res4GetComVo companiesVo = iCompanyService.select(1, 99999);
+		List<Sons4GetComVo> comVos = companiesVo.getList();
+		Iterator<Sons4GetComVo> itt = comVos.iterator();
+		while (itt.hasNext()) {
+			Sons4GetComVo companyVo = itt.next();
+			String companyId = companyVo.getId();
+			String companyName = companyVo.getCompanyName();
+			
+			List<CourseVo> courseVos = iCourseService.selectCourseByTeacherIdAndCompanyId(teacherId, companyId);
+			
+			List<Course> courses = new ArrayList<>();
+			
+			
+			
+			
+			
+			Company company = new Company().builder()
+					.companyId(companyId)
+					.companyName(companyName)
+					
+					.courses(courses)
+					.build();
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		return null;
+	}
+
+}

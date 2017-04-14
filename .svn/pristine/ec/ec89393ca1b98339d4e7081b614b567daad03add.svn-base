@@ -1,0 +1,38 @@
+package com.shenmintech.cbp.mapper;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+import com.shenmintech.cbp.entity.User;
+import com.shenmintech.cbp.entity.UserExample;
+import com.shenmintech.cbp.entity.UserWithBLOBs;
+
+public interface UserMapper {
+    int countByExample(UserExample example);
+
+    int deleteByExample(UserExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(UserWithBLOBs record);
+
+    int insertSelective(UserWithBLOBs record);
+
+    List<UserWithBLOBs> selectByExampleWithBLOBs(UserExample example);
+
+    List<User> selectByExample(UserExample example);
+
+    UserWithBLOBs selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") UserWithBLOBs record, @Param("example") UserExample example);
+
+    int updateByExampleWithBLOBs(@Param("record") UserWithBLOBs record, @Param("example") UserExample example);
+
+    int updateByExample(@Param("record") User record, @Param("example") UserExample example);
+
+    int updateByPrimaryKeySelective(UserWithBLOBs record);
+
+    int updateByPrimaryKeyWithBLOBs(UserWithBLOBs record);
+
+    int updateByPrimaryKey(User record);
+}

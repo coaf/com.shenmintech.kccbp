@@ -1,0 +1,12 @@
+/*package com.shenmintech.cbp.client;
+
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@FeignClient(
+		name = "schedular-server"
+		)
+@RequestMapping("/method")
+public class TaskClient {
+
+}*/

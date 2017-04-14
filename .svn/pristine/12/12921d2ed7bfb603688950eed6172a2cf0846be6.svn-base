@@ -1,0 +1,102 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.cbp.biz.vo.ques.Req4PostCompanyVo;
+import com.shenmintech.cbp.biz.vo.ques.Req4PutComVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetComVo;
+import com.shenmintech.cbp.biz.vo.res.Sons4GetComVo;
+import com.shenmintech.cbp.entity.PagingExample;
+import com.shenmintech.cbp.entity.TKcCompany;
+import com.shenmintech.cbp.entity.TKcCompanyExample;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcCompanyMapper;
+import com.shenmintech.cbp.mapper.TKcCourseMapper;
+import com.shenmintech.cbp.service.ICompanyService;
+import com.shenmintech.common.util.Constants;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+public class CompanyServiceImpl implements ICompanyService {
+
+	@Autowired
+	TKcCompanyMapper tKcCompanyMapper;
+	
+	@Autowired
+	TKcCourseMapper tKcCourseMapper;
+	
+	@Override
+	public void add(List<Req4PostCompanyVo> list) {
+		Iterator<Req4PostCompanyVo> it = list.iterator();
+		while (it.hasNext()) {
+			TKcCompany tKcCompany = new TKcCompany();
+			Req4PostCompanyVo companyVo = it.next();
+			tKcCompany.setId(companyVo.getId());
+			tKcCompany.setCompanyName(companyVo.getCompanyName());
+			tKcCompany.setEstimatedStudentsNum(companyVo.getEstimatedStudentsNum());
+			tKcCompany.setStatus(0);
+			try {
+				tKcCompanyMapper.insertSelective(tKcCompany);
+			} catch (Exception e) {
+				log.error("context", e);
+				throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加公司失败",Constants.BLANKSTR);
+			}
+		}
+	}
+
+	@Override
+	public void update(Req4PutComVo putComVo) {
+		TKcCompany tKcCompany = new TKcCompany();
+		tKcCompany.setId(putComVo.getId());
+		String companyName = putComVo.getCompanyName();
+		if(null != companyName) tKcCompany.setCompanyName(companyName);
+		Integer esStudentNum = putComVo.getEstimatedStudentsNum();
+		if(null != esStudentNum) tKcCompany.setEstimatedStudentsNum(esStudentNum);
+		try {
+			tKcCompanyMapper.updateByPrimaryKeySelective(tKcCompany);
+		} catch (Exception e) {
+			log.error("context", e);
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新公司失败",Constants.BLANKSTR);
+		}
+	}
+
+	@Override
+	public Res4GetComVo select(int pageNo,int rowsPerPage) {
+		TKcCompanyExample example = new TKcCompanyExample();
+		example.or().andStatusNotEqualTo(-1);
+		int recordCount = tKcCompanyMapper.countByExample(example);
+		PagingExample pagingExample = new PagingExample(pageNo, rowsPerPage);
+		example.setPagingExample(pagingExample);
+		List<TKcCompany> companies = tKcCompanyMapper.selectByExample(example);//有效数据
+		Iterator<TKcCompany> it = companies.iterator();
+		List<Sons4GetComVo> list = new ArrayList<>();
+		while(it.hasNext()){
+			Sons4GetComVo sons4GetComVo = new Sons4GetComVo();
+			TKcCompany company = it.next();
+			BeanUtils.copyProperties(company, sons4GetComVo);
+			list.add(sons4GetComVo);
+		}
+		Res4GetComVo res4GetComVo = new Res4GetComVo();
+		res4GetComVo.setList(list);
+		res4GetComVo.setRecordCount(recordCount);
+		return res4GetComVo;
+	}
+
+	@Override
+	public String selectNameById(String companyId) {
+		TKcCompany company = tKcCompanyMapper.selectByPrimaryKey(companyId);
+		if(null == company) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_company未找到公司id为"+companyId+"的记录",Constants.BLANKSTR);
+		return company.getCompanyName();
+	}
+	
+}

@@ -1,0 +1,55 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import com.shenmintech.base.bean.BaseRetBean;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Builder
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ResRecord4AppBean extends BaseRetBean {
+
+  @ApiModelProperty(value = "类型", required = true)
+  public String recordType;
+
+  @ApiModelProperty(value = "类型名", required = true)
+  public String recordTypeName;
+
+  @ApiModelProperty(value = "录播视频ID", required = true)
+  public String recordId;
+
+  @ApiModelProperty(value = "录播视频名字", required = true)
+  public String recordName;
+
+  @ApiModelProperty(value = "配图", required = true)
+  public String coverPictureId;
+
+  @ApiModelProperty(value = "视频流文件Id", required = true)
+  public String fileId;
+
+  @ApiModelProperty(value = "视频文件URL", required = true)
+  public String fileURL;
+
+  @ApiModelProperty(value = "播放时长mm:ss", required = true)
+  public String duration;
+
+  @ApiModelProperty(value = "播放量", required = true)
+  public String playAmount;
+
+  @ApiModelProperty(value = "收藏量", required = true)
+  public String collectAmount;
+
+  @ApiModelProperty(value = "是否收藏:0否，1是", required = true)
+  public boolean isCollected;
+
+  @ApiModelProperty(value = "录播视频详情", required = true)
+  public String recordSynopsis;
+
+}

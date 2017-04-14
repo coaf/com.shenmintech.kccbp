@@ -1,0 +1,58 @@
+package com.shenmintech.cbp.controller.bean.req;
+
+public class NetEasyRoomCreateChannelBean {
+  private String code;
+
+  NetEasyRoomCreateChannel ret;
+
+
+
+  public String getCode() {
+    return code;
+  }
+
+
+
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+
+
+  public NetEasyRoomCreateChannel getRet() {
+    return ret;
+  }
+
+
+
+  public void setRet(NetEasyRoomCreateChannel ret) {
+    this.ret = ret;
+  }
+
+
+
+  public class NetEasyRoomCreateChannel {
+    private String httpPullUrl;
+
+    private String rtmpPullUrl;
+
+    public String getHttpPullUrl() {
+      return httpPullUrl;
+    }
+
+    public void setHttpPullUrl(String httpPullUrl) {
+      this.httpPullUrl = httpPullUrl;
+    }
+
+    public String getRtmpPullUrl() {
+      return rtmpPullUrl;
+    }
+
+    public void setRtmpPullUrl(String rtmpPullUrl) {
+      this.rtmpPullUrl = rtmpPullUrl;
+    }
+  }
+
+
+
+}

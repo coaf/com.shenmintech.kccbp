@@ -1,0 +1,31 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Builder
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class CalAndDistributeSuggest {
+
+  @ApiModelProperty(value = "每日可摄取", required = true)
+  String dailyIntake;
+
+  @ApiModelProperty(value = "早餐建议", required = true)
+  String breakfastSuggest;
+
+  @ApiModelProperty(value = "午餐建议", required = true)
+  String lubchSuggest;
+
+  @ApiModelProperty(value = "晚餐建议", required = true)
+  String supperSuggest;
+
+  @ApiModelProperty(value = "加餐建议", required = true)
+  String addSuggest;
+}

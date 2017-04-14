@@ -1,0 +1,246 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.IRoomAndVideoBiz;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostClazzVo;
+import com.shenmintech.cbp.biz.vo.ques.SonRelationVo;
+import com.shenmintech.cbp.biz.vo.res.ClazzVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetClazzVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetRoomVo;
+import com.shenmintech.cbp.biz.vo.res.RoomVo;
+import com.shenmintech.cbp.entity.TKcCourse;
+import com.shenmintech.cbp.entity.TKcCourseExample;
+import com.shenmintech.cbp.entity.TKcCourseTable;
+import com.shenmintech.cbp.entity.TKcCourseTableExample;
+import com.shenmintech.cbp.entity.TKcCourseTableGroupRelation;
+import com.shenmintech.cbp.entity.TKcCourseTableGroupRelationExample;
+import com.shenmintech.cbp.entity.TKcGroup;
+import com.shenmintech.cbp.entity.TKcTeacher;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcCourseMapper;
+import com.shenmintech.cbp.mapper.TKcCourseTableGroupRelationMapper;
+import com.shenmintech.cbp.mapper.TKcCourseTableMapper;
+import com.shenmintech.cbp.mapper.TKcGroupMapper;
+import com.shenmintech.cbp.mapper.TKcTeacherMapper;
+import com.shenmintech.cbp.service.IClazzService;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.DateUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+public class ClazzServiceImpl implements IClazzService {
+	
+	@Autowired
+	TKcCourseTableGroupRelationMapper tKcCourseTableGroupRelationMapper;
+	
+	@Autowired
+	TKcCourseTableMapper tKcCourseTableMapper;
+	
+	@Autowired
+	TKcGroupMapper tKcGroupMapper;
+	
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Autowired
+	TKcCourseMapper tKcCourseMapper;
+	
+	@Autowired
+	IRoomAndVideoBiz iRoomAndVideoBiz;
+	
+	@Autowired
+	TKcTeacherMapper tKcTeacherMapper;
+	
+	@Override
+	public List<Res4GetClazzVo> selectByGroupId(String groupId) {
+		List<Res4GetClazzVo> list = new ArrayList<>();
+		
+		TKcGroup group = tKcGroupMapper.selectByPrimaryKey(groupId);
+		String courseId = group.getCourseFid();//追溯课程
+		TKcCourseTableExample tableExample = new TKcCourseTableExample();
+		tableExample.or().andStatusNotEqualTo(-1).andCourseFidEqualTo(courseId);
+		tableExample.setOrderByClause("clazz_no");
+		List<TKcCourseTable> courseTables = tKcCourseTableMapper.selectByExample(tableExample);//追溯课程表
+		Iterator<TKcCourseTable> it = courseTables.iterator();
+		while (it.hasNext()) {
+			Res4GetClazzVo res4GetClazzVo = new Res4GetClazzVo();
+			TKcCourseTable clazz = it.next();
+			String clazzId = clazz.getId();
+			TKcCourseTableGroupRelationExample relationExample = new TKcCourseTableGroupRelationExample();
+			relationExample.or().andStatusNotEqualTo(-1).andGroupFidEqualTo(groupId).andCourseTableFidEqualTo(clazzId);
+			List<TKcCourseTableGroupRelation> relations = tKcCourseTableGroupRelationMapper.selectByExample(relationExample);
+			if(relations.size()<1){
+				res4GetClazzVo.setCourseTableGroupRelationId("");
+				res4GetClazzVo.setStartTime(null);
+				res4GetClazzVo.setEndTime(null);
+			}else if(relations.size()>1){
+				throw new ApplicationException(Constants.META_STATUS_CODE_D1,"查询开课时间失败：找到针对小组："+groupId+"的课程："+clazzId+"超过一条数据记录，请联系开发清理脏数据",Constants.BLANKSTR);
+			}else{
+				TKcCourseTableGroupRelation relation = relations.get(0);
+				String courseTableGroupRelationId = relation.getId();
+				res4GetClazzVo.setCourseTableGroupRelationId(courseTableGroupRelationId);
+				Date sTime = relation.getPreStartTime();
+				res4GetClazzVo.setStartTime(sTime);
+				Date eTime = relation.getPreEndTime();
+				res4GetClazzVo.setEndTime(eTime);
+			}
+			String clazzName = clazz.getClazzName();//课名
+			res4GetClazzVo.setClazzName(clazzName);
+			int clazzNo = clazz.getClazzNo();
+			res4GetClazzVo.setClazzNo(clazzNo);
+			list.add(res4GetClazzVo);
+		}
+		return list;
+	}
+
+	@Override
+	public List<ClazzVo> setClazzTime(Req4PostClazzVo clazzVo) {
+		List<ClazzVo> clazzs = new ArrayList<>();
+		
+		List<SonRelationVo> list = clazzVo.getRelations();
+		Iterator<SonRelationVo> it = list.iterator();
+		int i = 0;
+		while (it.hasNext()) {
+			TKcCourseTableGroupRelation tableGroupRelation = new TKcCourseTableGroupRelation();
+			SonRelationVo sonRelationVo = it.next();
+			String clazzId = sonRelationVo.getClazzId();
+			Date startTime = sonRelationVo.getStartTime();
+			Date endTime = sonRelationVo.getEndTime();
+			
+			TKcCourseTableGroupRelation relation = tKcCourseTableGroupRelationMapper.selectByPrimaryKey(clazzId);
+			if(null==relation) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_course_table_group_relation表中未找到id为"+clazzId+"的记录",Constants.BLANKSTR);
+			String courseTableFid = relation.getCourseTableFid();
+			String groupFid = relation.getGroupFid();
+			TKcCourseTable kcCourseTable = tKcCourseTableMapper.selectByPrimaryKey(courseTableFid);
+			if(null==kcCourseTable) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_course_table表中未找到id为"+courseTableFid+"的记录",Constants.BLANKSTR);
+			TKcGroup group = tKcGroupMapper.selectByPrimaryKey(groupFid);
+			if(null==group) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_group表中未找到id为"+groupFid+"的记录",Constants.BLANKSTR);
+			String ntesRoomName = kcCourseTable.getClazzName()+"-"+group.getGroupName()+"-"+clazzId.substring(clazzId.length()-4);
+			tableGroupRelation.setId(clazzId);
+			tableGroupRelation.setNtesRoomName(ntesRoomName);
+			tableGroupRelation.setPreStartTime(startTime);
+			tableGroupRelation.setPreEndTime(endTime);
+			tableGroupRelation.setStatus(0);
+			try {
+				tKcCourseTableGroupRelationMapper.updateByPrimaryKeySelective(tableGroupRelation);
+			} catch (Exception e) {
+				log.error("context", e);
+				throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加课表时间失败",Constants.BLANKSTR);
+			}
+			if(0==i){//编辑完小组课程表之后，将课程的状态改成2.之后课程模板将不能被修改
+				TKcCourseTableGroupRelation clazz = tKcCourseTableGroupRelationMapper.selectByPrimaryKey(clazzId);
+				String courseTableId = clazz.getCourseTableFid();
+				TKcCourseTableGroupRelationExample tKcCourseTableGroupRelationExample = new TKcCourseTableGroupRelationExample();
+				tKcCourseTableGroupRelationExample.or().andCourseTableFidEqualTo(courseTableId);
+				List<TKcCourseTableGroupRelation> tKcCourseTableGroupRelations = tKcCourseTableGroupRelationMapper.selectByExample(tKcCourseTableGroupRelationExample);
+				if(tKcCourseTableGroupRelations.stream().allMatch(n->null!=n.getPreStartTime())){
+					TKcCourseTable courseTable = tKcCourseTableMapper.selectByPrimaryKey(courseTableId);
+					String courseId = courseTable.getCourseFid();
+					TKcCourse course = new TKcCourse();
+					course.setId(courseId);
+					course.setStatus(3);
+					tKcCourseMapper.updateByPrimaryKeySelective(course);
+				}
+			}
+			i++;
+			ClazzVo vo = new ClazzVo();
+			vo.setClazzId(clazzId);
+			vo.setClazzName(ntesRoomName);
+			clazzs.add(vo);
+		}
+		return clazzs;
+	}
+
+	@Override
+	public void setRoomData(String clazzId,String roomId, String rtmpPullUrl, String httpPullUrl,String pushUrl) {
+		TKcCourseTableGroupRelation relation = new TKcCourseTableGroupRelation();
+		relation.setId(clazzId);
+		relation.setNtesRoomId(roomId);
+		relation.setNtesRtmpPullUrl(rtmpPullUrl);
+		relation.setNtesHttpPullUrl(httpPullUrl);
+		relation.setNtesPushUrl(pushUrl);
+		tKcCourseTableGroupRelationMapper.updateByPrimaryKeySelective(relation);
+	}
+
+	@SuppressWarnings("static-access")
+	@Override
+	public Res4GetRoomVo selectRoomsByTeacherId(String teacherId) {
+		Res4GetRoomVo resVo = new Res4GetRoomVo(); 
+		List<RoomVo> roomList = new ArrayList<>();
+		List<String> timeList = new ArrayList<>();
+		TKcTeacher teacher = tKcTeacherMapper.selectByPrimaryKey(teacherId);
+		resVo.setTeacherToken(teacher.getNtesToken());
+		resVo.setTeacherAccid(teacher.getNtesAccid());
+		
+		TKcCourseExample tKcCourseExample = new TKcCourseExample();
+		tKcCourseExample.or().andStatusNotEqualTo(-1).andTeacherFidEqualTo(teacherId);
+		List<TKcCourse> courses = tKcCourseMapper.selectByExample(tKcCourseExample);
+		
+		Iterator<TKcCourse> it = courses.iterator();
+		while (it.hasNext()) {
+			TKcCourse course = it.next();
+			String courseName = course.getCourseName();//-------------------------
+			String courseId = course.getId();
+			TKcCourseTableExample courseTableExample = new TKcCourseTableExample();
+			courseTableExample.or().andStatusNotEqualTo(-1).andCourseFidEqualTo(courseId);
+			List<TKcCourseTable> courseTables = tKcCourseTableMapper.selectByExample(courseTableExample);
+			if(null == courseTables || 0 == courseTables.size()) continue;
+			Iterator<TKcCourseTable> ita = courseTables.iterator();
+			while (ita.hasNext()) {
+				TKcCourseTable courseTable = ita.next();
+				String clazzName = courseTable.getClazzName();//-----------------------------
+				String courseTableId = courseTable.getId();
+				TKcCourseTableGroupRelationExample ctgrExample = new TKcCourseTableGroupRelationExample();
+				ctgrExample.or().andStatusNotEqualTo(-1).andCourseTableFidEqualTo(courseTableId);
+				List<TKcCourseTableGroupRelation> ctgrRelation = tKcCourseTableGroupRelationMapper.selectByExample(ctgrExample);
+				if(null == ctgrRelation || 0 == ctgrRelation.size()) continue;
+				Iterator<TKcCourseTableGroupRelation> itb = ctgrRelation.iterator();
+				while (itb.hasNext()) {
+					TKcCourseTableGroupRelation rela = itb.next();
+					String relaId = rela.getId();
+					Date preStartTime = rela.getPreStartTime();
+					Date preEndTime = rela.getPreEndTime();
+					String pushUrl = rela.getNtesPushUrl();
+					if(null == preStartTime || null == preEndTime || null == pushUrl) continue;
+					StringBuffer dayStr = new StringBuffer(DateUtil.format(preStartTime, DateUtil.DATETYPE_14));//开始日期
+					dayStr.append(" ").append(DateUtil.format(preStartTime, DateUtil.DATETYPE_12));//开始小时分钟数
+					dayStr.append(" ~ ").append(DateUtil.format(preEndTime, DateUtil.DATETYPE_12));//结束小时分钟数
+					String groupId = rela.getGroupFid();
+					TKcGroup group = tKcGroupMapper.selectByPrimaryKey(groupId);
+					if(null == group) continue;
+					String groupName = group.getGroupName();
+					String roomId = rela.getNtesRoomId();
+					
+					RoomVo vo = new RoomVo().builder()
+							.relaId(relaId)
+							.period(dayStr.toString())
+							.courseName(courseName)
+							.clazzName(clazzName)
+							.groupName(groupName)
+							.roomId(roomId)
+							.pushUrl(pushUrl)
+							.build();
+					roomList.add(vo);
+					String clazzTime = DateUtil.format(preStartTime, DateUtil.DATETYPE_4);
+					timeList.add(clazzTime);
+				}
+			}
+		}
+		resVo.setRoomList(roomList);
+		resVo.setTimeList(timeList);
+		return resVo;
+	}
+
+}

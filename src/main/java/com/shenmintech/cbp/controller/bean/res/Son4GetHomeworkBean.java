@@ -1,0 +1,34 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@ApiModel("作业对象出参")
+public class Son4GetHomeworkBean {
+
+  @ApiModelProperty(value = "课后作业ID", required = true)
+  public String homeworkId;
+
+  @ApiModelProperty(value = "课后作业名字", required = true)
+  public String homeworkName;
+
+  @ApiModelProperty(value = "课后作业类型ID", required = true)
+  public String homeworkTypeId;
+
+  @ApiModelProperty(value = "课后作业类型名", required = true)
+  public String homeworkType;
+
+  @ApiModelProperty(value = "课后作业描述", required = true)
+  public String describe;
+
+  @ApiModelProperty(value = "创建时间", required = true)
+  public String createTime;
+
+  @ApiModelProperty(value = "课后作业状态：0初始状态，可以删除和修改。1已推送，不可以修改和删除。-1已删除", required = true)
+  public String homeworkStatus;
+
+}

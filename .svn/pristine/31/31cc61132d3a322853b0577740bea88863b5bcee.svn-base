@@ -1,0 +1,15 @@
+package com.shenmintech.cbp.service.model;
+
+import com.shenmintech.cbp.entity.TKcCourseTableGroupRelation;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+public class RelationModel extends TKcCourseTableGroupRelation{
+
+	int code;
+	String msg;
+	
+}

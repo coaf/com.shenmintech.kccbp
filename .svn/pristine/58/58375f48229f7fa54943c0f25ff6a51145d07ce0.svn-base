@@ -1,0 +1,69 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.junit.Test;
+
+import com.google.gson.Gson;
+import com.shenmintech.cbp.biz.IRoomAndVideoBiz;
+import com.shenmintech.cbp.controller.bean.res.NetEasyRoomResponse;
+import com.shenmintech.cbp.controller.bean.res.NetEasyUserResponse;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.NeteasyUtil;
+
+
+public class RoomAndVideoBiz implements IRoomAndVideoBiz {
+
+  @Override
+  public NetEasyRoomResponse createNetEasyRoom(String accid, String name) {
+    // TODO Auto-generated method stub
+    List<NameValuePair> nvps = new ArrayList<>();
+    nvps.add(new BasicNameValuePair("creator", accid));
+    nvps.add(new BasicNameValuePair("name", name));
+    String json = NeteasyUtil.sendPostNeteasy(nvps, Constants.CHATROOM_CREAT_URL);
+    Gson gson = new Gson();
+    NetEasyRoomResponse response = gson.fromJson(json, NetEasyRoomResponse.class);
+
+    return response;
+  }
+
+  @Override
+  public NetEasyUserResponse createAccoutAndAccid(String accid, String name) {
+    // TODO Auto-generated method stub
+    List<NameValuePair> nvps = new ArrayList<>();
+    nvps.add(new BasicNameValuePair("accid", accid));
+    nvps.add(new BasicNameValuePair("name", name));
+    String json = NeteasyUtil.sendPostNeteasy(nvps, Constants.USER_CREAT_URL);
+    Gson gson = new Gson();
+    NetEasyUserResponse response = gson.fromJson(json, NetEasyUserResponse.class);
+
+    return response;
+  }
+
+  @Override
+  public NetEasyRoomResponse getAccoutAndAccidAndToken(String accids) {
+    // TODO Auto-generated method stub
+    List<NameValuePair> nvps = new ArrayList<>();
+    List<String> accidsArray = new ArrayList<>();
+    accidsArray.add(accids);
+    Gson gson = new Gson();
+    accids = gson.toJson(accidsArray);
+    nvps.add(new BasicNameValuePair("accids", accids));
+    String json = NeteasyUtil.sendPostNeteasy(nvps, Constants.USER_GETUINFOS_URL);
+    NetEasyRoomResponse response = gson.fromJson(json, NetEasyRoomResponse.class);
+
+    return response;
+  }
+
+
+  @Test
+  public void test() {
+
+    RoomAndVideoBiz biz = new RoomAndVideoBiz();
+    biz.createAccoutAndAccid("12345678123456782", "hello");
+  }
+
+}

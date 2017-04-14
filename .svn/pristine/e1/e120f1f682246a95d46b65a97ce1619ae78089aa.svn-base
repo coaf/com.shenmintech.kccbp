@@ -1,0 +1,114 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IRecordBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4DeleteRecordBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetRecordsBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetUCRBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PatchIndexBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostRecordBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutRecordBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutRecordStatusBean;
+import com.shenmintech.cbp.controller.bean.req.ReqRecord4AppBean;
+import com.shenmintech.cbp.controller.bean.req.ReqRecords4AppBean;
+import com.shenmintech.cbp.controller.bean.req.ReqRecordsByType4AppBean;
+import com.shenmintech.cbp.controller.bean.res.Res4DeleteRecordBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRecordsBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetUCRBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PatchIndexBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostRecordBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutRecordBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutRecordStatusBean;
+import com.shenmintech.cbp.controller.bean.res.ResRecord4AppBean;
+import com.shenmintech.cbp.controller.bean.res.ResRecords4AppBean;
+import com.shenmintech.cbp.controller.bean.res.ResRecordsByType4AppBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Controller
+@Api(value = "录播课程", description = "录播课程的相关操作--max")
+public class RecordController {
+
+	@Autowired
+	IRecordBiz iRecordBiz;
+	
+	@PostMapping("/tkcRecords/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师查看录播课程列表", httpMethod = "POST", value = "查询录播课程列表（OK）")
+	public @ResponseBody Res4GetRecordsBean getTKcRecords(@ApiParam(required = true, value = "查询录播视频列表入参对象") @RequestBody Req4GetRecordsBean req4GetRecordsBean){
+		return iRecordBiz.getRecords(req4GetRecordsBean);
+	}
+	
+	@PostMapping("/tkcRecord/delete")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师删除某个视频", httpMethod = "POST", value = "删除某个录播视频（OK）")
+	public @ResponseBody Res4DeleteRecordBean deleteTKcRecord(@ApiParam(required = true, value = "删除某个录播视频入参对象") @RequestBody Req4DeleteRecordBean req4DeleteRecordBean){
+		return iRecordBiz.deleteRecord(req4DeleteRecordBean);
+	}
+	
+	@PostMapping("/tkcRecord/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师添加视频", httpMethod = "POST", value = "添加录播视频（OK）")
+	public @ResponseBody Res4PostRecordBean postTKcRecord(@ApiParam(required = true, value = "添加录播视频入参对象") @RequestBody Req4PostRecordBean req4PostRecordBean){
+		return iRecordBiz.postRecord(req4PostRecordBean);
+	}
+	
+	@PostMapping("/tkcRecord/status/put")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师修改视频是否隐藏", httpMethod = "POST", value = "修改录播视频的隐藏状态（OK）")
+	public @ResponseBody Res4PutRecordStatusBean putTKcRecordStatus(@ApiParam(required = true, value = "添加录播视频入参对象") @RequestBody Req4PutRecordStatusBean req4PutRecordStatusBean){
+		return iRecordBiz.putRecordStatus(req4PutRecordStatusBean);
+	}
+	
+	@PostMapping("/tkcRecord/put")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师修改视频", httpMethod = "POST", value = "修改录播视频信息（OK）")
+	public @ResponseBody Res4PutRecordBean putTKcRecord(@ApiParam(required = true, value = "更改录播视频入参对象") @RequestBody Req4PutRecordBean req4PutRecordBean){
+		return iRecordBiz.putRecord(req4PutRecordBean);
+	}
+	
+	@PostMapping("/tkcRecord/recordIndex/patch")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师修改录播视频排序", httpMethod = "POST", value = "修改录播视频排序（OK）")
+	public @ResponseBody Res4PatchIndexBean patchTKcRecordIndex(@ApiParam(required = true, value = "更改录播视频入参对象") @RequestBody Req4PatchIndexBean req4PatchIndexBean){
+		return iRecordBiz.patchIndex(req4PatchIndexBean);
+	}
+	
+	@PostMapping("/tkcRecords4App/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户查询自己的录播课程(每个录播类型的前五个视频)", httpMethod = "POST", value = "查询发现-课程-录播视频（OK）")
+	public @ResponseBody ResRecords4AppBean getTKcRecords4App(@ApiParam(required = true, value = "查询前五个录播视频入参对象") @RequestBody ReqRecords4AppBean req4Records4AppBean){
+		return iRecordBiz.getRecords4App(req4Records4AppBean);
+	}
+	
+	@PostMapping("/tkcRecord4App/type/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户分页查看某类型的录播视频", httpMethod = "POST", value = "查看某类型的更多录播视频（OK）")
+	public @ResponseBody ResRecordsByType4AppBean getRecordsByType(@ApiParam(required = true, value = "查看某类型的更多录播视频入参对象") @RequestBody ReqRecordsByType4AppBean reqRecordsByType4AppBean){
+		return iRecordBiz.getRecordsByType4App(reqRecordsByType4AppBean);
+	}
+	
+	@PostMapping("/tkcRecord4App/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户查询具体某个录播课程", httpMethod = "POST", value = "录播视频详细信息查询（OK）")
+	public @ResponseBody ResRecord4AppBean getTKcRecord4App(@ApiParam(required = true, value = "查询单个录播视频入参对象") @RequestBody ReqRecord4AppBean req4Records4AppBean){
+		return iRecordBiz.getRecord4App(req4Records4AppBean);
+	}
+	
+	@PostMapping("user/collect/records/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户查询自己收藏的录播课程", httpMethod = "POST", value = "收藏的录播视频列表查询（OK）")
+	public @ResponseBody Res4GetUCRBean getUCR(@ApiParam(required = true, value = "查询收藏的录播视频入参对象") @RequestBody Req4GetUCRBean req4GetUCRBean){
+		return iRecordBiz.getUCR(req4GetUCRBean);
+	}
+	
+}

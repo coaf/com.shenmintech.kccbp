@@ -1,0 +1,20 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import java.util.List;
+
+import com.shenmintech.base.bean.BaseRetBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+@ApiModel("查询小组列表出参")
+@Getter
+@Setter
+public class Res4GetGroupBean extends BaseRetBean {
+
+  @ApiModelProperty(value = "小组列表", required = true)
+  public List<Son4GetGroupBean> list;
+
+}

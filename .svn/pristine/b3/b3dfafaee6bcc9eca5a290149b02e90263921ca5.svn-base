@@ -1,0 +1,152 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IRecordBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4DeleteRecordBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetRecordsBean;
+import com.shenmintech.cbp.controller.bean.res.RecordModel;
+import com.shenmintech.cbp.controller.bean.res.RecordType;
+import com.shenmintech.cbp.controller.bean.res.Res4DeleteRecordBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRecordsBean;
+import com.shenmintech.cbp.entity.PagingExample;
+import com.shenmintech.cbp.entity.TKcRecord;
+import com.shenmintech.cbp.entity.TKcRecordExample;
+import com.shenmintech.cbp.entity.TKcRecordType;
+import com.shenmintech.cbp.entity.TKcRecordTypeExample;
+import com.shenmintech.cbp.mapper.TKcRecordMapper;
+import com.shenmintech.cbp.mapper.TKcRecordTypeMapper;
+import com.shenmintech.cbp.service.IRecordService;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+@Component
+public class RecordBizImpl implements IRecordBiz{
+
+	@Autowired
+	TKcRecordMapper tKcRecordMapper;
+	
+	@Autowired
+	TKcRecordTypeMapper tKcRecordTypeMapper;
+	
+	@Autowired
+	IRecordService iRecordService;
+	
+	@Override
+	public Res4GetRecordsBean getRecords(Req4GetRecordsBean req4GetRecordsBean) {
+		Res4GetRecordsBean resBean = new Res4GetRecordsBean();
+		
+		String keywords = req4GetRecordsBean.getKeywords();
+		String recordTypeId = req4GetRecordsBean.getRecordTypeId();
+		
+		int pageNo = -1==req4GetRecordsBean.getPageNo()?1:req4GetRecordsBean.getPageNo();
+		int rowsPerPage = -1==req4GetRecordsBean.getPageNo()?99999:req4GetRecordsBean.getRowsPerPage();
+		
+		TKcRecordExample tKcRecordExample = new TKcRecordExample();
+		TKcRecordExample.Criteria criteria = tKcRecordExample.createCriteria();
+		criteria.andStatusNotEqualTo(-1);
+		if(StringUtil.isNotBlank(keywords)) criteria.andRecordNameLike("%"+ keywords +"%");
+		if(StringUtil.isNotBlank(recordTypeId)) criteria.andRecordTypeFidEqualTo(recordTypeId);
+		int recordCount = tKcRecordMapper.countByExample(tKcRecordExample);
+		PagingExample pagingExample = new PagingExample(pageNo, rowsPerPage);
+		tKcRecordExample.setPagingExample(pagingExample);
+		tKcRecordExample.setOrderByClause("record_index desc");
+		List<TKcRecord> tKcRecords = tKcRecordMapper.selectByExample(tKcRecordExample);
+		
+		Iterator<TKcRecord> it = tKcRecords.iterator();
+		List<RecordModel> recordList = new ArrayList<>();
+		while (it.hasNext()) {
+			RecordModel recordModel = new RecordModel();
+			TKcRecord record = it.next();
+			String recordId = record.getId();
+			recordModel.setRecordId(recordId);
+			String recordName = record.getRecordName();
+			recordModel.setRecordName(recordName);
+			String recordTypeFid = record.getRecordTypeFid();
+			TKcRecordType tKcRecordType = tKcRecordTypeMapper.selectByPrimaryKey(recordTypeFid);
+			String recordTypeName = tKcRecordType.getTypeName();
+			recordModel.setRecordName(recordTypeName);
+			Integer viewPermission = record.getViewPermission();
+			switch (viewPermission) {
+			case 1://所有用户
+				recordModel.setViewPermission("所有用户");
+				break;
+			case 2://企业用户
+				recordModel.setViewPermission("企业用户");
+				break;
+			default:
+				recordModel.setViewPermission("--");
+				break;
+			}
+			Date createTime = record.getCreateTime();
+			String cTimeStr = DateUtil.format(createTime, DateUtil.DATETYPE_1);
+			recordModel.setCreateTime(cTimeStr);
+			
+			String title1 = record.getTitle1();
+			String title2 = record.getTitle2();
+			String title3 = record.getTitle3();
+			recordModel.setTitles(new StringBuffer(title1).append("\n").append(title2).append("\n").append(title3).toString());
+			
+			String picId = record.getCoverPictureId();
+			recordModel.setCoverPictureId(picId);
+			int duration = record.getDuration();//课程时长/秒
+			int min = duration/60;
+			int sec = duration%60;
+			recordModel.setDuration(new StringBuffer(min).append(":").append(sec).toString());
+			double recordSize = record.getRecordSize();
+			recordModel.setRecordSize(new StringBuffer(String.valueOf(recordSize)).append("M").toString());
+			recordModel.setHideFlag(record.getHideFlag().toString());
+			recordModel.setRecordIndex(record.getRecordIndex().toString());
+			recordList.add(recordModel);
+		}
+		
+		//开始查询类型列表
+		TKcRecordTypeExample tKcRecordTypeExample = new TKcRecordTypeExample();
+		tKcRecordTypeExample.or().andStatusNotEqualTo(-1).andIdIsNotNull();
+		List<TKcRecordType> tKcRecordTypes = tKcRecordTypeMapper.selectByExample(tKcRecordTypeExample);
+		Iterator<TKcRecordType> ita = tKcRecordTypes.iterator();
+		List<RecordType> typeList = new ArrayList<>();
+		while (ita.hasNext()) {
+			RecordType recordType = new RecordType();
+			TKcRecordType tKcRecordType = ita.next();
+			recordType.setRecordTypeId(tKcRecordType.getId());
+			recordType.setRecordTypename(tKcRecordType.getTypeName());
+			typeList.add(recordType);
+		}
+		
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setPageNo(pageNo);
+		resBean.setPageSumCount((recordCount+rowsPerPage-1)/rowsPerPage);
+		resBean.setRecordCount(recordCount);
+		resBean.setRecordList(recordList);
+		resBean.setSuccess(true);
+		resBean.setTypeList(typeList);
+		return resBean;
+	}
+
+	@Override
+	public Res4DeleteRecordBean deleteRecord(Req4DeleteRecordBean req4DeleteRecordBean) {
+		Res4DeleteRecordBean resBean = new Res4DeleteRecordBean();
+		String recordId = req4DeleteRecordBean.getRecordId();
+		if(StringUtil.isBlank(recordId)){
+			resBean.setError(-1);
+			resBean.setMsg("recordId不能为空");
+			resBean.setSuccess(false);
+		}
+		
+		iRecordService.delById(recordId);
+		
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+}

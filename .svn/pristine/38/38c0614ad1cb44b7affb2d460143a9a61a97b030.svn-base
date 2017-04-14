@@ -1,0 +1,148 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import io.swagger.annotations.ApiModelProperty;
+
+public class NetEasyRoomResponse {
+
+  @ApiModelProperty(value = "用户房间信息", required = true)
+  Uinfos chatroom;
+
+  @ApiModelProperty(value = "状态码", required = true)
+  int code;
+
+
+  public Uinfos getChatroom() {
+    return chatroom;
+  }
+
+
+  public void setChatroom(Uinfos chatroom) {
+    this.chatroom = chatroom;
+  }
+
+
+  public class Uinfos {
+
+    @ApiModelProperty(value = "房间id", required = true)
+    private String roomid;
+
+    @ApiModelProperty(value = "是否有效", required = true)
+    private String valid;
+
+    @ApiModelProperty(value = "通知", required = true)
+    private String announcement;
+
+    @ApiModelProperty(value = "名称", required = true)
+    private String name;
+
+    @ApiModelProperty(value = "rtmp地址", required = true)
+    private String rtmpPullUrl;
+
+    @ApiModelProperty(value = "http地址", required = true)
+    private String httpPullUrl;
+
+
+
+    public String getRtmpPullUrl() {
+      return rtmpPullUrl;
+    }
+
+
+    public void setRtmpPullUrl(String rtmpPullUrl) {
+      this.rtmpPullUrl = rtmpPullUrl;
+    }
+
+
+    public String getHttpPullUrl() {
+      return httpPullUrl;
+    }
+
+
+    public void setHttpPullUrl(String httpPullUrl) {
+      this.httpPullUrl = httpPullUrl;
+    }
+
+
+    public String getRoomid() {
+      return roomid;
+    }
+
+
+    public void setRoomid(String roomid) {
+      this.roomid = roomid;
+    }
+
+
+    public String getValid() {
+      return valid;
+    }
+
+
+    public void setValid(String valid) {
+      this.valid = valid;
+    }
+
+
+    public String getAnnouncement() {
+      return announcement;
+    }
+
+
+    public void setAnnouncement(String announcement) {
+      this.announcement = announcement;
+    }
+
+
+    public String getName() {
+      return name;
+    }
+
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+
+    public String getBroadcasturl() {
+      return broadcasturl;
+    }
+
+
+    public void setBroadcasturl(String broadcasturl) {
+      this.broadcasturl = broadcasturl;
+    }
+
+
+    public String getCreator() {
+      return creator;
+    }
+
+
+    public void setCreator(String creator) {
+      this.creator = creator;
+    }
+
+
+    private String broadcasturl;
+
+
+    private String creator;
+
+
+
+  }
+
+
+
+  public int getCode() {
+    return code;
+  }
+
+
+  public void setCode(int code) {
+    this.code = code;
+  }
+
+
+
+}

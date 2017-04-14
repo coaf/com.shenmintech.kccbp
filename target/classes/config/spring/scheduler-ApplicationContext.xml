@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.2.xsd
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<!-- <task:executor id="executor" rejection-policy="ABORT" keep-alive="1" 
+		pool-size="1" queue-capacity="0"/> <task:scheduler id="threadPoolTaskScheduler1" 
+		pool-size="1" /> <task:scheduled-tasks scheduler="threadPoolTaskScheduler1"> 
+		<task:scheduled ref="orderGetInScheduleTaskStep1" method="doTask" cron="10/1 
+		* * * * ?" /> </task:scheduled-tasks> <task:executor id="executor" rejection-policy="ABORT" 
+		keep-alive="1" pool-size="1" queue-capacity="0"/> <task:scheduler id="threadPoolTaskScheduler2" 
+		pool-size="1" /> <task:scheduled-tasks scheduler="threadPoolTaskScheduler2"> 
+		<task:scheduled ref="orderGetInScheduleTaskStep2" method="doTask" cron="10/1 
+		* * * * ?" /> </task:scheduled-tasks> <task:executor id="executor" rejection-policy="ABORT" 
+		keep-alive="1" pool-size="1" queue-capacity="0"/> <task:scheduler id="threadPoolTaskScheduler3" 
+		pool-size="1" /> <task:scheduled-tasks scheduler="threadPoolTaskScheduler3"> 
+		<task:scheduled ref="orderGetInScheduleTaskStep3" method="doTask" cron="10/1 
+		* * * * ?" /> </task:scheduled-tasks> -->
+
+</beans>

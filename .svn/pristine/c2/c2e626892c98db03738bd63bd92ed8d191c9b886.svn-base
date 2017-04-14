@@ -1,0 +1,14 @@
+package com.shenmintech.cbp.service;
+
+import java.util.List;
+
+import com.shenmintech.cbp.biz.vo.ques.Req4PostClazzVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetClazzVo;
+
+public interface IClazzService {
+	
+	public List<Res4GetClazzVo> selectByGroupId(String groupId);
+	
+	public void setClazzTime(Req4PostClazzVo clazzVo);
+	
+}

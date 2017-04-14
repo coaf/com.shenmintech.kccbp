@@ -1,0 +1,10 @@
+httpErrorMsg:
+  addCompany:
+    codeFail: 107001001
+    msgFail: companyName,estimatedStudentsNum不能为空
+    
+    
+    
+    
+    
+    

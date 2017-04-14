@@ -1,0 +1,50 @@
+package com.shenmintech.cbp.biz.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IActionBiz;
+import com.shenmintech.cbp.config.HttpAction;
+import com.shenmintech.cbp.config.HttpErrorMsg;
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectRecordBean;
+import com.shenmintech.cbp.service.ITToolAccountService;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class ActionBizImpl implements IActionBiz {
+
+	@Autowired
+	HttpErrorMsg httpErrorMsg;
+	
+	@Autowired
+	HttpAction httpAction;
+	
+	@Autowired
+	ITToolAccountService iTToolAccountService;
+	
+	@Override
+	public ResUserCollectRecordBean postRecordAccount4App(ReqUserCollectRecordBean reqUserCollectRecordBean){
+		ResUserCollectRecordBean resBean = new ResUserCollectRecordBean();
+		String userId = reqUserCollectRecordBean.getUserId();
+		String recordId = reqUserCollectRecordBean.getRecordId();
+		String remark = reqUserCollectRecordBean.getRemark();
+		
+		if(StringUtil.checkBlank(userId,recordId)){
+			log.error("userId,recordId不能为空");
+			resBean.setError(httpErrorMsg.getPostRecordCount().variMiss.getCodeFail());
+			resBean.setMsg(httpErrorMsg.getPostRecordCount().variMiss.getMsgFail());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		iTToolAccountService.addAccount(userId, recordId, httpAction.getCbpModule().getCollectArticles(),remark);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+	
+}

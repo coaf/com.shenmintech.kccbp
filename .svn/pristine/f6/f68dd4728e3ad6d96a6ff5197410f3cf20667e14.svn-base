@@ -1,0 +1,8 @@
+httpAction:
+  cbpModule:
+    collectRecordVideo: 846549020079813001 #收藏录播视频
+    playRecordVideo: 646541020079813002 #播放录播视频
+    praiseRecordVideo: 846549020020816004 #点赞录播视频
+    criticizeRecordVideo: 846549020020216005 #批评录播视频
+    readArticles: 846549020079816003  #浏览文章
+    collectArticles: 846549020079234001 #收藏文章

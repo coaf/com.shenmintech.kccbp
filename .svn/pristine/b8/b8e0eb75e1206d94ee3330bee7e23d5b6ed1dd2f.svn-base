@@ -1,0 +1,219 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IHomeworkBiz;
+import com.shenmintech.cbp.biz.vo.res.HomeWorkTypesVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetHomeworkTypeVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetHomeworkTypeVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetHomeworkVo;
+import com.shenmintech.cbp.controller.bean.req.Req4DelHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4DelHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetHomeworkTypeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4HomeWorkTypeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetHomeworkBean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IHomeWorkService;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class HomeworkBizImpl implements IHomeworkBiz {
+
+	@Autowired
+	IHomeWorkService iHomeWorkService;
+	
+	@Override
+	public Res4GetHomeworkTypeBean selectTKcHomeworkType() {
+		Res4GetHomeworkTypeBean res4GetHomeworkTypeBean= new Res4GetHomeworkTypeBean();
+		Res4GetHomeworkTypeVo res4GetHomeworkTypeVo = new Res4GetHomeworkTypeVo();
+		try {
+			res4GetHomeworkTypeVo = iHomeWorkService.selectHomeworkType();
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetHomeworkTypeBean.setError(-1);
+			res4GetHomeworkTypeBean.setMsg(e.msg);
+			res4GetHomeworkTypeBean.setSuccess(false);
+			return res4GetHomeworkTypeBean;
+		}
+		Iterator<Son4GetHomeworkTypeVo> it = res4GetHomeworkTypeVo.getHomeworkTypeVos().iterator();
+		List<Res4HomeWorkTypeBean> homeworkTypeList = new ArrayList<>();
+		while (it.hasNext()) {
+			Res4HomeWorkTypeBean res4HomeWorkTypeBean = new Res4HomeWorkTypeBean();
+			Son4GetHomeworkTypeVo son4GetHomeworkTypeVo = it.next();
+			res4HomeWorkTypeBean.setHomeworkTypeId(son4GetHomeworkTypeVo.getHomeWorkTypeId());
+			res4HomeWorkTypeBean.setHomeworkTypeName(son4GetHomeworkTypeVo.getTypeName());
+			homeworkTypeList.add(res4HomeWorkTypeBean);
+		}
+		res4GetHomeworkTypeBean.setHomeworkTypeList(homeworkTypeList);
+		res4GetHomeworkTypeBean.setError(0);
+		res4GetHomeworkTypeBean.setMsg("SUCCESS");
+		res4GetHomeworkTypeBean.setSuccess(true);
+		return res4GetHomeworkTypeBean;
+	}
+
+	@Override
+	public Res4PostHomeworkBean addTKcHomework(Req4PostHomeworkBean req4PostHomeworkBean) {
+		Res4PostHomeworkBean res4PostHomeworkBean = new Res4PostHomeworkBean();
+		
+		String teacherId = req4PostHomeworkBean.getTeacherId();
+		String workName = req4PostHomeworkBean.getWorkName();
+		String typeId = req4PostHomeworkBean.getTypeId();
+		String describe = req4PostHomeworkBean.getHomeDescribe();
+		if(StringUtil.checkBlank(teacherId,workName,typeId,describe)){
+			res4PostHomeworkBean.setError(-1);
+			res4PostHomeworkBean.setMsg("teacherId,workName,typeId,describe不能为空");
+			res4PostHomeworkBean.setSuccess(false);
+			return res4PostHomeworkBean;
+		}
+		try {
+			iHomeWorkService.add(teacherId, workName, typeId, describe);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PostHomeworkBean.setError(-1);
+			res4PostHomeworkBean.setMsg(e.msg);
+			res4PostHomeworkBean.setSuccess(false);
+			return res4PostHomeworkBean;
+		}
+		res4PostHomeworkBean.setError(0);
+		res4PostHomeworkBean.setMsg("SUCCESS");
+		res4PostHomeworkBean.setSuccess(true);
+		return res4PostHomeworkBean;
+	}
+
+	@Override
+	public Res4GetHomeworkBean selectTKcHomeworkByTeacherId(Req4GetHomeworkBean req4GetHomeworkBean) {
+		Res4GetHomeworkBean res4GetHomeworkBean = new Res4GetHomeworkBean();
+		
+		String teacherId = req4GetHomeworkBean.getTeacherId();
+		if(StringUtil.isBlank(teacherId)){
+			res4GetHomeworkBean.setError(-1);
+			res4GetHomeworkBean.setMsg("teacherId不能为空");
+			res4GetHomeworkBean.setSuccess(false);
+			return res4GetHomeworkBean;
+		}
+		int ipageNo = 1;
+		int pageNo = -1==req4GetHomeworkBean.getPageNo()?1:req4GetHomeworkBean.getPageNo();
+		int rowsPerPage = -1==req4GetHomeworkBean.getPageNo()?99999:req4GetHomeworkBean.getRowsPerPage();
+		Res4GetHomeworkVo res4GetHomeworkVo = new Res4GetHomeworkVo();
+		try {
+			res4GetHomeworkVo = iHomeWorkService.selectByTeacherIdPages(teacherId, ipageNo, rowsPerPage);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetHomeworkBean.setError(-1);
+			res4GetHomeworkBean.setMsg(e.msg);
+			res4GetHomeworkBean.setSuccess(false);
+			return res4GetHomeworkBean;
+		}
+		int recordCount = res4GetHomeworkVo.getRecordCount();
+		List<Son4GetHomeworkVo> son4GetHomeworkVos = res4GetHomeworkVo.getHomeworkTypeVos();
+		List<String> typeIdList = son4GetHomeworkVos.stream().map(n->n.getHomeworkTypeId()).collect(Collectors.toList());
+		List<HomeWorkTypesVo> workTypesVos = iHomeWorkService.getHomeWorkTypesByIds(typeIdList);
+		if(workTypesVos.size()!=typeIdList.size()){
+			res4GetHomeworkBean.setError(-1);
+			res4GetHomeworkBean.setMsg("t_kc_homework和t_kx_homework_type的关联数据出现脏数据，请联系DB排查");
+			res4GetHomeworkBean.setSuccess(false);
+			return res4GetHomeworkBean;
+		}
+		Iterator<Son4GetHomeworkVo> it = son4GetHomeworkVos.iterator();
+		List<Son4GetHomeworkBean> son4GetHomeworkBeans = new ArrayList<>();
+		while (it.hasNext()) {
+			Son4GetHomeworkVo son4GetHomeworkVo = it.next();
+			String homeworkId = son4GetHomeworkVo.getHomeworkId();
+			String homeworkName = son4GetHomeworkVo.getHomeworkName();
+			String describe = son4GetHomeworkVo.getDescribe();
+			Date createDate = son4GetHomeworkVo.getCreateTime();
+			String createDateStr = DateUtil.format(createDate, DateUtil.DATETYPE_4);
+			String homeworkTypeId = son4GetHomeworkVo.getHomeworkTypeId();
+			String homeworkTypeName = "";
+			for (HomeWorkTypesVo vo : workTypesVos) if(vo.getId().equals(homeworkTypeId)) homeworkTypeName = vo.getTypeName();
+			Son4GetHomeworkBean son4GetHomeworkBean =new Son4GetHomeworkBean();
+			son4GetHomeworkBean.setHomeworkId(homeworkId);
+			son4GetHomeworkBean.setHomeworkName(homeworkName);
+			son4GetHomeworkBean.setDescribe(describe);
+			son4GetHomeworkBean.setCreateTime(createDateStr);
+			son4GetHomeworkBean.setHomeworkTypeId(homeworkTypeId);
+			son4GetHomeworkBean.setHomeworkType(homeworkTypeName);
+			son4GetHomeworkBeans.add(son4GetHomeworkBean);
+		}
+		res4GetHomeworkBean.setList(son4GetHomeworkBeans);
+		res4GetHomeworkBean.setPageNo(pageNo);
+		res4GetHomeworkBean.setRecordCount(recordCount);
+		res4GetHomeworkBean.setPageSumCount((recordCount+rowsPerPage-1)/rowsPerPage);
+		res4GetHomeworkBean.setError(0);
+		res4GetHomeworkBean.setMsg("SUCCESS");
+		res4GetHomeworkBean.setSuccess(true);
+		return res4GetHomeworkBean;
+	}
+
+	@Override
+	public Res4DelHomeworkBean delTKcHomework(Req4DelHomeworkBean req4DelHomeworkBean) {
+		Res4DelHomeworkBean res4DelHomeworkBean = new Res4DelHomeworkBean();
+		String workId = req4DelHomeworkBean.getWorkId();
+		if(StringUtil.isBlank(workId)) {
+			res4DelHomeworkBean.setError(-1);
+			res4DelHomeworkBean.setMsg("workId不能为空");
+			res4DelHomeworkBean.setSuccess(false);
+			return res4DelHomeworkBean;
+		}
+		try {
+			iHomeWorkService.deleteById(workId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4DelHomeworkBean.setError(-1);
+			res4DelHomeworkBean.setMsg(e.msg);
+			res4DelHomeworkBean.setSuccess(false);
+			return res4DelHomeworkBean;
+		}
+		res4DelHomeworkBean.setError(0);
+		res4DelHomeworkBean.setMsg("SUCCESS");
+		res4DelHomeworkBean.setSuccess(true);
+		return res4DelHomeworkBean;
+	}
+
+	@Override
+	public Res4PutHomeworkBean updateTKcHomework(Req4PutHomeworkBean req4PutHomeworkBean) {
+		Res4PutHomeworkBean res4PutHomeworkBean = new Res4PutHomeworkBean();
+		String workId = req4PutHomeworkBean.getWorkId();
+		String workName = req4PutHomeworkBean.getWorkName();
+		String typeId = req4PutHomeworkBean.getTypeId();
+		String describe = req4PutHomeworkBean.getHomeDescribe();
+		if(StringUtil.checkBlank(workId,workName,typeId,describe)){
+			res4PutHomeworkBean.setError(-1);
+			res4PutHomeworkBean.setMsg("workId,workName,typeId,describe不能为空");
+			res4PutHomeworkBean.setSuccess(false);
+			return res4PutHomeworkBean;
+		}
+		try {
+			iHomeWorkService.updateById(workId, workName, typeId, describe);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PutHomeworkBean.setError(-1);
+			res4PutHomeworkBean.setMsg(e.msg);
+			res4PutHomeworkBean.setSuccess(false);
+			return res4PutHomeworkBean;
+		}
+		res4PutHomeworkBean.setError(0);
+		res4PutHomeworkBean.setMsg("SUCCESS");
+		res4PutHomeworkBean.setSuccess(true);
+		return res4PutHomeworkBean;
+	}
+
+}

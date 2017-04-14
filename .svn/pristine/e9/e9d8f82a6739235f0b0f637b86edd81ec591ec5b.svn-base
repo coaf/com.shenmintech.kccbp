@@ -1,0 +1,42 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IHomeworkPushBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostPushHomeworkBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Controller
+@Api(value = "推送", description = "推送（课后作业）相关操作")
+public class HomeworkPushController {
+
+	@Autowired
+	IHomeworkPushBiz iHomeworkPushBiz;
+	
+	@PostMapping("/tkcPushHomework/pre/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "初始化添加推送任务下拉选项树页面", httpMethod = "POST", value = "添加推送课后作业相关前置查询")
+	public @ResponseBody Res4GetPrePushHomeworkBean preHomework(@ApiParam(required = true, value = "前置对象") @RequestBody Req4GetPrePushHomeworkBean req4GetPrePushHomeworkBean){
+		return iHomeworkPushBiz.selectInitElement(req4GetPrePushHomeworkBean);
+	}
+	
+	@PostMapping("/tkcPushHomework/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "添加推送任务", httpMethod = "POST", value = "添加推送任务")
+	public @ResponseBody Res4PostPushHomeworkBean postHomework(@ApiParam(required = true, value = "添加推送任务对象") @RequestBody Req4PostPushHomeworkBean req4PostPushHomeworkBean){
+		return iHomeworkPushBiz.postPushHomework(req4PostPushHomeworkBean);
+	}
+	
+}

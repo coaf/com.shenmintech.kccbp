@@ -1,0 +1,24 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import java.util.List;
+
+import com.shenmintech.base.bean.BaseRetBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@ApiModel("用户获取具体打卡任务出参")
+public class Res4AppGetHomeworkSignCardBean extends BaseRetBean {
+
+  @ApiModelProperty(value = "明细", required = true)
+  List<Res4AppGetHomeworkSignCardVoBean> list;
+
+  @ApiModelProperty(value = "任务要求", required = true)
+  private String taskDesc;
+
+
+}

@@ -1,0 +1,26 @@
+package com.shenmintech.cbp.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.cbp.entity.TKcRecord;
+import com.shenmintech.cbp.mapper.TKcRecordMapper;
+import com.shenmintech.cbp.service.IRecordService;
+
+@Service
+@Transactional
+public class RecordServiceImpl implements IRecordService {
+
+	@Autowired
+	TKcRecordMapper tKcRecordMapper;
+	
+	@Override
+	public void delById(String id) {
+		TKcRecord tKcRecord = new TKcRecord();
+		tKcRecord.setId(id);
+		tKcRecord.setStatus(-1);
+		tKcRecordMapper.updateByPrimaryKeySelective(tKcRecord);
+	}
+	
+}

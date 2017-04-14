@@ -1,0 +1,74 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+/*
+ * 
+ */
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IHomeworkBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4DelHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetHomeworkTypeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4DelHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetHomeworkTypeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutHomeworkBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Controller
+@Api(value = "作业", description = "作业（任务）相关操作--max")
+public class HomeworkController {
+	
+	@Autowired
+	IHomeworkBiz iHomeworkBiz;
+	
+	@PostMapping("/tkcHomeworkType/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "获取作业类型,供导师选择来创建作业", httpMethod = "POST", value = "查询作业类型（OK）")
+	public @ResponseBody Res4GetHomeworkTypeBean getTKcHomeworkType(@ApiParam(required = true, value = "查询作业类型列表对象") @RequestBody Req4GetHomeworkTypeBean req4GetHomeworkTypeBean){
+		return iHomeworkBiz.selectTKcHomeworkType();
+	}
+	
+	@PostMapping("/tkcHomework/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师创建作业（此接口并非导师布置作业，而是初始化作业而已，所以不绑定到小组）（OK）", httpMethod = "POST", value = "添加作业任务")
+	public @ResponseBody Res4PostHomeworkBean postTKcHomework(@ApiParam(required = true, value = "某个导师的初始化作业对象") @RequestBody Req4PostHomeworkBean req4PostHomeworkBean){
+		return iHomeworkBiz.addTKcHomework(req4PostHomeworkBean);
+	}
+
+	@PostMapping("/tkcHomework/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "", httpMethod = "POST", value = "查询某个导师的所有初始化的作业（OK）")
+	public @ResponseBody Res4GetHomeworkBean getTKcHomework(@ApiParam(required = true, value = "导师表的主键") @RequestBody Req4GetHomeworkBean req4GetHomeworkBean){
+		return iHomeworkBiz.selectTKcHomeworkByTeacherId(req4GetHomeworkBean);
+	}
+	
+	@PostMapping("/tkcHomework/delete")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师删除作业任务", httpMethod = "POST", value = "删除作业任务（OK）")
+	public @ResponseBody Res4DelHomeworkBean deleteTKcHomework(@ApiParam(required = true, value = "某个导师的删除作业对象") @RequestBody Req4DelHomeworkBean req4DelHomeworkBean){
+		return iHomeworkBiz.delTKcHomework(req4DelHomeworkBean);
+	}
+	
+	@PostMapping("/tkcHomework/put")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师修改作业任务", httpMethod = "POST", value = "修改作业任务（OK）")
+	public @ResponseBody Res4PutHomeworkBean putTKcHomework(@ApiParam(required = true, value = "某个导师的更新作业对象") @RequestBody Req4PutHomeworkBean req4PutHomeworkBean){
+		return iHomeworkBiz.updateTKcHomework(req4PutHomeworkBean);
+	}
+	
+}

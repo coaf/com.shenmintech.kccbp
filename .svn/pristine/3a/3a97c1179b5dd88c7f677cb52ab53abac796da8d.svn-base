@@ -1,0 +1,72 @@
+httpErrorMsg:
+  #CompanyController
+  addCompany:
+    variMiss:
+      codeFail: 107001001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107001002
+      msgFail: 参数非法
+    sysInnerExc:
+      codeFail: 107001003
+      msgFail: 系统内部异常
+  putTKcCompany:
+    variMiss:
+      codeFail: 107002001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107002002
+      msgFail: 参数非法
+    sysInnerExc:
+      codeFail: 107002003
+      msgFail: 系统内部异常
+  getTKcCompany:
+    variMiss:
+      codeFail: 107003001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107003002
+      msgFail: 参数非法
+    sysInnerExc:
+      codeFail: 107003003
+      msgFail: 系统内部异常
+  getSingleCompany:
+    variMiss:
+      codeFail: 107004001
+      msgFail: 参数缺失
+  #CourseController
+  postTKcCourse:
+    variMiss:
+      codeFail: 107005001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107005002
+      msgFail: 系统内部异常
+  getTKcCourse:
+    variMiss:
+      codeFail: 107006001
+      msgFail: 参数缺失
+  getTKcCourseTable:
+    variMiss:
+      codeFail: 107007001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107007002
+      msgFail: 参数非法
+  putCourseTable:
+    variMiss:
+      codeFail: 107008001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107008002
+      msgFail: 系统内部异常
+  #
+      
+      
+      
+      
+      
+      
+      
+      
+      

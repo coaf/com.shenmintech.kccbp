@@ -1,0 +1,101 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.cbp.biz.vo.res.Res4AppGetClazzVo;
+import com.shenmintech.cbp.entity.TKcCourse;
+import com.shenmintech.cbp.entity.TKcCourseTable;
+import com.shenmintech.cbp.entity.TKcCourseTableGroupRelation;
+import com.shenmintech.cbp.entity.TKcCourseTableGroupRelationExample;
+import com.shenmintech.cbp.entity.TKcStudent;
+import com.shenmintech.cbp.entity.TKcStudentExample;
+import com.shenmintech.cbp.entity.TKcTeacher;
+import com.shenmintech.cbp.mapper.TKcCourseMapper;
+import com.shenmintech.cbp.mapper.TKcCourseTableGroupRelationMapper;
+import com.shenmintech.cbp.mapper.TKcCourseTableMapper;
+import com.shenmintech.cbp.mapper.TKcGroupMapper;
+import com.shenmintech.cbp.mapper.TKcStudentMapper;
+import com.shenmintech.cbp.mapper.TKcTeacherMapper;
+import com.shenmintech.cbp.service.ICourse4AppService;
+import com.shenmintech.common.util.DateUtil;
+
+@Service
+@Transactional
+public class Course4AppServiceImpl implements ICourse4AppService {
+	
+	@Autowired
+	TKcGroupMapper tKcGroupMapper;
+	
+	@Autowired
+	TKcCourseMapper tKcCourseMapper;
+	
+	@Autowired
+	TKcTeacherMapper tKcTeacherMapper;
+	
+	@Autowired
+	TKcStudentMapper tKcStudentMapper;
+	
+	@Autowired
+	TKcCourseTableMapper tKcCourseTableMapper;
+	
+	@Autowired
+	TKcCourseTableGroupRelationMapper tKcCourseTableGroupRelationMapper;
+	
+	@SuppressWarnings("static-access")
+	@Override
+	public List<Res4AppGetClazzVo> selectByStudentIds(List<String> ids) {
+		Date nowTime = new Date();//现在的时间
+		TKcStudentExample tKcStudentExample = new TKcStudentExample();
+		tKcStudentExample.or().andStatusNotEqualTo(-1).andIdIn(ids);
+		List<TKcStudent> tKcStudents = tKcStudentMapper.selectByExample(tKcStudentExample);
+		List<String> groupIds = tKcStudents.stream().map(n->n.getGroupFid()).collect(Collectors.toList());
+		
+		TKcCourseTableGroupRelationExample example = new TKcCourseTableGroupRelationExample();
+		example.or().andStatusNotEqualTo(-1).andPreStartTimeGreaterThanOrEqualTo(nowTime).andGroupFidIn(groupIds);
+		example.setOrderByClause("pre_start_time desc");
+		List<TKcCourseTableGroupRelation> tKcCourseTableGroupRelations = tKcCourseTableGroupRelationMapper.selectByExample(example);
+		
+		Iterator<TKcCourseTableGroupRelation> it = tKcCourseTableGroupRelations.iterator();
+		List<Res4AppGetClazzVo> res4AppGetClazzVos = new ArrayList<>();
+		while (it.hasNext()) {
+			TKcCourseTableGroupRelation relation = it.next();
+			String courseTableFid = relation.getCourseTableFid();
+			TKcCourseTable courseTable = tKcCourseTableMapper.selectByPrimaryKey(courseTableFid);
+			String clazzName = courseTable.getClazzName();//-----------------
+			String courseFid = courseTable.getCourseFid();
+			TKcCourse course = tKcCourseMapper.selectByPrimaryKey(courseFid);
+			String teacherId = course.getTeacherFid();
+			TKcTeacher teacher = tKcTeacherMapper.selectByPrimaryKey(teacherId);
+			String nickName = teacher.getNickName();//-----------------------
+			String preTimeStr = "";//----------------------------------------
+			Date preStartTime = relation.getPreStartTime();//开课时间
+			
+			String preStartDayStr = DateUtil.format(preStartTime, DateUtil.DATETYPE_4);
+			String todayStr = DateUtil.format(nowTime, DateUtil.DATETYPE_4);
+			if(preStartDayStr.equals(todayStr)){
+				preTimeStr = DateUtil.format(preStartTime, DateUtil.DATETYPE_12+" 今天");
+			}else{
+				preTimeStr = DateUtil.format(preStartTime, DateUtil.DATETYPE_11);
+			}
+			String describe = DateUtil.deltaDate(nowTime,preStartTime);//---
+			
+			Res4AppGetClazzVo res4AppGetClazzVo = new Res4AppGetClazzVo().builder()
+					.clazzName(clazzName)
+					.nickName(nickName)
+					.preStartTime(preTimeStr)
+					.interval(describe)
+					.build();
+			res4AppGetClazzVos.add(res4AppGetClazzVo);
+		}
+		return res4AppGetClazzVos;
+	}
+
+}

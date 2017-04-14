@@ -1,0 +1,38 @@
+package com.shenmintech.cbp.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.shenmintech.cbp.entity.TKcHomeworkStudentRelation;
+import com.shenmintech.cbp.entity.TKcHomeworkStudentRelationExample;
+
+public interface TKcHomeworkStudentRelationMapper {
+  int countByExample(TKcHomeworkStudentRelationExample example);
+
+  int deleteByExample(TKcHomeworkStudentRelationExample example);
+
+  int deleteByPrimaryKey(String id);
+
+  int insert(TKcHomeworkStudentRelation record);
+
+  int insertSelective(TKcHomeworkStudentRelation record);
+
+  List<TKcHomeworkStudentRelation> selectByExample(TKcHomeworkStudentRelationExample example);
+
+  TKcHomeworkStudentRelation selectByPrimaryKey(String id);
+
+  int updateByExampleSelective(@Param("record") TKcHomeworkStudentRelation record,
+      @Param("example") TKcHomeworkStudentRelationExample example);
+
+  int updateByExample(@Param("record") TKcHomeworkStudentRelation record,
+      @Param("example") TKcHomeworkStudentRelationExample example);
+
+  int updateByPrimaryKeySelective(TKcHomeworkStudentRelation record);
+
+  int updateByPrimaryKey(TKcHomeworkStudentRelation record);
+
+  void insertList(List<TKcHomeworkStudentRelation> list);
+
+
+}

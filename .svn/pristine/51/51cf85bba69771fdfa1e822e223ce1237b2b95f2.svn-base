@@ -1,0 +1,11 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import com.shenmintech.base.bean.BaseRetBean;
+
+import io.swagger.annotations.ApiModel;
+
+
+@ApiModel("更新公司列表出参")
+public class Res4PutComBean extends BaseRetBean {
+
+}

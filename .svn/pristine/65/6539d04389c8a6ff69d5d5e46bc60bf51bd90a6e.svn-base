@@ -1,0 +1,149 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.http.Consts;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.junit.Test;
+import org.springframework.stereotype.Component;
+
+import com.google.gson.Gson;
+import com.shenmintech.cbp.biz.IRoomAndVideoBiz;
+import com.shenmintech.cbp.controller.bean.req.NetEasyRoomCreateChannelBean;
+import com.shenmintech.cbp.controller.bean.req.NetEasyRoomCreateRoomReq;
+import com.shenmintech.cbp.controller.bean.res.NetEasyRoomGetTokenResBean;
+import com.shenmintech.cbp.controller.bean.res.NetEasyRoomResponse;
+import com.shenmintech.cbp.controller.bean.res.NetEasyUserResponse;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.NeteasyUtil;
+
+@Component
+public class RoomAndVideoBiz implements IRoomAndVideoBiz {
+
+  @Override
+  public NetEasyRoomResponse createNetEasyRoom(NetEasyRoomCreateRoomReq req) {
+    // TODO Auto-generated method stub
+    List<NameValuePair> nvps = new ArrayList<>();
+    NetEasyRoomGetTokenResBean userInfoResult = getAccoutAndAccidAndToken(req.getOperatorUserId());
+    if (userInfoResult.getCode() != 200) {
+      createAccoutAndAccid(req.getOperatorUserId(), "用户" + req.getOperatorUserId());
+    }
+
+
+    String json2 = NeteasyUtil.sendPostNeteasyVideo(req.getGroupId() + req.getRoomName(),
+        "https://vcloud.163.com/app/channel/create");
+    System.out.println(json2);
+
+    nvps.add(new BasicNameValuePair("creator", req.getOperatorUserId()));
+    nvps.add(new BasicNameValuePair("name", req.getRoomName()));
+    String json = NeteasyUtil.sendPostNeteasy(nvps, Constants.CHATROOM_CREAT_URL);
+    Gson gson = new Gson();
+    NetEasyRoomResponse response = gson.fromJson(json, NetEasyRoomResponse.class);
+
+    NetEasyRoomCreateChannelBean tempResponse =
+        gson.fromJson(json2, NetEasyRoomCreateChannelBean.class);
+
+    NetEasyRoomResponse.Uinfos uinfos = response.getChatroom();
+    uinfos.setHttpPullUrl(tempResponse.getRet().getHttpPullUrl());
+    uinfos.setRtmpPullUrl(tempResponse.getRet().getRtmpPullUrl());
+
+    response.setChatroom(uinfos);
+
+
+    return response;
+  }
+
+  @Override
+  public NetEasyUserResponse createAccoutAndAccid(String accid, String name) {
+    // TODO Auto-generated method stub
+    List<NameValuePair> nvps = new ArrayList<>();
+    nvps.add(new BasicNameValuePair("accid", accid));
+    nvps.add(new BasicNameValuePair("name", name));
+    String json = NeteasyUtil.sendPostNeteasy(nvps, Constants.USER_CREAT_URL);
+    Gson gson = new Gson();
+    NetEasyUserResponse response = gson.fromJson(json, NetEasyUserResponse.class);
+
+    return response;
+  }
+
+  @Override
+  public NetEasyRoomGetTokenResBean getAccoutAndAccidAndToken(String accids) {
+    // TODO Auto-generated method stub
+    List<NameValuePair> nvps = new ArrayList<>();
+    List<String> accidsArray = new ArrayList<>();
+    accidsArray.add(accids);
+    Gson gson = new Gson();
+    accids = gson.toJson(accidsArray);
+    nvps.add(new BasicNameValuePair("accids", accids));
+    String json = NeteasyUtil.sendPostNeteasy(nvps, Constants.USER_GETUINFOS_URL);
+    NetEasyRoomGetTokenResBean response = gson.fromJson(json, NetEasyRoomGetTokenResBean.class);
+
+    return response;
+  }
+
+
+  @Test
+  public void test() {
+
+    RoomAndVideoBiz biz = new RoomAndVideoBiz();
+    // biz.createAccoutAndAccid("12345678123456782", "hello");
+    // NetEasyRoomResponse result = biz.getAccoutAndAccidAndToken("12345678123456782");
+    // System.out.println(result);
+  }
+
+  public void createChannel() {
+
+
+
+  }
+
+
+  public static void main(String[] args) throws Exception {
+    DefaultHttpClient httpClient = new DefaultHttpClient();
+    String url = "https://vcloud.163.com/app/channel/create";
+    HttpPost httpPost = new HttpPost(url);
+
+    // String appKey = "94kid09c9ig9k1loimjg012345123456";
+    // String appSecret = "123456789012";
+
+    String appKey = "99b3d70bd7fa46c474cb85af03be25ea";
+    String appSecret = "c0cb4143da72";
+    String nonce = "1";
+    String curTime = String.valueOf((new Date()).getTime() / 1000L);
+    String checkSum = NeteasyUtil.getCheckSum(appSecret, nonce, curTime);// 参考 计算CheckSum的java代码
+
+    // 设置请求的header
+    httpPost.addHeader("AppKey", appKey);
+    httpPost.addHeader("Nonce", nonce);
+    httpPost.addHeader("CurTime", curTime);
+    httpPost.addHeader("CheckSum", checkSum);
+    httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
+
+    // 设置请求的参数
+    StringEntity params =
+        new StringEntity("{\"name\":\"netease_vcloud_3\", \"type\":0}", Consts.UTF_8);
+    httpPost.setEntity(params);
+
+    // 执行请求
+    HttpResponse response = httpClient.execute(httpPost);
+
+    String json = EntityUtils.toString(response.getEntity(), "utf-8");
+    // 打印执行结果
+    System.out.println(json);
+
+
+    Gson gson = new Gson();
+    NetEasyRoomCreateChannelBean resp = gson.fromJson(json, NetEasyRoomCreateChannelBean.class);
+
+    System.out.println("*************");
+  }
+
+}

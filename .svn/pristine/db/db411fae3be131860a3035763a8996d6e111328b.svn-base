@@ -1,0 +1,56 @@
+package com.shenmintech.common.util;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
+public class ResUtil {
+	
+	/* 深敏分页适配回参,4参 */
+	@SuppressWarnings("unchecked")
+	public static String reportPageMsg(String resCode, String descCtx, String data ,UUID uuid) {//供回执外部接口
+		Map<String,Object> map = new HashMap<>();
+		map.put("Code", resCode);
+		map.put("Desc", descCtx);
+		Map<String,Object> curMap = GsonUtil.gson.fromJson(data, Map.class);
+		for (Map.Entry<String, Object> entry : curMap.entrySet()) {
+			map.put(entry.getKey(), entry.getValue());
+		}
+		String result = GsonUtil.gson.toJson(map);
+		log.info("返回给【外部】调用方：" + result);
+		log.info("\n ╔═══════════════════════════════════════════════════════════╗\n ╠═══END═════"+uuid+"═══END══════╣\n ╚═══════════════════════════════════════════════════════════╝");
+		return result;
+	}
+	
+	/* 返回信息,4参 */
+	public static String reportOrderMsg(String resCode, String descCtx, String data) {//供回执外部接口
+		Map<String,Object> map = new HashMap<>();
+		map.put("Code", resCode);
+		map.put("Desc", descCtx);
+		map.put("Data", GsonUtil.gson.fromJson(data, Map.class));
+		String result = GsonUtil.gson.toJson(map);
+		log.info("返回给【外部】调用方：" + result);
+		log.info("\n ╔═══════════════════════════════════════════════════════════╗\n ╠═══END═════"+Thread.currentThread().getName()+"═══END══════╣\n ╚═══════════════════════════════════════════════════════════╝");
+		return result;
+	}
+	
+	/* 返回信息,3参 */
+	public static Map<String,String> resMessage(String code, String msg, String data ) {//供回执内部接口
+		Map<String,String> map = new HashMap<String,String>();
+		map.put("code", code);
+		map.put("msg", msg);
+		map.put("data", data);
+		log.info("返回给【内部】调用方：" + GsonUtil.gson.toJson(map));
+		return map;
+	}
+	
+	public static String analysis(Map<String,Object> map,String key){
+		Object value = map.get(key);
+		if(null != value) return value.toString();
+		return null;
+	}
+	
+	
+}

@@ -1,0 +1,10 @@
+INSERT IGNORE INTO `t_kc_homework_type` VALUES ('1', '文字拍照类', '2017-01-19 14:16:59', '2017-02-16 17:28:38', '0', null);^
+INSERT IGNORE INTO `t_kc_homework_type` VALUES ('2', '打卡类', '2017-01-19 14:17:11', '2017-02-20 16:26:54', '0', null);^
+INSERT IGNORE INTO `t_kc_homework_type` VALUES ('3', '课后任务卡', '2017-01-19 14:18:06', '2017-02-16 17:28:43', '0', null);^
+INSERT IGNORE INTO `t_kc_homework_card_selection` VALUES ('1', '减肥', '1234', '0', '2017-02-20 18:43:32', '2017-02-21 10:48:32', null);^
+INSERT IGNORE INTO `t_kc_homework_card_selection` VALUES ('2', '运动', '1235', '0', '2017-02-20 18:43:40', '2017-02-21 10:48:44', null);^
+INSERT IGNORE INTO `t_kc_homework_card_selection` VALUES ('3', '跑步', '1236', '0', '2017-02-21 10:48:49', '2017-02-21 10:48:53', null);^
+INSERT IGNORE INTO `t_kc_course_type` VALUES ('1', '血糖', '2017-01-13 15:02:18', '2017-02-17 09:52:53', '0', null);^
+INSERT IGNORE INTO `t_kc_course_type` VALUES ('2', '减肥减脂', '2017-01-13 15:00:41', '2017-02-17 09:52:55', '0', null);^
+INSERT IGNORE INTO `t_kc_course_type` VALUES ('3', '塑身', '2017-01-13 15:01:10', '2017-02-17 09:52:56', '0', null);^
+INSERT IGNORE INTO `t_kc_course_type` VALUES ('4', '高血压', '2017-01-13 15:01:36', '2017-02-17 09:53:00', '0', null);^

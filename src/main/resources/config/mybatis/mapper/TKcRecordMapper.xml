@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shenmintech.cbp.mapper.TKcRecordMapper">
+	<resultMap id="BaseResultMap" type="com.shenmintech.cbp.entity.TKcRecord">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="record_name" property="recordName" jdbcType="VARCHAR" />
+		<result column="record_type_fid" property="recordTypeFid"
+			jdbcType="VARCHAR" />
+		<result column="view_permission" property="viewPermission"
+			jdbcType="INTEGER" />
+		<result column="title1" property="title1" jdbcType="VARCHAR" />
+		<result column="title2" property="title2" jdbcType="VARCHAR" />
+		<result column="title3" property="title3" jdbcType="VARCHAR" />
+		<result column="cover_picture_id" property="coverPictureId"
+			jdbcType="VARCHAR" />
+		<result column="file_id" property="fileId" jdbcType="VARCHAR" />
+		<result column="format" property="format" jdbcType="VARCHAR" />
+		<result column="duration" property="duration" jdbcType="INTEGER" />
+		<result column="hide_flag" property="hideFlag" jdbcType="INTEGER" />
+		<result column="record_size" property="recordSize" jdbcType="DOUBLE" />
+		<result column="record_describe" property="recordDescribe"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="record_index" property="recordIndex" jdbcType="BIGINT" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="remark1" property="remark1" jdbcType="VARCHAR" />
+		<result column="remark2" property="remark2" jdbcType="VARCHAR" />
+		<result column="remark3" property="remark3" jdbcType="VARCHAR" />
+		<result column="remark4" property="remark4" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="pagingExample">
+		<if test="pagingExample != null">
+			limit ${pagingExample.offset}, ${pagingExample.limit}
+		</if>
+	</sql>
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, record_name, record_type_fid, view_permission, title1,
+		title2,
+		title3, cover_picture_id,
+		file_id, format, duration, hide_flag,
+		record_size, record_describe, status,
+		record_index,
+		create_time,
+		update_time, remark1, remark2, remark3, remark4
+	</sql>
+	<select id="selectByExample" resultMap="BaseResultMap"
+		parameterType="com.shenmintech.cbp.entity.TKcRecordExample">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from t_kc_record
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+		<include refid="pagingExample" />
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_kc_record
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from
+		t_kc_record
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteByExample" parameterType="com.shenmintech.cbp.entity.TKcRecordExample">
+		delete from t_kc_record
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.shenmintech.cbp.entity.TKcRecord">
+		insert into t_kc_record (id,
+		record_name, record_type_fid,
+		view_permission, title1, title2,
+		title3,
+		cover_picture_id, file_id,
+		format, duration, hide_flag,
+		record_size,
+		record_describe, status,
+		record_index, create_time, update_time,
+		remark1, remark2, remark3,
+		remark4)
+		values (#{id,jdbcType=VARCHAR},
+		#{recordName,jdbcType=VARCHAR},
+		#{recordTypeFid,jdbcType=VARCHAR},
+		#{viewPermission,jdbcType=INTEGER}, #{title1,jdbcType=VARCHAR},
+		#{title2,jdbcType=VARCHAR},
+		#{title3,jdbcType=VARCHAR},
+		#{coverPictureId,jdbcType=VARCHAR},
+		#{fileId,jdbcType=VARCHAR},
+		#{format,jdbcType=VARCHAR}, #{duration,jdbcType=INTEGER},
+		#{hideFlag,jdbcType=INTEGER},
+		#{recordSize,jdbcType=DOUBLE},
+		#{recordDescribe,jdbcType=VARCHAR},
+		#{status,jdbcType=INTEGER},
+		#{recordIndex,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP},
+		#{remark1,jdbcType=VARCHAR},
+		#{remark2,jdbcType=VARCHAR},
+		#{remark3,jdbcType=VARCHAR},
+		#{remark4,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.shenmintech.cbp.entity.TKcRecord">
+		insert into t_kc_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="recordName != null">
+				record_name,
+			</if>
+			<if test="recordTypeFid != null">
+				record_type_fid,
+			</if>
+			<if test="viewPermission != null">
+				view_permission,
+			</if>
+			<if test="title1 != null">
+				title1,
+			</if>
+			<if test="title2 != null">
+				title2,
+			</if>
+			<if test="title3 != null">
+				title3,
+			</if>
+			<if test="coverPictureId != null">
+				cover_picture_id,
+			</if>
+			<if test="fileId != null">
+				file_id,
+			</if>
+			<if test="format != null">
+				format,
+			</if>
+			<if test="duration != null">
+				duration,
+			</if>
+			<if test="hideFlag != null">
+				hide_flag,
+			</if>
+			<if test="recordSize != null">
+				record_size,
+			</if>
+			<if test="recordDescribe != null">
+				record_describe,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="recordIndex != null">
+				record_index,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="remark1 != null">
+				remark1,
+			</if>
+			<if test="remark2 != null">
+				remark2,
+			</if>
+			<if test="remark3 != null">
+				remark3,
+			</if>
+			<if test="remark4 != null">
+				remark4,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="recordName != null">
+				#{recordName,jdbcType=VARCHAR},
+			</if>
+			<if test="recordTypeFid != null">
+				#{recordTypeFid,jdbcType=VARCHAR},
+			</if>
+			<if test="viewPermission != null">
+				#{viewPermission,jdbcType=INTEGER},
+			</if>
+			<if test="title1 != null">
+				#{title1,jdbcType=VARCHAR},
+			</if>
+			<if test="title2 != null">
+				#{title2,jdbcType=VARCHAR},
+			</if>
+			<if test="title3 != null">
+				#{title3,jdbcType=VARCHAR},
+			</if>
+			<if test="coverPictureId != null">
+				#{coverPictureId,jdbcType=VARCHAR},
+			</if>
+			<if test="fileId != null">
+				#{fileId,jdbcType=VARCHAR},
+			</if>
+			<if test="format != null">
+				#{format,jdbcType=VARCHAR},
+			</if>
+			<if test="duration != null">
+				#{duration,jdbcType=INTEGER},
+			</if>
+			<if test="hideFlag != null">
+				#{hideFlag,jdbcType=INTEGER},
+			</if>
+			<if test="recordSize != null">
+				#{recordSize,jdbcType=DOUBLE},
+			</if>
+			<if test="recordDescribe != null">
+				#{recordDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="recordIndex != null">
+				#{recordIndex,jdbcType=BIGINT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark1 != null">
+				#{remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="remark2 != null">
+				#{remark2,jdbcType=VARCHAR},
+			</if>
+			<if test="remark3 != null">
+				#{remark3,jdbcType=VARCHAR},
+			</if>
+			<if test="remark4 != null">
+				#{remark4,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="countByExample" parameterType="com.shenmintech.cbp.entity.TKcRecordExample"
+		resultType="java.lang.Integer">
+		select count(*) from t_kc_record
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update t_kc_record
+		<set>
+			<if test="record.id != null">
+				id = #{record.id,jdbcType=VARCHAR},
+			</if>
+			<if test="record.recordName != null">
+				record_name = #{record.recordName,jdbcType=VARCHAR},
+			</if>
+			<if test="record.recordTypeFid != null">
+				record_type_fid =
+				#{record.recordTypeFid,jdbcType=VARCHAR},
+			</if>
+			<if test="record.viewPermission != null">
+				view_permission =
+				#{record.viewPermission,jdbcType=INTEGER},
+			</if>
+			<if test="record.title1 != null">
+				title1 = #{record.title1,jdbcType=VARCHAR},
+			</if>
+			<if test="record.title2 != null">
+				title2 = #{record.title2,jdbcType=VARCHAR},
+			</if>
+			<if test="record.title3 != null">
+				title3 = #{record.title3,jdbcType=VARCHAR},
+			</if>
+			<if test="record.coverPictureId != null">
+				cover_picture_id =
+				#{record.coverPictureId,jdbcType=VARCHAR},
+			</if>
+			<if test="record.fileId != null">
+				file_id = #{record.fileId,jdbcType=VARCHAR},
+			</if>
+			<if test="record.format != null">
+				format = #{record.format,jdbcType=VARCHAR},
+			</if>
+			<if test="record.duration != null">
+				duration = #{record.duration,jdbcType=INTEGER},
+			</if>
+			<if test="record.hideFlag != null">
+				hide_flag = #{record.hideFlag,jdbcType=INTEGER},
+			</if>
+			<if test="record.recordSize != null">
+				record_size = #{record.recordSize,jdbcType=DOUBLE},
+			</if>
+			<if test="record.recordDescribe != null">
+				record_describe =
+				#{record.recordDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="record.status != null">
+				status = #{record.status,jdbcType=INTEGER},
+			</if>
+			<if test="record.recordIndex != null">
+				record_index = #{record.recordIndex,jdbcType=BIGINT},
+			</if>
+			<if test="record.createTime != null">
+				create_time = #{record.createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.updateTime != null">
+				update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.remark1 != null">
+				remark1 = #{record.remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark2 != null">
+				remark2 = #{record.remark2,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark3 != null">
+				remark3 = #{record.remark3,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark4 != null">
+				remark4 = #{record.remark4,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update t_kc_record
+		set id = #{record.id,jdbcType=VARCHAR},
+		record_name =
+		#{record.recordName,jdbcType=VARCHAR},
+		record_type_fid =
+		#{record.recordTypeFid,jdbcType=VARCHAR},
+		view_permission =
+		#{record.viewPermission,jdbcType=INTEGER},
+		title1 =
+		#{record.title1,jdbcType=VARCHAR},
+		title2 =
+		#{record.title2,jdbcType=VARCHAR},
+		title3 =
+		#{record.title3,jdbcType=VARCHAR},
+		cover_picture_id =
+		#{record.coverPictureId,jdbcType=VARCHAR},
+		file_id =
+		#{record.fileId,jdbcType=VARCHAR},
+		format =
+		#{record.format,jdbcType=VARCHAR},
+		duration =
+		#{record.duration,jdbcType=INTEGER},
+		hide_flag =
+		#{record.hideFlag,jdbcType=INTEGER},
+		record_size =
+		#{record.recordSize,jdbcType=DOUBLE},
+		record_describe =
+		#{record.recordDescribe,jdbcType=VARCHAR},
+		status =
+		#{record.status,jdbcType=INTEGER},
+		record_index =
+		#{record.recordIndex,jdbcType=BIGINT},
+		create_time =
+		#{record.createTime,jdbcType=TIMESTAMP},
+		update_time =
+		#{record.updateTime,jdbcType=TIMESTAMP},
+		remark1 =
+		#{record.remark1,jdbcType=VARCHAR},
+		remark2 =
+		#{record.remark2,jdbcType=VARCHAR},
+		remark3 =
+		#{record.remark3,jdbcType=VARCHAR},
+		remark4 =
+		#{record.remark4,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.shenmintech.cbp.entity.TKcRecord">
+		update t_kc_record
+		<set>
+			<if test="recordName != null">
+				record_name = #{recordName,jdbcType=VARCHAR},
+			</if>
+			<if test="recordTypeFid != null">
+				record_type_fid = #{recordTypeFid,jdbcType=VARCHAR},
+			</if>
+			<if test="viewPermission != null">
+				view_permission = #{viewPermission,jdbcType=INTEGER},
+			</if>
+			<if test="title1 != null">
+				title1 = #{title1,jdbcType=VARCHAR},
+			</if>
+			<if test="title2 != null">
+				title2 = #{title2,jdbcType=VARCHAR},
+			</if>
+			<if test="title3 != null">
+				title3 = #{title3,jdbcType=VARCHAR},
+			</if>
+			<if test="coverPictureId != null">
+				cover_picture_id = #{coverPictureId,jdbcType=VARCHAR},
+			</if>
+			<if test="fileId != null">
+				file_id = #{fileId,jdbcType=VARCHAR},
+			</if>
+			<if test="format != null">
+				format = #{format,jdbcType=VARCHAR},
+			</if>
+			<if test="duration != null">
+				duration = #{duration,jdbcType=INTEGER},
+			</if>
+			<if test="hideFlag != null">
+				hide_flag = #{hideFlag,jdbcType=INTEGER},
+			</if>
+			<if test="recordSize != null">
+				record_size = #{recordSize,jdbcType=DOUBLE},
+			</if>
+			<if test="recordDescribe != null">
+				record_describe = #{recordDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="recordIndex != null">
+				record_index = #{recordIndex,jdbcType=BIGINT},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark1 != null">
+				remark1 = #{remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="remark2 != null">
+				remark2 = #{remark2,jdbcType=VARCHAR},
+			</if>
+			<if test="remark3 != null">
+				remark3 = #{remark3,jdbcType=VARCHAR},
+			</if>
+			<if test="remark4 != null">
+				remark4 = #{remark4,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.shenmintech.cbp.entity.TKcRecord">
+		update t_kc_record
+		set record_name = #{recordName,jdbcType=VARCHAR},
+		record_type_fid =
+		#{recordTypeFid,jdbcType=VARCHAR},
+		view_permission =
+		#{viewPermission,jdbcType=INTEGER},
+		title1 =
+		#{title1,jdbcType=VARCHAR},
+		title2 = #{title2,jdbcType=VARCHAR},
+		title3
+		= #{title3,jdbcType=VARCHAR},
+		cover_picture_id =
+		#{coverPictureId,jdbcType=VARCHAR},
+		file_id =
+		#{fileId,jdbcType=VARCHAR},
+		format = #{format,jdbcType=VARCHAR},
+		duration = #{duration,jdbcType=INTEGER},
+		hide_flag =
+		#{hideFlag,jdbcType=INTEGER},
+		record_size =
+		#{recordSize,jdbcType=DOUBLE},
+		record_describe =
+		#{recordDescribe,jdbcType=VARCHAR},
+		status =
+		#{status,jdbcType=INTEGER},
+		record_index =
+		#{recordIndex,jdbcType=BIGINT},
+		create_time =
+		#{createTime,jdbcType=TIMESTAMP},
+		update_time =
+		#{updateTime,jdbcType=TIMESTAMP},
+		remark1 =
+		#{remark1,jdbcType=VARCHAR},
+		remark2 = #{remark2,jdbcType=VARCHAR},
+		remark3 = #{remark3,jdbcType=VARCHAR},
+		remark4 =
+		#{remark4,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

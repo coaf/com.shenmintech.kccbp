@@ -1,0 +1,23 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectArticleBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserLikeRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserPlayRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectArticleBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserLikeRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserPlayRecordBean;
+
+public interface IActionBiz {
+
+	public ResUserCollectRecordBean postUCR(ReqUserCollectRecordBean reqUserCollectRecordBean);
+	
+	public ResUserPlayRecordBean postUPR(ReqUserPlayRecordBean reqUserPlayRecordBean);
+	
+	public ResUserLikeRecordBean postULR(ReqUserLikeRecordBean reqUserLikeRecordBean);
+	
+	public ResUserCollectArticleBean postUCA(ReqUserCollectArticleBean reqUserCollectArticleBean);
+	
+	
+}

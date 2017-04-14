@@ -1,0 +1,9 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.Req4PostRollingPicBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostRollingPicBean;
+
+public interface IRollingPictureBiz {
+
+	public Res4PostRollingPicBean postRollingPic(Req4PostRollingPicBean req4PostRollingPicBean);
+}

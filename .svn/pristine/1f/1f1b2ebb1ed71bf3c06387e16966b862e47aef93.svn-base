@@ -1,0 +1,9 @@
+package com.shenmintech.cbp.service;
+
+public interface ITToolAccountService {
+
+	public void addAccount(String activeId,String passiveId,String actionId);//添加甲方对乙方的行为流水
+	
+	public int countOfActionByPassiveId(String passiveId,String actionId);//查询乙方被某行为的施行此数
+	
+}

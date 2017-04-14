@@ -1,0 +1,20 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import java.util.List;
+
+import com.shenmintech.base.bean.BaseRetBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@ApiModel("用户获取课程列表出参")
+public class Res4AppGetCourseBean extends BaseRetBean{
+	
+	@ApiModelProperty(value = "课程类型列表", required = true)
+	public List<Son4AppGetCourseTypeListBean> typeList;
+	
+}

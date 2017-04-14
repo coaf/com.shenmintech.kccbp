@@ -1,0 +1,11 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectRecordBean;
+
+public interface IActionBiz {
+
+	public ResUserCollectRecordBean postRecordAccount4App(ReqUserCollectRecordBean reqUserCollectRecordBean);
+	
+	
+}

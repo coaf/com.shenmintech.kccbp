@@ -1,0 +1,146 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IGroupBiz;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostGroupVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetGroupVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetGroupVo;
+import com.shenmintech.cbp.controller.bean.req.Req4GetGroupBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostGroupBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutGroupBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetGroupBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostGroupBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutGroupBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetGroupBean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IGroupService;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@SuppressWarnings("static-access")
+public class GroupBizImpl implements IGroupBiz {
+
+	@Autowired
+	IGroupService iGroupService;
+	
+	@Override
+	public Res4PostGroupBean addGroup(Req4PostGroupBean req4PostGroupBean) {
+		Res4PostGroupBean res4PostGroupBean = new Res4PostGroupBean();
+		String courseId = req4PostGroupBean.getCourseFid();
+		String groupName = req4PostGroupBean.getGroupName();
+		if(StringUtil.checkBlank(courseId,groupName)){
+			res4PostGroupBean.setError(-1);
+			res4PostGroupBean.setMsg("courseId,groupName不可为空");
+			res4PostGroupBean.setSuccess(false);
+			return res4PostGroupBean;
+		}
+		Req4PostGroupVo groupVo = new Req4PostGroupVo().builder()
+				.courseFid(courseId)
+				.groupName(groupName)
+				.build();
+		List<Req4PostGroupVo> list = new ArrayList<>();
+		list.add(groupVo);
+		try {
+			iGroupService.add(list);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PostGroupBean.setError(-1);
+			res4PostGroupBean.setMsg(e.msg);
+			res4PostGroupBean.setSuccess(false);
+			return res4PostGroupBean;
+		}
+		res4PostGroupBean.setError(0);
+		res4PostGroupBean.setMsg("SUCCESS");
+		res4PostGroupBean.setSuccess(true);
+		return res4PostGroupBean;
+	}
+
+	@Override
+	public Res4PutGroupBean updateByGroupId(Req4PutGroupBean req4PutGroupBean) {
+		Res4PutGroupBean res4PostGroupBean = new Res4PutGroupBean();
+		String groupId = req4PutGroupBean.getGroupId();
+		String groupName = req4PutGroupBean.getGroupName();
+		if(StringUtil.checkBlank(groupId,groupName)){
+			res4PostGroupBean.setError(-1);
+			res4PostGroupBean.setMsg("groupId,groupName不可为空");
+			res4PostGroupBean.setSuccess(false);
+			return res4PostGroupBean;
+		}
+		try {
+			iGroupService.updateById(groupId, groupName);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PostGroupBean.setError(-1);
+			res4PostGroupBean.setMsg(e.msg);
+			res4PostGroupBean.setSuccess(false);
+			return res4PostGroupBean;
+		}
+		res4PostGroupBean.setError(0);
+		res4PostGroupBean.setMsg("SUCCESS");
+		res4PostGroupBean.setSuccess(true);
+		return res4PostGroupBean;
+	}
+
+	@Override
+	public Res4GetGroupBean selectByCourseId(Req4GetGroupBean req4GetGroupBean) {
+		Res4GetGroupBean res4GetGroupBean = new Res4GetGroupBean();
+		String courseId = req4GetGroupBean.getCourseId();
+		if(StringUtil.isBlank(courseId)){
+			res4GetGroupBean.setError(-1);
+			res4GetGroupBean.setMsg("courseId不可为空");
+			res4GetGroupBean.setSuccess(false);
+			return res4GetGroupBean;
+		}
+		int pageNo = -1==req4GetGroupBean.getPageNo()?1:req4GetGroupBean.getPageNo();
+		int rowsPerPage = -1==req4GetGroupBean.getPageNo()?99999:req4GetGroupBean.getRowsPerPage();
+		
+		Res4GetGroupVo res4GetGroupVo = new Res4GetGroupVo();
+		try {
+			res4GetGroupVo =iGroupService.selectByIdPages(courseId,pageNo,rowsPerPage);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetGroupBean.setError(-1);
+			res4GetGroupBean.setMsg(e.msg);
+			res4GetGroupBean.setSuccess(false);
+			return res4GetGroupBean;
+		}
+		
+		int recordCount = res4GetGroupVo.getRecordCount();
+		List<Son4GetGroupVo> son4GetGroupVos = res4GetGroupVo.getGroupVos();
+		Iterator<Son4GetGroupVo> it = son4GetGroupVos.iterator();
+		List<Son4GetGroupBean> son4GetGroupBeans = new ArrayList<>();
+		while (it.hasNext()) {
+			Son4GetGroupBean son4GetGroupBean= new Son4GetGroupBean(); 
+			Son4GetGroupVo son4GetGroupVo = it.next();
+			String groupId = son4GetGroupVo.getGroupId();
+			son4GetGroupBean.setGroupId(groupId);
+			String groupName = son4GetGroupVo.getGroupName();
+			son4GetGroupBean.setGroupName(groupName);
+			Date createDate = son4GetGroupVo.getCreateDate();
+			son4GetGroupBean.setCreateDate(DateUtil.format(createDate, DateUtil.DATETYPE_4));
+			int studentCount = iGroupService.countByGroupId(groupId);
+			son4GetGroupBean.setStudentCount(String.valueOf(studentCount));
+			son4GetGroupBeans.add(son4GetGroupBean);
+		}
+		res4GetGroupBean.setError(0);
+		res4GetGroupBean.setMsg("SUCCESS");
+		res4GetGroupBean.setSuccess(true);
+		res4GetGroupBean.setPageNo(pageNo);
+		res4GetGroupBean.setRecordCount(recordCount);
+		res4GetGroupBean.setPageSumCount((recordCount+rowsPerPage-1)/rowsPerPage);
+		res4GetGroupBean.setList(son4GetGroupBeans);
+		return res4GetGroupBean;
+	}
+
+}

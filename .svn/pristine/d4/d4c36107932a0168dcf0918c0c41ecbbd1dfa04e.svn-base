@@ -1,0 +1,378 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.IHomeworkPushBiz;
+import com.shenmintech.cbp.biz.vo.res.CourseVo;
+import com.shenmintech.cbp.biz.vo.res.PushHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetComVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourseTableVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourzeVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetGroupVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetPushHomeworksVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetGroupVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetHomeworkVo;
+import com.shenmintech.cbp.biz.vo.res.Son4GetPushHomeworksVo;
+import com.shenmintech.cbp.biz.vo.res.Sons4GetComVo;
+import com.shenmintech.cbp.controller.bean.req.Req4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetPushHomeworksBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Clazz;
+import com.shenmintech.cbp.controller.bean.res.Company;
+import com.shenmintech.cbp.controller.bean.res.Course;
+import com.shenmintech.cbp.controller.bean.res.Group;
+import com.shenmintech.cbp.controller.bean.res.Homework;
+import com.shenmintech.cbp.controller.bean.res.PushInfo;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPushHomeworksBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetPushHomeworksBean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.ICompanyService;
+import com.shenmintech.cbp.service.ICourseService;
+import com.shenmintech.cbp.service.IGroupService;
+import com.shenmintech.cbp.service.IHomeWorkService;
+import com.shenmintech.cbp.service.IHomeworkPushService;
+import com.shenmintech.cbp.service.IStudentService;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class HomeworkPushBizImpl implements IHomeworkPushBiz {
+	
+	@Autowired
+	IHomeWorkService iHomeWorkService;
+	
+	@Autowired
+	ICompanyService iCompanyService;
+	
+	@Autowired
+	ICourseService iCourseService;
+	
+	@Autowired
+	IGroupService iGroupService;
+	
+	@Autowired
+	IStudentService iStudentService;
+	
+	@Autowired
+	IHomeworkPushService iHomeworkPushService;
+	
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@SuppressWarnings("static-access")
+	@Override
+	public Res4GetPrePushHomeworkBean selectInitElement(Req4GetPrePushHomeworkBean req4GetPushHomeworkBean) {
+		Res4GetPrePushHomeworkBean res4GetPrePushHomeworkBean = new Res4GetPrePushHomeworkBean();
+		
+		String teacherId = req4GetPushHomeworkBean.getTeacherId();//教师的id
+		if(StringUtil.isBlank(teacherId)){
+			res4GetPrePushHomeworkBean.setError(-1);
+			res4GetPrePushHomeworkBean.setMsg("teacherId不能为空");
+			res4GetPrePushHomeworkBean.setSuccess(false);
+			return res4GetPrePushHomeworkBean;
+		}
+		
+		List<Homework> homeworks = new ArrayList<>();
+		Res4GetHomeworkVo homeworkVo = iHomeWorkService.selectByTeacherIdPages(teacherId, 1, 99999);
+		List<Son4GetHomeworkVo> homeworkVos = homeworkVo.getHomeworkTypeVos();
+		Iterator<Son4GetHomeworkVo> it = homeworkVos.iterator();
+		while (it.hasNext()) {
+			Son4GetHomeworkVo vo = it.next();
+			String homeworkId = vo.getHomeworkId();
+			String homeworkName = vo.getHomeworkName();
+			Homework homework = new Homework().builder()
+					.homeworkId(homeworkId)
+					.homeworkName(homeworkName)
+					.build();
+			homeworks.add(homework);
+		}
+		res4GetPrePushHomeworkBean.setHomeworks(homeworks);
+		
+		List<Company> companies = new ArrayList<>();
+		Res4GetComVo companiesVo = iCompanyService.select(1, 99999);
+		List<Sons4GetComVo> comVos = companiesVo.getList();
+		Iterator<Sons4GetComVo> itt = comVos.iterator();
+		while (itt.hasNext()) {
+			Sons4GetComVo companyVo = itt.next();
+			String companyId = companyVo.getId();
+			String companyName = companyVo.getCompanyName();
+			
+			List<CourseVo> courseVos = iCourseService.selectCourseByTeacherIdAndCompanyId(teacherId, companyId);
+			
+			List<Course> courses = new ArrayList<>();
+			Iterator<CourseVo> ita = courseVos.iterator();
+			while (ita.hasNext()) {
+				
+				CourseVo courseVo = ita.next();
+				String courseId = courseVo.getCourseId();
+				Res4GetGroupVo res4GetGroupVo = iGroupService.selectByIdPages(courseId, 1, 99999);
+				List<Son4GetGroupVo> groupVos = res4GetGroupVo.getGroupVos();
+				List<Group> groups = new ArrayList<>();
+				groupVos.stream().forEach(n->{
+					Group group = new Group();
+					BeanUtils.copyProperties(n, group);
+					groups.add(group);
+				});
+				
+				List<Res4GetCourseTableVo> res4GetCourseTableVos = iCourseService.selectCourseTableByCourseId(courseId);
+				List<Clazz> clazzes = new ArrayList<>();
+				res4GetCourseTableVos.stream().forEach(n->{
+					Clazz clazz = new Clazz();
+					BeanUtils.copyProperties(n, clazz);
+					clazzes.add(clazz);
+				});
+				
+				Course course = new Course().builder()
+						.courseId(courseId)
+						.courseName(courseVo.getCourseName())
+						.groups(groups)
+						.clazzes(clazzes)
+						.build();
+				courses.add(course);
+			}
+			Company company = new Company().builder()
+					.companyId(companyId)
+					.companyName(companyName)
+					
+					.courses(courses)
+					.build();
+			companies.add(company);
+		}
+		
+		List<PushInfo> pushInfo = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			String pushDesc = 0==i?"即时推送":1==i?"课前推送":"课后推送";
+			PushInfo info = new PushInfo().builder()
+					.pushFlag(String.valueOf(i))
+					.pushDesc(pushDesc)
+					.build();
+			pushInfo.add(info);
+		}
+		res4GetPrePushHomeworkBean.setPushInfo(pushInfo);
+		res4GetPrePushHomeworkBean.setCompanies(companies);
+		res4GetPrePushHomeworkBean.setError(0);
+		res4GetPrePushHomeworkBean.setMsg("SUCCESS");
+		res4GetPrePushHomeworkBean.setSuccess(true);
+		return res4GetPrePushHomeworkBean;
+	}
+
+	@Override
+	public Res4PostPushHomeworkBean postPushHomework(Req4PostPushHomeworkBean req4PostPushHomeworkBean) {
+		Res4PostPushHomeworkBean res4PostPushHomeworkBean = new Res4PostPushHomeworkBean();
+		String teacherId = req4PostPushHomeworkBean.getTeacherId();
+		String homeworkId = req4PostPushHomeworkBean.getHomeworkId();
+		String companyId = req4PostPushHomeworkBean.getCompanyId();
+		String courseId = req4PostPushHomeworkBean.getCourseId();
+		String clazzId = req4PostPushHomeworkBean.getClazzId();
+		String pushFlag = req4PostPushHomeworkBean.getPushFlag();
+		List<String> groupIds = req4PostPushHomeworkBean.getGroupIds();
+		if(StringUtil.checkBlank(teacherId,homeworkId,pushFlag,companyId,courseId)){
+			res4PostPushHomeworkBean.setError(-1);
+			res4PostPushHomeworkBean.setMsg("teacherId,homeworkId,pushFlag,companyId,courseId不能为空");
+			res4PostPushHomeworkBean.setSuccess(false);
+			return res4PostPushHomeworkBean;
+		}
+		
+		if(!Constants.l012.contains(pushFlag)){
+			res4PostPushHomeworkBean.setError(-1);
+			res4PostPushHomeworkBean.setMsg("pushFlag必须是0/1/2");
+			res4PostPushHomeworkBean.setSuccess(false);
+			return res4PostPushHomeworkBean;
+		}
+		
+		if(!"0".equals(pushFlag)){//定时推送
+			if(StringUtil.isBlank(clazzId)){
+				res4PostPushHomeworkBean.setError(-1);
+				res4PostPushHomeworkBean.setMsg("非即时推送的时候需要关联课程实例，clazz必传");
+				res4PostPushHomeworkBean.setSuccess(false);
+				return res4PostPushHomeworkBean;
+			}
+			//非即时推送需要校验的内容
+			try {
+				iHomeworkPushService.checkAddPushHomework(homeworkId,clazzId,groupIds,pushFlag);
+			} catch (ApplicationException e) {
+				res4PostPushHomeworkBean.setError(-1);
+				res4PostPushHomeworkBean.setMsg(e.msg);
+				res4PostPushHomeworkBean.setSuccess(false);
+				return res4PostPushHomeworkBean;
+			} catch (Exception e) {
+				res4PostPushHomeworkBean.setError(-1);
+				res4PostPushHomeworkBean.setMsg(e.getMessage());
+				res4PostPushHomeworkBean.setSuccess(false);
+				return res4PostPushHomeworkBean;
+			}
+		}
+		
+		if(null == groupIds || 0 == groupIds.size()){
+			res4PostPushHomeworkBean.setError(-1);
+			res4PostPushHomeworkBean.setMsg("groupIds不能为空");
+			res4PostPushHomeworkBean.setSuccess(false);
+			return res4PostPushHomeworkBean;
+		}
+		
+		//加入推送任务
+		String remark = req4PostPushHomeworkBean.getRemark();
+		try {
+			iHomeworkPushService.addPushHomework(teacherId,homeworkId,companyId,courseId,groupIds,clazzId,pushFlag,remark);
+		} catch (ApplicationException e) {
+			res4PostPushHomeworkBean.setError(-1);
+			res4PostPushHomeworkBean.setMsg(e.msg);
+			res4PostPushHomeworkBean.setSuccess(false);
+			return res4PostPushHomeworkBean;
+		}
+		
+		
+		res4PostPushHomeworkBean.setError(0);
+		res4PostPushHomeworkBean.setMsg("SUCCESS");
+		res4PostPushHomeworkBean.setSuccess(true);
+		return res4PostPushHomeworkBean;
+	}
+
+	@Override
+	public Res4GetPushHomeworksBean getPushHomeworks(Req4GetPushHomeworksBean req4GetPushHomeworksBean) {
+		Res4GetPushHomeworksBean res4GetPushHomeworksBean = new Res4GetPushHomeworksBean();
+		String teacherId = req4GetPushHomeworksBean.getTeacherId();
+		if(StringUtil.checkBlank(teacherId)){
+			res4GetPushHomeworksBean.setError(-1);
+			res4GetPushHomeworksBean.setMsg("teacherId不能为空");
+			res4GetPushHomeworksBean.setSuccess(false);
+			return res4GetPushHomeworksBean;
+		}
+		int pageNo = -1==req4GetPushHomeworksBean.getPageNo()?1:req4GetPushHomeworksBean.getPageNo();
+		int rowsPerPage = -1==req4GetPushHomeworksBean.getPageNo()?99999:req4GetPushHomeworksBean.getRowsPerPage();
+		Res4GetPushHomeworksVo res4GetPushHomeworksVo = new Res4GetPushHomeworksVo();
+		
+		try {
+			res4GetPushHomeworksVo = iHomeworkPushService.selectByTeacherIdPages(teacherId, pageNo, rowsPerPage);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetPushHomeworksBean.setError(-1);
+			res4GetPushHomeworksBean.setMsg(e.msg);
+			res4GetPushHomeworksBean.setSuccess(false);
+			return res4GetPushHomeworksBean;
+		}
+		List<Son4GetPushHomeworksVo> vos = res4GetPushHomeworksVo.getList();
+		Iterator<Son4GetPushHomeworksVo> it = vos.iterator();
+		List<Son4GetPushHomeworksBean> list = new ArrayList<>();
+		while(it.hasNext()){
+			Son4GetPushHomeworksBean bean = new Son4GetPushHomeworksBean();
+			Son4GetPushHomeworksVo vo = it.next();
+			String homeworkId = vo.getHomeworkFid();
+			String homeworkName = iHomeWorkService.selectNameById(homeworkId);
+			bean.setHomeworkId(homeworkId);
+			bean.setHomeworkName(homeworkName);
+			String companyId = vo.getCompanyFid();
+			bean.setCompanyId(companyId);
+			String courseFid = vo.getCourseFid();
+			Res4GetCourzeVo  courzeVo = iCourseService.selectByCourseId(courseFid);
+			String courseName = courzeVo.getCourseName();
+			bean.setCourseId(courseFid);
+			bean.setCourseName(courseName);
+			String groupFids = vo.getGroupFids();
+			String groupNames = "";
+			if("ALL".equalsIgnoreCase(groupFids)){
+				groupNames = "全部小组";
+			}else{
+				groupNames = iGroupService.selelctNameById(groupFids);
+			}
+			bean.setGroupIds(groupFids);
+			bean.setGroupNames(groupNames);
+			String clazzId = vo.getClazzId();
+			bean.setClazzId(null == clazzId?"":clazzId);
+			String pushTimeTypeFid = vo.getPushTimeTypeFid();
+			bean.setPushCode(pushTimeTypeFid);
+			String pushFlg ="";
+			pushFlg = "0".equals(pushTimeTypeFid)?"即时推送":"1".equals(pushTimeTypeFid)?"课前推送":"2".equals(pushTimeTypeFid)?"课后推送":"";
+			bean.setPushFlg(pushFlg);
+			Integer status = vo.getStatus();
+			if(null == status){
+				res4GetPushHomeworksBean.setError(-1);
+				res4GetPushHomeworksBean.setMsg("推送任务状态为null，请联系db排查脏数据");
+				res4GetPushHomeworksBean.setSuccess(false);
+				return res4GetPushHomeworksBean;
+			}
+			bean.setStatus(String.valueOf(status));
+			String remark = vo.getRemark();
+			bean.setRemark(remark);
+			list.add(bean);
+		}
+		int recordCount = res4GetPushHomeworksVo.getRecordCount();
+		res4GetPushHomeworksBean.setError(0);
+		res4GetPushHomeworksBean.setMsg("SUCCESS");
+		res4GetPushHomeworksBean.setSuccess(true);
+		res4GetPushHomeworksBean.setPageNo(pageNo);
+		res4GetPushHomeworksBean.setRecordCount(recordCount);
+		res4GetPushHomeworksBean.setPageSumCount((recordCount+rowsPerPage-1)/rowsPerPage);
+		res4GetPushHomeworksBean.setList(list);
+		return res4GetPushHomeworksBean;
+	}
+
+	@Override
+	public Res4PutPushHomeworkBean putPushHomework(Req4PutPushHomeworkBean req4PutPushHomeworkBean) {
+		Res4PutPushHomeworkBean res4PutPushHomeworkBean = new Res4PutPushHomeworkBean();
+		
+		PushHomeworkVo reqVo = new PushHomeworkVo();
+		String pushHomeworkId = req4PutPushHomeworkBean.getPushHomeworkId();
+		if(StringUtil.checkBlank(pushHomeworkId)){
+			res4PutPushHomeworkBean.setError(-1);
+			res4PutPushHomeworkBean.setMsg("pushHomeworkId不能为空");
+			res4PutPushHomeworkBean.setSuccess(false);
+			return res4PutPushHomeworkBean;
+		}
+		reqVo.setId(pushHomeworkId);
+		String teacherId = req4PutPushHomeworkBean.getTeacherId();//提交更新任务的老师
+		if(StringUtil.isNotBlank(teacherId)) reqVo.setTeacherId(teacherId);
+		String homeworkId = req4PutPushHomeworkBean.getHomeworkId();
+		if(StringUtil.isNotBlank(homeworkId)) reqVo.setHomeworkFid(homeworkId);
+		String companyId = req4PutPushHomeworkBean.getCompanyId();
+		if(StringUtil.isNotBlank(companyId)) reqVo.setCompanyFid(companyId);
+		String courseId = req4PutPushHomeworkBean.getCourseId();
+		if(StringUtil.isNotBlank(courseId)) reqVo.setCourseFid(courseId);
+		List<String> groupIds = req4PutPushHomeworkBean.getGroupIds();
+		int size = groupIds.size();
+		String groupFids = "ALL";
+		if(1==size) groupFids = groupIds.get(0);
+		if(StringUtil.isNotBlank(groupFids)) reqVo.setCourseFid(groupFids);
+		String pushFlag = req4PutPushHomeworkBean.getPushFlag();
+		reqVo.setPushTimeTypeFid(pushFlag);
+		String clazzId = req4PutPushHomeworkBean.getClazzId();
+		if(!"0".equals(pushFlag) && StringUtil.isBlank(clazzId)){
+			res4PutPushHomeworkBean.setError(-1);
+			res4PutPushHomeworkBean.setMsg("非即时推送必须关联课程实例");
+			res4PutPushHomeworkBean.setSuccess(false);
+			return res4PutPushHomeworkBean;
+		}
+		reqVo.setClazzFid(clazzId);
+		String remark = req4PutPushHomeworkBean.getRemark();
+		if(StringUtil.isNotBlank(remark)) reqVo.setRemark(remark);
+		
+		try {
+			iHomeworkPushService.updateByIdSelective(reqVo);
+		} catch (ApplicationException e) {
+			res4PutPushHomeworkBean.setError(-1);
+			res4PutPushHomeworkBean.setMsg(e.msg);
+			res4PutPushHomeworkBean.setSuccess(false);
+			return res4PutPushHomeworkBean;
+		}
+		res4PutPushHomeworkBean.setError(0);
+		res4PutPushHomeworkBean.setMsg("SUCCESS");
+		res4PutPushHomeworkBean.setSuccess(true);
+		return res4PutPushHomeworkBean;
+	}
+
+}

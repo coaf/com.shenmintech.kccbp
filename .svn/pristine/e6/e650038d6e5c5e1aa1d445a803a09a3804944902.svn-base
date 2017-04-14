@@ -1,0 +1,17 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.Req4DeleteRecordBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetRecordsBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostRecordBean;
+import com.shenmintech.cbp.controller.bean.res.Res4DeleteRecordBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRecordsBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostRecordBean;
+
+public interface IRecordBiz {
+
+	public Res4GetRecordsBean getRecords(Req4GetRecordsBean req4GetRecordsBean);
+	
+	public Res4DeleteRecordBean deleteRecord(Req4DeleteRecordBean req4DeleteRecordBean);
+	
+	public Res4PostRecordBean postRecord(Req4PostRecordBean req4PostRecordBean);
+}

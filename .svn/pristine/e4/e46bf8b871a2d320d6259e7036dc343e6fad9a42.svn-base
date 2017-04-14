@@ -1,0 +1,32 @@
+package com.shenmintech.cbp.mapper;
+
+import com.shenmintech.cbp.entity.TKcRollingPlacehd;
+import com.shenmintech.cbp.entity.TKcRollingPlacehdExample;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface TKcRollingPlacehdMapper {
+  int countByExample(TKcRollingPlacehdExample example);
+
+  int deleteByExample(TKcRollingPlacehdExample example);
+
+  int deleteByPrimaryKey(String id);
+
+  int insert(TKcRollingPlacehd record);
+
+  int insertSelective(TKcRollingPlacehd record);
+
+  List<TKcRollingPlacehd> selectByExample(TKcRollingPlacehdExample example);
+
+  TKcRollingPlacehd selectByPrimaryKey(String id);
+
+  int updateByExampleSelective(@Param("record") TKcRollingPlacehd record,
+      @Param("example") TKcRollingPlacehdExample example);
+
+  int updateByExample(@Param("record") TKcRollingPlacehd record,
+      @Param("example") TKcRollingPlacehdExample example);
+
+  int updateByPrimaryKeySelective(TKcRollingPlacehd record);
+
+  int updateByPrimaryKey(TKcRollingPlacehd record);
+}

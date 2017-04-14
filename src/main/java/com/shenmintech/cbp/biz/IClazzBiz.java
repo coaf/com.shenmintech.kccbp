@@ -1,0 +1,17 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.Req4GetRoomBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetTeachClazzBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostTeachClazzBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRoomBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetTeachClazzBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostTeachClazzBean;
+
+public interface IClazzBiz {
+
+  public Res4PostTeachClazzBean addTeachClazz(Req4PostTeachClazzBean req4TeachClazzBean);
+
+  public Res4GetTeachClazzBean selectById(Req4GetTeachClazzBean Req4GetTeachClazzBean);
+
+  public Res4GetRoomBean getRooms(Req4GetRoomBean req4GetRoomBean);
+}

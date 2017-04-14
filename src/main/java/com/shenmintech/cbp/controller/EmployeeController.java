@@ -1,0 +1,68 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IEmployeeBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetUserNtesBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostEmployeeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostUEStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Reas4PostUEStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetUserNtesBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostEmployeeBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/*
+ * 
+ */
+
+@Controller
+@Api(value = "员工", description = "员工列表显示并附加小组归属--max")
+public class EmployeeController {
+
+  @Autowired
+  IEmployeeBiz iEmployeeBiz;
+
+  @PostMapping("/tkcEmployee/post")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "扫码成为员工接口", httpMethod = "POST", value = "扫码加员工（OK）")
+  public @ResponseBody Res4PostEmployeeBean postTKcEmployee(
+      @ApiParam(required = true, value = "用户id") @RequestBody Req4PostEmployeeBean req4PostEmployeeBean) {
+    return iEmployeeBiz.addEmployee(req4PostEmployeeBean);
+  }
+
+  @PostMapping("/tkcEmployee/get")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "查询所有当前公司下某个班级的员工，并且附加小组归属，属于综合型接口", httpMethod = "POST", value = "查询员工（包含小组归属）列表（OK）")
+  public @ResponseBody Res4GetEmployeeBean getTKcEmployee(
+      @ApiParam(required = true, value = "用户id") @RequestBody Req4GetEmployeeBean req4GetEmployeeBean) {
+    return iEmployeeBiz.getByComIdAndCouIdPages(req4GetEmployeeBean);
+  }
+
+  @PostMapping("/student/post")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "教师直接添加某一个用户，并加入公司，分配小组，此接口为综合性接口，调用用户模块添加用户接口", httpMethod = "POST", value = "添加会员")
+  public @ResponseBody Reas4PostUEStudentBean postUserEmployeeStudent(
+      @ApiParam(required = true, value = "添加学员入参对象") @RequestBody Req4PostUEStudentBean req4PostUEStudentBean) {
+    return iEmployeeBiz.addUserEmployeeStudent(req4PostUEStudentBean);
+  }
+
+  @PostMapping("/ntesAccIdAndToken/get")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "获取网易第三方accId和token", httpMethod = "POST", value = "网易登录通行证+密码")
+  public @ResponseBody Res4GetUserNtesBean getUserNtesData(
+      @ApiParam(required = true, value = "添加学员入参对象") @RequestBody Req4GetUserNtesBean req4GetUserNtesBean) {
+    return iEmployeeBiz.getNtesDataByUserId(req4GetUserNtesBean);
+  }
+
+}

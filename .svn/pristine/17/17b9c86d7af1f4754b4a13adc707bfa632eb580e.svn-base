@@ -1,0 +1,540 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.ICourse4AppBiz;
+import com.shenmintech.cbp.biz.vo.res.CourseVo;
+import com.shenmintech.cbp.biz.vo.res.RelationVo;
+import com.shenmintech.cbp.biz.vo.res.Res4AppGetClazzVo;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetCourseBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppGetHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.req.Req4AppPostHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.res.Grand4AppGetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkSignCardVoBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkWorkCardStandardsVoBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppGetHomeworkWorkCardVoBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppPostHomeworkPicTxtBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppPostHomeworkSignCardBean;
+import com.shenmintech.cbp.controller.bean.res.Res4AppPostHomeworkWorkCardBean;
+import com.shenmintech.cbp.controller.bean.res.Son4AppGetCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Son4AppGetCourseTypeListBean;
+import com.shenmintech.cbp.controller.bean.res.Son4AppGetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.entity.TKcHomeworkCardSelection;
+import com.shenmintech.cbp.entity.TKcHomeworkPicTxt;
+import com.shenmintech.cbp.entity.TKcHomeworkSignCard;
+import com.shenmintech.cbp.entity.TKcHomeworkWorkCard;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.ICourse4AppService;
+import com.shenmintech.cbp.service.ICourseService;
+import com.shenmintech.cbp.service.IEmpolyeeService;
+import com.shenmintech.cbp.service.IHomeWorkService;
+import com.shenmintech.cbp.service.IStudentService;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class Course4AppBizImpl implements ICourse4AppBiz {
+
+  @Autowired
+  IEmpolyeeService iEmpolyeeService;
+
+  @Autowired
+  IStudentService iStudentService;
+
+  @Autowired
+  ICourse4AppService iCourse4AppService;
+
+  @Autowired
+  IHomeWorkService iHomeWorkService;
+
+  @Autowired
+  ICourseService iCourseService;
+
+  @Override
+  public Res4AppGetCourseBean selectByUserId(Req4AppGetCourseBean req4AppGetCourseBean) {
+    Res4AppGetCourseBean res4AppGetCourseBean = new Res4AppGetCourseBean();
+    String userId = req4AppGetCourseBean.getUserId();
+    if (StringUtil.checkBlank(userId)) {
+      res4AppGetCourseBean.setError(-1);
+      res4AppGetCourseBean.setMsg("userId不能为空");
+      res4AppGetCourseBean.setSuccess(false);
+      return res4AppGetCourseBean;
+    }
+
+    String employeeId = "";
+    try {
+      employeeId = iEmpolyeeService.selectByUserId(userId);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      res4AppGetCourseBean.setError(-1);
+      res4AppGetCourseBean.setMsg(e.msg);
+      res4AppGetCourseBean.setSuccess(false);
+      return res4AppGetCourseBean;
+    }
+
+    List<String> idList = new ArrayList<>();// 查找该用户在所有课程下的studentId
+    try {
+      idList = iStudentService.selectByEmployeeId(employeeId);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      res4AppGetCourseBean.setError(-1);
+      res4AppGetCourseBean.setMsg(e.msg);
+      res4AppGetCourseBean.setSuccess(false);
+      return res4AppGetCourseBean;
+    }
+
+    List<Res4AppGetClazzVo> res4AppGetClazzVos = new ArrayList<>();
+    try {
+      res4AppGetClazzVos = iCourse4AppService.selectByStudentIds(idList);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      res4AppGetCourseBean.setError(-1);
+      res4AppGetCourseBean.setMsg(e.msg);
+      res4AppGetCourseBean.setSuccess(false);
+      return res4AppGetCourseBean;
+    }
+    Map<String, List<Res4AppGetClazzVo>> map = res4AppGetClazzVos.stream().collect(Collectors.groupingBy(Res4AppGetClazzVo::getClazzTypeId));
+    List<Son4AppGetCourseTypeListBean> typeList = new ArrayList<>();
+    for (Map.Entry<String, List<Res4AppGetClazzVo>> entry : map.entrySet()) {
+      Son4AppGetCourseTypeListBean son4AppGetCourseTypeListBean = new Son4AppGetCourseTypeListBean();
+      String columnTypeId = entry.getKey();
+      String columnTypeName = iCourseService.selectCourseTypeNameById(columnTypeId);
+      son4AppGetCourseTypeListBean.setColumnTypeId(columnTypeId);
+      son4AppGetCourseTypeListBean.setColumnTypeName(columnTypeName);
+      List<Res4AppGetClazzVo> clazzVos = entry.getValue();
+      List<Res4AppGetClazzVo> undoneList = clazzVos.stream().filter(n -> n.getDoneFlag().equals("0")).collect(Collectors.toList());// 过滤出未开始的课程
+      Iterator<Res4AppGetClazzVo> it = undoneList.iterator();
+      List<Son4AppGetCourseBean> undoneBeans = new ArrayList<>();
+      while (it.hasNext()) {
+        Son4AppGetCourseBean bean = new Son4AppGetCourseBean();
+        Res4AppGetClazzVo vo = it.next();
+        bean.setClazzId(vo.getClazzId());
+        bean.setClazzName(vo.getClazzName());
+        bean.setInterval(vo.getInterval());
+        bean.setNickName(vo.getNickName());
+        bean.setPicId(vo.getPicId());
+        bean.setPreStartTime(vo.getPreStartTime());
+        bean.setNtesHttpPullUrl(vo.getNtesHttpPullUrl());
+        bean.setNtesRtmpPullUrl(vo.getNtesRtmpPullUrl());
+        bean.setNtesRoomId(vo.getNtesRoomId());
+        bean.setNtesRoomName(vo.getNtesRoomName());
+        undoneBeans.add(bean);
+      }
+      son4AppGetCourseTypeListBean.setUndoneList(undoneBeans);
+      List<Res4AppGetClazzVo> completedList = clazzVos.stream().filter(n -> n.getDoneFlag().equals("1")).collect(Collectors.toList());// 过滤出已完成的课程
+      Iterator<Res4AppGetClazzVo> ita = completedList.iterator();
+      List<Son4AppGetCourseBean> completedBeans = new ArrayList<>();
+      while (ita.hasNext()) {
+        Son4AppGetCourseBean bean = new Son4AppGetCourseBean();
+        Res4AppGetClazzVo vo = ita.next();
+        bean.setClazzId(vo.getClazzId());
+        bean.setClazzName(vo.getClazzName());
+        bean.setInterval(vo.getInterval());
+        bean.setNickName(vo.getNickName());
+        bean.setPicId(vo.getPicId());
+        bean.setPreStartTime(vo.getPreStartTime());
+        bean.setNtesHttpPullUrl(vo.getNtesHttpPullUrl());
+        bean.setNtesRtmpPullUrl(vo.getNtesRtmpPullUrl());
+        bean.setNtesRoomId(vo.getNtesRoomId());
+        bean.setNtesRoomName(vo.getNtesRoomName());
+        completedBeans.add(bean);
+      }
+      son4AppGetCourseTypeListBean.setCompletedList(completedBeans);
+      typeList.add(son4AppGetCourseTypeListBean);
+    }
+    res4AppGetCourseBean.setTypeList(typeList);
+    res4AppGetCourseBean.setError(0);
+    res4AppGetCourseBean.setMsg("SUCCESS");
+    res4AppGetCourseBean.setSuccess(true);
+    return res4AppGetCourseBean;
+  }
+
+  @Override
+  public Res4AppGetHomeworkStudentRelationBean selectHomeworkStudentRelationByUserId(Req4AppGetHomeworkStudentRelationBean req4AppGetHomeworkStudentRelationBean) {
+    Res4AppGetHomeworkStudentRelationBean res4AppGetHomeworkStudentRelationBean = new Res4AppGetHomeworkStudentRelationBean();
+    String userId = req4AppGetHomeworkStudentRelationBean.getUserId();
+    if (StringUtil.checkBlank(userId)) {
+      res4AppGetHomeworkStudentRelationBean.setError(-1);
+      res4AppGetHomeworkStudentRelationBean.setMsg("userId不能为空");
+      res4AppGetHomeworkStudentRelationBean.setSuccess(false);
+      return res4AppGetHomeworkStudentRelationBean;
+    }
+    String employeeId = "";
+    try {
+      employeeId = iEmpolyeeService.selectByUserId(userId);
+    } catch (ApplicationException e) {
+      res4AppGetHomeworkStudentRelationBean.setError(-1);
+      res4AppGetHomeworkStudentRelationBean.setMsg(e.msg);
+      res4AppGetHomeworkStudentRelationBean.setSuccess(false);
+      return res4AppGetHomeworkStudentRelationBean;
+    } catch (Exception e) {
+      log.error("context", e);
+      res4AppGetHomeworkStudentRelationBean.setError(-1);
+      res4AppGetHomeworkStudentRelationBean.setMsg(e.getMessage());
+      res4AppGetHomeworkStudentRelationBean.setSuccess(false);
+      return res4AppGetHomeworkStudentRelationBean;
+	}
+    List<String> idList = new ArrayList<>();// 查找该用户在所有课程下的studentId，同一个人会拥有多个studentId，其中几个studentId可能是隶属于同一个老师教的多个课程，但是同一个课程对于一个学生来说只能拥有一个唯一的studentId。
+    try {
+      idList = iStudentService.selectByEmployeeId(employeeId);
+    } catch (ApplicationException e) {
+      res4AppGetHomeworkStudentRelationBean.setError(-1);
+      res4AppGetHomeworkStudentRelationBean.setMsg(e.msg);
+      res4AppGetHomeworkStudentRelationBean.setSuccess(false);
+      return res4AppGetHomeworkStudentRelationBean;
+    } catch (Exception e) {
+      log.error("context", e);
+      res4AppGetHomeworkStudentRelationBean.setError(-1);
+      res4AppGetHomeworkStudentRelationBean.setMsg(e.getMessage());
+      res4AppGetHomeworkStudentRelationBean.setSuccess(false);
+      return res4AppGetHomeworkStudentRelationBean;
+  	}
+    Iterator<String> it = idList.iterator();
+    List<Son4AppGetHomeworkStudentRelationBean> son4AppGetHomeworkStudentRelationBeans = new ArrayList<>();
+    while (it.hasNext()) {
+      Son4AppGetHomeworkStudentRelationBean son4AppGetHomeworkStudentRelationBean = new Son4AppGetHomeworkStudentRelationBean();
+      String studentId = it.next();
+      List<RelationVo> relationVos = new ArrayList<>();
+
+      CourseVo courseVo = iCourseService.selectCourseByStudentId(studentId);// 当前课程的id和name
+      son4AppGetHomeworkStudentRelationBean.setCourseId(courseVo.getCourseId());
+      son4AppGetHomeworkStudentRelationBean.setCourseName(courseVo.getCourseName());
+      son4AppGetHomeworkStudentRelationBean.setCourseTypeId(courseVo.getCourseTypeId());
+      son4AppGetHomeworkStudentRelationBean.setCourseTypeName(courseVo.getCourseTypeName());
+
+      try {
+        relationVos = iHomeWorkService.selectHomeworksByStudentIds(studentId);// 根据学生id分组查找学生归属在不同课程下的任务列表
+      } catch (ApplicationException e) {
+        log.error("context", e);
+        res4AppGetHomeworkStudentRelationBean.setError(-1);
+        res4AppGetHomeworkStudentRelationBean.setMsg(e.msg);
+        res4AppGetHomeworkStudentRelationBean.setSuccess(false);
+        return res4AppGetHomeworkStudentRelationBean;
+      }
+      Iterator<RelationVo> ita = relationVos.iterator();
+      List<Grand4AppGetHomeworkStudentRelationBean> grandList = new ArrayList<>();
+      while (ita.hasNext()) {
+        Grand4AppGetHomeworkStudentRelationBean bean =
+            new Grand4AppGetHomeworkStudentRelationBean();
+        RelationVo vo = ita.next();
+        bean.setRelationId(vo.getRelationId());
+        bean.setRelationName(vo.getRelationName());
+        bean.setHomeworkTypeId(vo.getHomeworkTypeId());
+        bean.setHomeworkTypeName(vo.getHomeworkTypeName());
+        bean.setStatusFlg(vo.getStatusFlag());
+        bean.setStatusDesc(vo.getRemainDescribe());
+        grandList.add(bean);
+      }
+      son4AppGetHomeworkStudentRelationBean.setList(grandList);
+      son4AppGetHomeworkStudentRelationBeans.add(son4AppGetHomeworkStudentRelationBean);
+    }
+
+    Son4AppGetCourseBean clazz = new Son4AppGetCourseBean();
+    List<Res4AppGetClazzVo> res4AppGetClazzVos = new ArrayList<>();
+    try {
+      res4AppGetClazzVos = iCourse4AppService.selectByStudentIds(idList);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      res4AppGetHomeworkStudentRelationBean.setError(-1);
+      res4AppGetHomeworkStudentRelationBean.setMsg(e.msg);
+      res4AppGetHomeworkStudentRelationBean.setSuccess(false);
+      return res4AppGetHomeworkStudentRelationBean;
+    }
+    if (null != res4AppGetClazzVos && 0 < res4AppGetClazzVos.size()) {
+      Res4AppGetClazzVo res4AppGetClazzVo = res4AppGetClazzVos.get(0);
+      String clazzId = res4AppGetClazzVo.getClazzId();
+      clazz.setClazzId(clazzId);
+      String clazzName = res4AppGetClazzVo.getClazzName();
+      clazz.setClazzName(clazzName);
+      String nickName = res4AppGetClazzVo.getNickName();
+      clazz.setNickName(nickName);
+      String preStartTime = res4AppGetClazzVo.getPreStartTime();
+      clazz.setPreStartTime(preStartTime);
+      String interval = res4AppGetClazzVo.getInterval();
+      clazz.setInterval(interval);
+      String picId = res4AppGetClazzVo.getPicId();
+      clazz.setPicId(picId);
+      String ntesHttpPullUrl = res4AppGetClazzVo.getNtesHttpPullUrl();
+      clazz.setNtesHttpPullUrl(ntesHttpPullUrl);
+      String ntesRtmpPullUrl = res4AppGetClazzVo.getNtesRtmpPullUrl();
+      clazz.setNtesRtmpPullUrl(ntesRtmpPullUrl);
+      String ntesRoomId = res4AppGetClazzVo.getNtesRoomId();
+      clazz.setNtesRoomId(ntesRoomId);
+      String ntesRoomName = res4AppGetClazzVo.getNtesRoomName();
+      clazz.setNtesRoomName(ntesRoomName);
+    }
+
+    res4AppGetHomeworkStudentRelationBean.setClazz(clazz);
+    res4AppGetHomeworkStudentRelationBean.setList(son4AppGetHomeworkStudentRelationBeans);
+    res4AppGetHomeworkStudentRelationBean.setError(0);
+    res4AppGetHomeworkStudentRelationBean.setMsg("SUCCESS");
+    res4AppGetHomeworkStudentRelationBean.setSuccess(true);
+    return res4AppGetHomeworkStudentRelationBean;
+  }
+
+
+  @Override
+  public Res4AppPostHomeworkPicTxtBean addHomeworkPicTxt(
+      Req4AppPostHomeworkPicTxtBean req4AppPostHomeworkPicTxtBean) {
+    // TODO Auto-generated method stub
+
+    Res4AppPostHomeworkPicTxtBean res4AppPostHomeworkPicTxtBean =
+        new Res4AppPostHomeworkPicTxtBean();
+    String userId = req4AppPostHomeworkPicTxtBean.getOperatorUserId();
+    if (StringUtil.checkBlank(userId)) {
+      res4AppPostHomeworkPicTxtBean.setError(-1);
+      res4AppPostHomeworkPicTxtBean.setMsg("userId不能为空");
+      res4AppPostHomeworkPicTxtBean.setSuccess(false);
+      return res4AppPostHomeworkPicTxtBean;
+    }
+
+    TKcHomeworkPicTxt bean = new TKcHomeworkPicTxt();
+    bean.setContent(req4AppPostHomeworkPicTxtBean.getContent());
+    bean.setId(req4AppPostHomeworkPicTxtBean.getId());
+    bean.setPicId(req4AppPostHomeworkPicTxtBean.getPicIds());
+    try {
+      iHomeWorkService.updateTKcHomeworkPicTxt(bean);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      res4AppPostHomeworkPicTxtBean.setError(-1);
+      res4AppPostHomeworkPicTxtBean.setMsg(e.msg);
+      res4AppPostHomeworkPicTxtBean.setSuccess(false);
+      return res4AppPostHomeworkPicTxtBean;
+    }
+
+
+    res4AppPostHomeworkPicTxtBean.setError(0);
+    res4AppPostHomeworkPicTxtBean.setMsg("SUCCESS");
+    res4AppPostHomeworkPicTxtBean.setSuccess(true);
+    return res4AppPostHomeworkPicTxtBean;
+  }
+
+  @Override
+  public Res4AppPostHomeworkSignCardBean addHomeworkSignCard(
+      Req4AppPostHomeworkSignCardBean req4AppPostHomeworkSignCardBean) {
+    // TODO Auto-generated method stub
+    Res4AppPostHomeworkSignCardBean res4AppPostHomeworkSignCardBean =
+        new Res4AppPostHomeworkSignCardBean();
+
+
+
+    try {
+      iHomeWorkService.updateTKcHomeworkSignCard(req4AppPostHomeworkSignCardBean);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      res4AppPostHomeworkSignCardBean.setError(-1);
+      res4AppPostHomeworkSignCardBean.setMsg(e.msg);
+      res4AppPostHomeworkSignCardBean.setSuccess(false);
+      return res4AppPostHomeworkSignCardBean;
+    }
+
+
+    res4AppPostHomeworkSignCardBean.setError(0);
+    res4AppPostHomeworkSignCardBean.setMsg("SUCCESS");
+    res4AppPostHomeworkSignCardBean.setSuccess(true);
+    return res4AppPostHomeworkSignCardBean;
+  }
+
+  @Override
+  public Res4AppPostHomeworkWorkCardBean addHomeworkWorkCard(
+      Req4AppPostHomeworkWorkCardBean req4AppPostHomeworkWorkCardBean) {
+
+
+    // TODO Auto-generated method stub
+    Res4AppPostHomeworkWorkCardBean res4AppPostHomeworkWorkCardBean =
+        new Res4AppPostHomeworkWorkCardBean();
+
+
+
+    try {
+      iHomeWorkService.updateTKcHomeworkWorkCard(req4AppPostHomeworkWorkCardBean);
+    } catch (ApplicationException e) {
+      log.error("context", e);
+      res4AppPostHomeworkWorkCardBean.setError(-1);
+      res4AppPostHomeworkWorkCardBean.setMsg(e.msg);
+      res4AppPostHomeworkWorkCardBean.setSuccess(false);
+      return res4AppPostHomeworkWorkCardBean;
+    }
+
+
+    res4AppPostHomeworkWorkCardBean.setError(0);
+    res4AppPostHomeworkWorkCardBean.setMsg("SUCCESS");
+    res4AppPostHomeworkWorkCardBean.setSuccess(true);
+    return res4AppPostHomeworkWorkCardBean;
+
+  }
+
+  @Override
+  public Res4AppGetHomeworkPicTxtBean selectHomeworkPicTxtByRelationId(
+      Req4AppGetHomeworkPicTxtBean req4AppGetHomeworkPicTxtBean) {
+    // TODO Auto-generated method stub
+
+
+    Res4AppGetHomeworkPicTxtBean res4AppGetHomeworkPicTxtBean = new Res4AppGetHomeworkPicTxtBean();
+    String fid = req4AppGetHomeworkPicTxtBean.getRelationId();
+    if (StringUtil.checkBlank(fid)) {
+      res4AppGetHomeworkPicTxtBean.setError(-1);
+      res4AppGetHomeworkPicTxtBean.setMsg("fid不能为空");
+      res4AppGetHomeworkPicTxtBean.setSuccess(false);
+      return res4AppGetHomeworkPicTxtBean;
+    }
+    List<TKcHomeworkPicTxt> picTxts = iHomeWorkService.selectHomeworkPicTxtByRaleationId(fid);
+
+    for (int i = 0; i < picTxts.size(); i++) {
+
+      res4AppGetHomeworkPicTxtBean.setId(picTxts.get(i).getId());
+      res4AppGetHomeworkPicTxtBean.setContent(picTxts.get(i).getContent());
+      res4AppGetHomeworkPicTxtBean.setPicIds(picTxts.get(i).getPicId());
+      res4AppGetHomeworkPicTxtBean.setTaskDesc(iHomeWorkService
+          .selectHomeWorkByRelationId(picTxts.get(i).getHomeworkStudentRelationFid())
+          .getWorkDescribe());
+    }
+
+
+    res4AppGetHomeworkPicTxtBean.setError(0);
+    res4AppGetHomeworkPicTxtBean.setMsg("success");
+    res4AppGetHomeworkPicTxtBean.setSuccess(true);
+    return res4AppGetHomeworkPicTxtBean;
+  }
+
+  @Override
+  public Res4AppGetHomeworkSignCardBean selectHomeworkSignCardByRelationId(
+      Req4AppGetHomeworkSignCardBean req4AppGetHomeworkPicTxtBean) {
+    // TODO Auto-generated method stub
+
+
+    Res4AppGetHomeworkSignCardBean res4AppGetHomeworkSignCardBean =
+        new Res4AppGetHomeworkSignCardBean();
+    String fid = req4AppGetHomeworkPicTxtBean.getRelationId();
+    if (StringUtil.checkBlank(fid)) {
+      res4AppGetHomeworkSignCardBean.setError(-1);
+      res4AppGetHomeworkSignCardBean.setMsg("fid不能为空");
+      res4AppGetHomeworkSignCardBean.setSuccess(false);
+      return res4AppGetHomeworkSignCardBean;
+    }
+    List<TKcHomeworkSignCard> signCards = iHomeWorkService.selecHomeworkSignCardByRaleationId(fid);
+
+    List<Res4AppGetHomeworkSignCardVoBean> beans =
+        new ArrayList<Res4AppGetHomeworkSignCardVoBean>();
+    for (int i = 0; i < signCards.size(); i++) {
+      Res4AppGetHomeworkSignCardVoBean bean = new Res4AppGetHomeworkSignCardVoBean();
+      bean.setId(signCards.get(i).getId());
+      bean.setMarkDate(signCards.get(i).getMarkDate());
+      bean.setBreakfastFlag(signCards.get(i).getBreakfastFlag());
+      bean.setLunchFlag(signCards.get(i).getLunchFlag());
+      bean.setSupperFlag(signCards.get(i).getSupperFlag());
+      bean.setDrinkWater(signCards.get(i).getDrinkWater());
+      beans.add(bean);
+    }
+
+    res4AppGetHomeworkSignCardBean.setList(beans);
+
+
+    res4AppGetHomeworkSignCardBean.setError(0);
+    res4AppGetHomeworkSignCardBean.setMsg("success");
+    res4AppGetHomeworkSignCardBean.setSuccess(true);
+    res4AppGetHomeworkSignCardBean.setTaskDesc(
+        iHomeWorkService.selectHomeWorkByRelationId(req4AppGetHomeworkPicTxtBean.getRelationId())
+            .getWorkDescribe());
+    return res4AppGetHomeworkSignCardBean;
+
+
+  }
+
+  @Override
+  public Res4AppGetHomeworkWorkCardBean selectHomeworkWorkCardByRelationId(
+      Req4AppGetHomeworkWorkCardBean req4AppGetHomeworkPicTxtBean) {
+    // TODO Auto-generated method stub
+
+
+    Res4AppGetHomeworkWorkCardBean res4AppGetHomeworkWorkCardBean =
+        new Res4AppGetHomeworkWorkCardBean();
+    String fid = req4AppGetHomeworkPicTxtBean.getRelationId();
+    if (StringUtil.checkBlank(fid)) {
+      res4AppGetHomeworkWorkCardBean.setError(-1);
+      res4AppGetHomeworkWorkCardBean.setMsg("fid不能为空");
+      res4AppGetHomeworkWorkCardBean.setSuccess(false);
+      return res4AppGetHomeworkWorkCardBean;
+    }
+    List<TKcHomeworkWorkCard> workCards = iHomeWorkService.selecHomeworkWorkCardByRaleationId(fid);
+
+    List<Res4AppGetHomeworkWorkCardVoBean> beans =
+        new ArrayList<Res4AppGetHomeworkWorkCardVoBean>();
+    for (int i = 0; i < workCards.size(); i++) {
+      Res4AppGetHomeworkWorkCardVoBean bean = new Res4AppGetHomeworkWorkCardVoBean();
+      bean.setId(workCards.get(i).getId());
+      bean.setSelections(workCards.get(i).getSelections());
+      bean.setWeekNo(workCards.get(i).getWeekNo());
+      bean.setCommitTime(workCards.get(i).getCommitTime());
+      bean.setCurrentWeekResult(workCards.get(i).getCurrentWeekResult());
+      bean.setCurrentWeekTarget(workCards.get(i).getCurrentWeekTarget());
+      if (DateUtil.getrecent1weeksDate().before(workCards.get(i).getCreateTime())) {
+        bean.setIsCurrentWeek(1);
+      } else {
+        bean.setIsCurrentWeek(0);
+      }
+
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(workCards.get(i).getCreateTime());
+      cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); // 获取本周一的日期
+      String date1 = DateUtil.format(cal.getTime(), DateUtil.DATETYPE_13);
+
+
+      cal.setTime(workCards.get(i).getCreateTime());
+      cal.add(Calendar.WEEK_OF_YEAR, 1);
+      cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY); // 获取本周日的日期
+      String date2 = DateUtil.format(cal.getTime(), DateUtil.DATETYPE_13);
+
+      bean.setDateZoneArea(date1 + " - " + date2);
+
+      beans.add(bean);
+    }
+
+    res4AppGetHomeworkWorkCardBean.setList(beans);
+
+
+    List<TKcHomeworkCardSelection> stards = iHomeWorkService.selectSelection();
+
+    List<Res4AppGetHomeworkWorkCardStandardsVoBean> stardards = new ArrayList<>();
+    for (int i = 0; i < stards.size(); i++) {
+      Res4AppGetHomeworkWorkCardStandardsVoBean bean =
+          new Res4AppGetHomeworkWorkCardStandardsVoBean();
+      bean.setPicId(stards.get(i).getPicId());
+      bean.setName(stards.get(i).getCardName());
+      stardards.add(bean);
+    }
+
+    res4AppGetHomeworkWorkCardBean.setStandards(stardards);
+
+    res4AppGetHomeworkWorkCardBean.setError(0);
+    res4AppGetHomeworkWorkCardBean.setMsg("success");
+    res4AppGetHomeworkWorkCardBean.setSuccess(true);
+    return res4AppGetHomeworkWorkCardBean;
+
+
+  }
+
+
+
+}

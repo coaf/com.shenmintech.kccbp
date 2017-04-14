@@ -1,0 +1,82 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.cbp.biz.vo.res.Res4AddUserVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetUserVo;
+import com.shenmintech.cbp.client.AuthClient;
+import com.shenmintech.cbp.client.model.QueryUsersResp;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IUserService;
+import com.shenmintech.cbp.service.model.Res4AddUserModel;
+import com.shenmintech.cbp.service.model.TUser;
+import com.shenmintech.cbp.service.model.UserModel;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.GsonUtil;
+import com.shenmintech.common.util.HttpUtils;
+
+@Service
+@Transactional
+public class UserServiceImpl implements IUserService {
+
+	@Autowired
+	AuthClient authClient;
+	
+	@Override
+	public Res4GetUserVo selectByUserId(String userId) {
+		Res4GetUserVo res4GetUserVo = new Res4GetUserVo();
+		/*Map<String,String> map = new HashMap<>();
+		map.put("id",userId);
+		String jsonBodyStr = GsonUtil.gson.toJson(map);
+		String result = HttpUtils.sendPost("http://192.168.1.211:8000/authority/queryUserById","",jsonBodyStr);
+		UserModel userModel = GsonUtil.gson.fromJson(result, UserModel.class);*/
+		QueryUsersResp resp = new QueryUsersResp(userId);
+		UserModel userModel = authClient.queryUserById(resp);
+		if(0==userModel.getError()){
+			TUser tUser = userModel.getUser();
+			if(null!=tUser){
+				String userName = tUser.getName();
+				res4GetUserVo.setUserName(userName);
+				String mobile = tUser.getMobile();
+				res4GetUserVo.setUserMobile(mobile);
+				String createDate = tUser.getCreateDate();
+				Date registerDate = new Date(Long.parseLong(createDate));
+				res4GetUserVo.setRegisterDate(registerDate);
+				return res4GetUserVo;
+			}else{
+				throw new ApplicationException(Constants.META_STATUS_CODE_D1,"id未在用户表内找到相关用户",Constants.BLANKSTR);
+			}
+		}else{
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,"用户模块调用失败",Constants.BLANKSTR);
+		}
+		
+	}
+
+	@Override
+	public Res4AddUserVo addUser(String loginName, String mobile, String name, String password) {
+		Res4AddUserVo vo = new Res4AddUserVo();
+		Map<String,Object> map = new HashMap<>();
+		map.put("loginName",loginName);
+		map.put("mobile",mobile);
+		map.put("name",name);
+		map.put("password",password);
+		String jsonBodyStr = GsonUtil.gson.toJson(map);
+		String result = HttpUtils.sendPost("http://192.168.1.211:8000/authority/saveUser","",jsonBodyStr);
+		Res4AddUserModel res4AddUserModel = GsonUtil.gson.fromJson(result, Res4AddUserModel.class);
+		if(0==res4AddUserModel.getError()){
+			vo.setFlag("1");
+			vo.setUserId(res4AddUserModel.getId());
+			return vo;
+		}
+		vo.setFlag("0");
+		vo.setUserId("");
+		return vo;
+	}
+
+}

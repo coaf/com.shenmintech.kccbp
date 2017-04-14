@@ -1,0 +1,11 @@
+package com.shenmintech.cbp.service;
+
+import com.shenmintech.cbp.biz.vo.ques.Req4PostRecordVo;
+
+public interface IRecordService {
+
+	public void delById(String id);
+	
+	public void addRecord(Req4PostRecordVo recordVo);
+	
+}

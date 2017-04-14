@@ -1,0 +1,201 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostRecordVo;
+import com.shenmintech.cbp.biz.vo.ques.Req4PutRecordVo;
+import com.shenmintech.cbp.entity.PagingExample;
+import com.shenmintech.cbp.entity.TKcRecord;
+import com.shenmintech.cbp.entity.TKcRecordExample;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcRecordMapper;
+import com.shenmintech.cbp.service.IRecordService;
+import com.shenmintech.common.util.Constants;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+public class RecordServiceImpl implements IRecordService {
+
+	@Autowired
+	TKcRecordMapper tKcRecordMapper;
+	
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Override
+	public void delById(String id) {
+		TKcRecord tKcRecord = new TKcRecord();
+		tKcRecord.setId(id);
+		tKcRecord.setStatus(-1);
+		tKcRecordMapper.updateByPrimaryKeySelective(tKcRecord);
+	}
+
+	@Override
+	public void addRecord(Req4PostRecordVo recordVo) {
+		TKcRecord tKcRecord = new TKcRecord();
+		String id = idWorkerTemplate.generateId();
+		tKcRecord.setId(id);
+		tKcRecord.setRecordName(recordVo.getRecordName());
+		tKcRecord.setRecordTypeFid(recordVo.getRecordTypeId());
+		tKcRecord.setViewPermission(Integer.parseInt(recordVo.getViewPermission()));
+		tKcRecord.setTitle1(recordVo.getTitle1());
+		tKcRecord.setTitle2(recordVo.getTitle2());
+		tKcRecord.setTitle3(recordVo.getTitle3());
+		tKcRecord.setCoverPictureId(recordVo.getCoverPictureId());
+		tKcRecord.setFileId(recordVo.getFileId());
+		tKcRecord.setFormat(".MP3");
+		tKcRecord.setDuration(recordVo.getDuration());
+		tKcRecord.setHideFlag(Integer.parseInt(recordVo.getHideFlag()));
+		tKcRecord.setRecordSize(recordVo.getRecordSizeDb());
+		tKcRecord.setRecordDescribe(recordVo.getRecordSynopsis());//复文本框对应url
+		tKcRecord.setStatus(0);
+		
+		TKcRecordExample tKcRecordExample = new TKcRecordExample();
+		tKcRecordExample.or().andIdIsNotNull();
+		tKcRecordExample.setOrderByClause("record_index desc");
+		PagingExample pagingExample = new PagingExample(1, 1);
+		tKcRecordExample.setPagingExample(pagingExample);
+		List<TKcRecord> tKcRecords = tKcRecordMapper.selectByExample(tKcRecordExample);
+		if(null==tKcRecords||0==tKcRecords.size()){
+			tKcRecord.setRecordIndex(0l);
+		}else{
+			tKcRecord.setRecordIndex(tKcRecords.get(0).getRecordIndex()+1);
+		}
+		
+		tKcRecordMapper.insertSelective(tKcRecord);
+	}
+
+	@Override
+	public void updateRecordById(Req4PutRecordVo recordVo) {
+		TKcRecord tKcRecord = new TKcRecord();
+		tKcRecord.setId(recordVo.getRecordId());
+		tKcRecord.setRecordName(recordVo.getRecordName());
+		tKcRecord.setRecordTypeFid(recordVo.getRecordTypeId());
+		tKcRecord.setViewPermission(Integer.parseInt(recordVo.getViewPermission()));
+		tKcRecord.setTitle1(recordVo.getTitle1());
+		tKcRecord.setTitle2(recordVo.getTitle2());
+		tKcRecord.setTitle3(recordVo.getTitle3());
+		tKcRecord.setCoverPictureId(recordVo.getCoverPictureId());
+		tKcRecord.setFileId(recordVo.getFileId());
+		tKcRecord.setDuration(recordVo.getDuration());
+		tKcRecord.setHideFlag(Integer.parseInt(recordVo.getHideFlag()));
+		tKcRecord.setRecordSize(recordVo.getRecordSizeDb());
+		tKcRecord.setRecordDescribe(recordVo.getRecordSynopsis());//复文本框对应url
+		
+		int i = tKcRecordMapper.updateByPrimaryKeySelective(tKcRecord);
+		if(1!=i) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更改录播视频信息失败",Constants.BLANKSTR);
+	}
+
+	@Override
+	public void stickTop(String recordId) {
+		TKcRecordExample tKcRecordExample = new TKcRecordExample();
+		PagingExample pagingExample = new PagingExample(1, 1);
+		tKcRecordExample.setPagingExample(pagingExample);
+		tKcRecordExample.setOrderByClause("record_index desc");
+		tKcRecordExample.or().andIdIsNotNull();
+		List<TKcRecord> tKcRecords = tKcRecordMapper.selectByExample(tKcRecordExample);
+		long recordIndex = tKcRecords.get(0).getRecordIndex();
+		
+		TKcRecord record = new TKcRecord();
+		record.setId(recordId);
+		record.setRecordIndex(recordIndex+1);
+		tKcRecordMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public void moveUp(String recordId) {
+		log.info("查出当前录播视频的index");
+		
+		TKcRecord tKcRecord = tKcRecordMapper.selectByPrimaryKey(recordId);//----------
+		long recordIndex = tKcRecord.getRecordIndex();//----------
+		
+		log.info("当前录播视频的index="+recordIndex);
+		log.info("比当前录播视频的index="+recordIndex+"大一位的未删除的录播视频对象");
+		TKcRecordExample tKcRecordExample = new TKcRecordExample();
+		tKcRecordExample.or().andStatusNotEqualTo(-1).andRecordIndexGreaterThan(recordIndex);
+		PagingExample pagingExample = new PagingExample(1, 1);
+		tKcRecordExample.setPagingExample(pagingExample);
+		List<TKcRecord> tKcRecords = tKcRecordMapper.selectByExample(tKcRecordExample);
+		if(null==tKcRecords||0==tKcRecords.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"当前视频已经为置顶视频",Constants.BLANKSTR);
+		
+		String upRecordId = tKcRecords.get(0).getId();//----------
+		long upRecordIndex = tKcRecords.get(0).getRecordIndex();//----------
+		
+		log.info("先把上面一个视频的索引值置为999999999999999");
+		long midIndex = 999999999999999l;
+		TKcRecord record1 = new TKcRecord();
+		record1.setId(upRecordId);
+		record1.setRecordIndex(midIndex);
+		tKcRecordMapper.updateByPrimaryKeySelective(record1);
+		
+		log.info("再把当前视频的索引值置为"+upRecordIndex);
+		TKcRecord record2 = new TKcRecord();
+		record2.setId(recordId);
+		record2.setRecordIndex(upRecordIndex);
+		tKcRecordMapper.updateByPrimaryKeySelective(record2);
+		
+		log.info("最后把刚才置为999999999999999索引值的视频的索引值置为"+recordIndex);
+		TKcRecord record3 = new TKcRecord();
+		record3.setId(upRecordId);
+		record3.setRecordIndex(recordIndex);
+		tKcRecordMapper.updateByPrimaryKeySelective(record3);
+	}
+
+	@Override
+	public void moveDown(String recordId) {
+		log.info("查出当前录播视频的index");
+		
+		TKcRecord tKcRecord = tKcRecordMapper.selectByPrimaryKey(recordId);//----------
+		long recordIndex = tKcRecord.getRecordIndex();//----------
+		
+		log.info("当前录播视频的index="+recordIndex);
+		log.info("比当前录播视频的index="+recordIndex+"小一位的未删除的录播视频对象");
+		TKcRecordExample tKcRecordExample = new TKcRecordExample();
+		tKcRecordExample.or().andStatusNotEqualTo(-1).andRecordIndexLessThan(recordIndex);
+		PagingExample pagingExample = new PagingExample(1, 1);
+		tKcRecordExample.setPagingExample(pagingExample);
+		List<TKcRecord> tKcRecords = tKcRecordMapper.selectByExample(tKcRecordExample);
+		if(null==tKcRecords||0==tKcRecords.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"当前视频已经为置顶视频",Constants.BLANKSTR);
+		
+		String downRecordId = tKcRecords.get(0).getId();//----------
+		long downRecordIndex = tKcRecords.get(0).getRecordIndex();//----------
+		
+		log.info("先把下面一个视频的索引值置为999999999999999");
+		long midIndex = 999999999999999l;
+		TKcRecord record1 = new TKcRecord();
+		record1.setId(downRecordId);
+		record1.setRecordIndex(midIndex);
+		tKcRecordMapper.updateByPrimaryKeySelective(record1);
+		
+		log.info("再把当前视频的索引值置为"+downRecordIndex);
+		TKcRecord record2 = new TKcRecord();
+		record2.setId(recordId);
+		record2.setRecordIndex(downRecordIndex);
+		tKcRecordMapper.updateByPrimaryKeySelective(record2);
+		
+		log.info("最后把刚才置为999999999999999索引值的视频的索引值置为"+recordIndex);
+		TKcRecord record3 = new TKcRecord();
+		record3.setId(downRecordId);
+		record3.setRecordIndex(recordIndex);
+		tKcRecordMapper.updateByPrimaryKeySelective(record3);
+		
+	}
+
+	@Override
+	public int updateRecordStatus(String recordId, int hideFlag) {
+		TKcRecord record = new TKcRecord();
+		record.setId(recordId);
+		record.setStatus(hideFlag);
+		return tKcRecordMapper.updateByPrimaryKeySelective(record);
+		
+	}
+	
+}

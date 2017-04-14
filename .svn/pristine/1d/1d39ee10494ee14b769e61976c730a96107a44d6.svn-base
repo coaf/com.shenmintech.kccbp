@@ -1,0 +1,29 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IActionBiz;
+import com.shenmintech.cbp.controller.bean.req.ReqActionCountBean;
+import com.shenmintech.cbp.controller.bean.res.ResActionCountBean;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+public class ActionController {
+
+	@Autowired
+	IActionBiz iActionBiz;
+	
+	@PostMapping("/action/count/patch")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "A对B行为次数+1", httpMethod = "POST", value = "行为次数+1（OK）")
+	public @ResponseBody ResActionCountBean patchActionCount(@ApiParam(required = true, value = "a对b行为次数加一入参对象") @RequestBody ReqActionCountBean reqActionCountBean){
+		return iActionBiz.patchRecordAccount4App(reqActionCountBean);
+	}
+	
+}

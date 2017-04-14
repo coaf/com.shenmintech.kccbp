@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: KCManage
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: max
+Implementation-Vendor-Id: com.shenmintech.kccbp
+Build-Jdk: 1.8.0_101
+Implementation-URL: http://projects.spring.io/spring-boot/com.shenmint
+ ech.kccbp/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

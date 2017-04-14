@@ -1,0 +1,14 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import com.shenmintech.base.bean.BaseRetBean;
+
+import io.swagger.annotations.ApiModel;
+import lombok.Getter;
+import lombok.Setter;
+
+@ApiModel("获取推送任务列表出参")
+@Getter
+@Setter
+public class Res4GetPushHomeworksBean extends BaseRetBean{
+
+}

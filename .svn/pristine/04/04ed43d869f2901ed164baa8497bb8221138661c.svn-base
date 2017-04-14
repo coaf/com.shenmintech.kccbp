@@ -1,0 +1,316 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.ICourseBiz;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostCourseVo;
+import com.shenmintech.cbp.biz.vo.res.Res4CourseTypeVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetComVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourseTableVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourseVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourzeVo;
+import com.shenmintech.cbp.biz.vo.res.Sons4GetComVo;
+import com.shenmintech.cbp.biz.vo.res.Sons4GetCourseVo;
+import com.shenmintech.cbp.controller.bean.req.ClazzObj;
+import com.shenmintech.cbp.controller.bean.req.Req4GetCourseBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetCourseTableBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostCourseBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutCourseTableBean;
+import com.shenmintech.cbp.controller.bean.res.Res4CompanyBean;
+import com.shenmintech.cbp.controller.bean.res.Res4CourseTypeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetCourseTableBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetCourseTypeAndCompanyBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutCourseTableBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetCourseBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetCourseTableBean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IClazzService;
+import com.shenmintech.cbp.service.ICompanyService;
+import com.shenmintech.cbp.service.ICourseService;
+import com.shenmintech.cbp.service.IGroupService;
+import com.shenmintech.cbp.service.IStudentService;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@SuppressWarnings("static-access")
+public class CourseBizImpl implements ICourseBiz {
+
+	@Autowired
+	ICourseService iCourseService;
+	
+	@Autowired
+	ICompanyService iCompanyService;
+	
+	@Autowired
+	IGroupService iGroupService;
+	
+	@Autowired
+	IStudentService iStudentService;
+	
+	@Autowired
+	IClazzService iClazzService;
+	
+	@Override
+	public Res4PostCourseBean addCourse(Req4PostCourseBean req4PostCourseBean) {
+		Res4PostCourseBean resBean = new Res4PostCourseBean();
+		String companyId = req4PostCourseBean.getCompanyFid();
+		String courseTypeId = req4PostCourseBean.getCourseTypeFid();
+		String teacherId = req4PostCourseBean.getTeacherId();
+		String courseName = req4PostCourseBean.getCourseName();
+		if(StringUtil.checkBlank(companyId,courseTypeId,teacherId,courseName)){
+			resBean.setError(-1);
+			resBean.setMsg("courseName,companyFid,teacherId,courseTypeFid不可为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		Req4PostCourseVo courseVo = new Req4PostCourseVo().builder()
+				.companyId(companyId)
+				.courseTypeId(courseTypeId)
+				.teacherId(teacherId)
+				.courseName(courseName)
+				.build();
+		List<Req4PostCourseVo> list = new ArrayList<>();
+		list.add(courseVo);
+		try {
+			iCourseService.add(list);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public Res4GetCourseTypeAndCompanyBean selectCourseTypeAndCompanies() {
+		Res4GetCourseTypeAndCompanyBean resBean = new Res4GetCourseTypeAndCompanyBean();
+		
+		List<Res4CourseTypeVo> res4CourseTypeVos = new ArrayList<>();
+		try {
+			res4CourseTypeVos = iCourseService.selectCourseType();
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		Iterator<Res4CourseTypeVo> it = res4CourseTypeVos.iterator();
+		List<Res4CourseTypeBean> tBeans = new ArrayList<>();
+		while (it.hasNext()) {
+			Res4CourseTypeBean tBean = new Res4CourseTypeBean();
+			Res4CourseTypeVo vo = it.next();
+			tBean.setTypeId(vo.getId());
+			tBean.setTypeName(vo.getTypeName());
+			tBeans.add(tBean);
+		}
+		resBean.setCourseTypeList(tBeans);
+		
+		Res4GetComVo res4GetComVo = new Res4GetComVo();
+		try {
+			res4GetComVo = iCompanyService.select(1,99999);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		List<Sons4GetComVo> sons4GetComVos = res4GetComVo.getList();
+		Iterator<Sons4GetComVo> ite = sons4GetComVos.iterator();
+		List<Res4CompanyBean> cBeans = new ArrayList<>();
+		while (ite.hasNext()) {
+			Res4CompanyBean cBean = new Res4CompanyBean();
+			Sons4GetComVo vo = ite.next();
+			String companyId = vo.getId();
+			cBean.setCompanyId(companyId);
+			String companyName  = vo.getCompanyName();
+			cBean.setCompanyName(companyName);
+			cBeans.add(cBean);
+		}
+		resBean.setCompanyList(cBeans);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public Res4GetCourseBean selectCourseById(Req4GetCourseBean req4GetCourseBean) {
+		Res4GetCourseBean resBean = new Res4GetCourseBean();
+		String teacherId = req4GetCourseBean.getTeacherId();
+		if(StringUtil.isBlank(teacherId)){
+			resBean.setError(-1);
+			resBean.setMsg("teacherId不可为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		int pageNo = -1==req4GetCourseBean.getPageNo()?1:req4GetCourseBean.getPageNo();
+		int rowsPerPage = -1==req4GetCourseBean.getPageNo()?99999:req4GetCourseBean.getRowsPerPage();
+		Res4GetCourseVo res4GetCourseVo = new Res4GetCourseVo();
+		try {
+			res4GetCourseVo = iCourseService.selectByTeacherIdPages(teacherId, pageNo, rowsPerPage);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		List<Sons4GetCourseVo> sons4GetCourseVos = res4GetCourseVo.getList();
+		Iterator<Sons4GetCourseVo> it = sons4GetCourseVos.iterator();
+		List<Son4GetCourseBean> list = new ArrayList<>();
+		while(it.hasNext()){
+			Son4GetCourseBean son4GetCourseBean = new Son4GetCourseBean();
+			Sons4GetCourseVo sons4GetCourseVo = it.next();
+			String courseId = sons4GetCourseVo.getId();
+			son4GetCourseBean.setCourseId(courseId);
+			son4GetCourseBean.setCourseName(sons4GetCourseVo.getCourseName());
+			String companyFid = sons4GetCourseVo.getCompanyFid();
+			String companyName = iCompanyService.selectNameById(companyFid);
+			son4GetCourseBean.setCompanyName(companyName);
+			Date createTime = sons4GetCourseVo.getCreateTime();
+			String createTimeStr = DateUtil.format(createTime, DateUtil.DATETYPE_4);
+			son4GetCourseBean.setCreateTime(createTimeStr);
+			int groupCount = iGroupService.countByCourseId(courseId);
+			son4GetCourseBean.setGroupCount(String.valueOf(groupCount));
+			String courseStatus = String.valueOf(sons4GetCourseVo.getStatus());
+			son4GetCourseBean.setCourseStatus(courseStatus);
+			List<String> groupIds = iGroupService.getGroupIdsByCourseId(courseId);
+			int studentCount = iStudentService.countByGroupIds(groupIds);
+			son4GetCourseBean.setStudentCount(String.valueOf(studentCount));
+			list.add(son4GetCourseBean);
+		}
+		int recordCount = res4GetCourseVo.getRecordCount();
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		resBean.setPageNo(pageNo);
+		resBean.setRecordCount(recordCount);
+		resBean.setPageSumCount((recordCount+rowsPerPage-1)/rowsPerPage);
+		resBean.setList(list);
+		return resBean;
+	}
+	
+	@Override
+	public Res4GetCourseTableBean selectByCourseId(Req4GetCourseTableBean req4GetCourseTableBean) {
+		Res4GetCourseTableBean resBean = new Res4GetCourseTableBean();
+		String id = req4GetCourseTableBean.getCourseId();
+		if(StringUtil.isBlank(id)){
+			resBean.setError(-1);
+			resBean.setMsg("teacherId不可为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		List<Res4CourseTypeVo> res4CourseTypeVos = new ArrayList<>();
+		try {
+			res4CourseTypeVos = iCourseService.selectCourseType();
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		List<Res4CourseTypeBean> res4CourseTypeBeans = new ArrayList<>();//所有课程类型列表
+		Iterator<Res4CourseTypeVo> it = res4CourseTypeVos.iterator();
+		while (it.hasNext()) {
+			Res4CourseTypeVo res4CourseTypeVo = it.next();
+			Res4CourseTypeBean res4CourseTypeBean = new Res4CourseTypeBean();
+			res4CourseTypeBean.setTypeId(res4CourseTypeVo.getId());
+			res4CourseTypeBean.setTypeName(res4CourseTypeVo.getTypeName());
+			res4CourseTypeBeans.add(res4CourseTypeBean);
+		}
+		resBean.setCourseTypeList(res4CourseTypeBeans);
+		
+		Res4GetCourzeVo res4GetCourzeVo = new Res4GetCourzeVo();//课程对象
+		try {
+			res4GetCourzeVo = iCourseService.selectByCourseId(id);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		resBean.setCourseId(res4GetCourzeVo.getId());
+		resBean.setCourseTypeId(res4GetCourzeVo.getCourseTypeId()); 
+		resBean.setCourseName(res4GetCourzeVo.getCourseName());
+		resBean.setRemark(res4GetCourzeVo.getRemark());
+		
+		List<Res4GetCourseTableVo> res4GetCourseTableVos = iCourseService.selectCourseTableByCourseId(id);//课程表对象列表
+		List<Son4GetCourseTableBean> courseTableBeans = new ArrayList<>();
+		Iterator<Res4GetCourseTableVo> iterator = res4GetCourseTableVos.iterator();
+		while (iterator.hasNext()) {
+			Res4GetCourseTableVo res4GetCourseTableVo = iterator.next();
+			Son4GetCourseTableBean son4GetCourseTableBean = new Son4GetCourseTableBean();
+			BeanUtils.copyProperties(res4GetCourseTableVo, son4GetCourseTableBean);
+			courseTableBeans.add(son4GetCourseTableBean);
+		}
+		resBean.setCourseTableList(courseTableBeans);
+		
+		return resBean;
+	}
+
+	@Override
+	public Res4PutCourseTableBean updateCourseTableById(Req4PutCourseTableBean req4PutCourseTableBean) {
+		Res4PutCourseTableBean resBean = new Res4PutCourseTableBean();
+		String courseId = req4PutCourseTableBean.getId();
+		String courseTypeId = req4PutCourseTableBean.getCourseTypeFid();
+		if(StringUtil.checkBlank(courseId,courseTypeId)){
+			resBean.setError(-1);
+			resBean.setMsg("courseId,courseTypeId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		List<ClazzObj> clazzList = req4PutCourseTableBean.getClazzList();
+		if(null == clazzList){
+			resBean.setError(-1);
+			resBean.setMsg("课表clazzList必传");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		if(clazzList.size()>0 && clazzList.stream().anyMatch(n->StringUtil.isBlank(n.getClazzName())||StringUtil.isBlank(n.getPicId()))){
+			resBean.setError(-1);
+			resBean.setMsg("课的名字:clazzName,图片ID:picId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		String remark1 = req4PutCourseTableBean.getRemark();
+		
+		try {
+			iCourseService.updateCourseTableById(courseId,courseTypeId,remark1,clazzList);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+	
+}

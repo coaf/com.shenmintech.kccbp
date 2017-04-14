@@ -1,0 +1,34 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.cbp.biz.vo.res.Res4GetUserVo;
+import com.shenmintech.cbp.entity.UserWithBLOBs;
+import com.shenmintech.cbp.mapper.UserMapper;
+import com.shenmintech.cbp.service.IUserService;
+
+@Service
+@Transactional
+public class UserServiceImpl implements IUserService {
+
+	@Autowired
+	UserMapper userMapper;
+	
+	@Override
+	public Res4GetUserVo selectByUserId(String userId) {
+		Res4GetUserVo res4GetUserVo = new Res4GetUserVo();
+		UserWithBLOBs bloBs = userMapper.selectByPrimaryKey(userId);
+		String userName = bloBs.getName();
+		res4GetUserVo.setUserName(userName);
+		String mobile = bloBs.getRealmobile();
+		res4GetUserVo.setUserMobile(mobile);
+		Date registerDate = bloBs.getRegisterdate();
+		res4GetUserVo.setRegisterDate(registerDate);
+		return res4GetUserVo;
+	}
+
+}

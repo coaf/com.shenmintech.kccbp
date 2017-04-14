@@ -1,0 +1,33 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IClazzBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetRoomBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRoomBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Controller
+@Api(value = "直播房间", description = "直播间的相关操作--max")
+public class RoomController {
+
+	@Autowired
+	IClazzBiz iClazzBiz;
+	
+	@PostMapping("/ntesRoom/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "获取网易将要上课的直播房间列表", httpMethod = "POST", value = "查询网易直播教室列表")
+	public @ResponseBody Res4GetRoomBean getNtesRoom(@ApiParam(required = true, value = "员工小组对象") @RequestBody Req4GetRoomBean req4GetRoomBean){
+		return iClazzBiz.getRooms(req4GetRoomBean);
+	}
+	
+}

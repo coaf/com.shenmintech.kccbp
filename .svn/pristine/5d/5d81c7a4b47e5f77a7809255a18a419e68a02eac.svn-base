@@ -1,0 +1,87 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.HttpRestTemplate;
+import com.shenmintech.cbp.biz.vo.res.Res4AddUserVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetUserVo;
+import com.shenmintech.cbp.client.model.QueryUsersResp;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IUserService;
+import com.shenmintech.cbp.service.model.Res4AddUserModel;
+import com.shenmintech.cbp.service.model.TUser;
+import com.shenmintech.cbp.service.model.UserModel;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.GsonUtil;
+import com.shenmintech.common.util.HttpUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+public class UserServiceImpl implements IUserService {
+
+	@Autowired
+	HttpRestTemplate httpRestTemplate; 
+	
+	@Override
+	public Res4GetUserVo selectByUserId(String userId) {
+		Res4GetUserVo res4GetUserVo = new Res4GetUserVo();
+		QueryUsersResp resp = new QueryUsersResp(userId);
+		String reqStr = GsonUtil.gson.toJson(resp);
+		log.info("请求reqStr==============" +reqStr);
+		String resStr = httpRestTemplate.postForObject("http://shenmin-authority/authority/queryUserById", reqStr);
+		log.info("返回resStr==============" +resStr);
+		UserModel userModel = GsonUtil.gson.fromJson(resStr,UserModel.class);
+		if(0==userModel.getError()){
+			TUser tUser = userModel.getUser();
+			if(null!=tUser){
+				String userName = tUser.getName();
+				res4GetUserVo.setUserName(userName);
+				String mobile = tUser.getMobile();
+				res4GetUserVo.setUserMobile(mobile);
+				String createDate = tUser.getCreateDate();
+				Date registerDate = new Date(Long.parseLong(createDate));
+				res4GetUserVo.setRegisterDate(registerDate);
+				return res4GetUserVo;
+			}else{
+				log.info("userId="+ userId +"在t_user表中未找到相关用户");
+				throw new ApplicationException(Constants.META_STATUS_CODE_D1,"userId="+ userId +"在t_user表中未找到相关用户",Constants.BLANKSTR);
+			}
+		}else{
+			throw new ApplicationException(Constants.META_STATUS_CODE_D1,"用户模块调用失败",Constants.BLANKSTR);
+		}
+		
+	}
+
+	@Override
+	public Res4AddUserVo addUser(String loginName, String mobile, String name, String password) {
+		Res4AddUserVo vo = new Res4AddUserVo();
+		Map<String,Object> map = new HashMap<>();
+		map.put("loginName",loginName);
+		map.put("mobile",mobile);
+		map.put("name",name);
+		map.put("password",password);
+		String jsonBodyStr = GsonUtil.gson.toJson(map);
+		log.info("请求jsonBodyStr==============" +jsonBodyStr);
+		String result = httpRestTemplate.postForObject("http://shenmin-authority/authority/saveUser", jsonBodyStr);
+		log.info("返回result==============" +result);
+		Res4AddUserModel res4AddUserModel = GsonUtil.gson.fromJson(result, Res4AddUserModel.class);
+		if(0==res4AddUserModel.getError()){
+			vo.setFlag("1");
+			vo.setUserId(res4AddUserModel.getId());
+			return vo;
+		}
+		vo.setFlag("0");
+		vo.setUserId("");
+		return vo;
+	}
+
+}

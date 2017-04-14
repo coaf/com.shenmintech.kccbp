@@ -1,0 +1,18 @@
+package com.shenmintech.cbp.controller.bean.req;
+
+import com.shenmintech.base.bean.BaseReqBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@ApiModel("获取单个轮播图详情入参对象")
+public class Req4GetRollingPicBean extends BaseReqBean {
+
+  @ApiModelProperty(value = "轮播图主键ID", required = true)
+  String rollingPicId;
+
+}

@@ -1,0 +1,10 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.Req4GetPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPushHomeworkBean;
+
+public interface IHomeworkPushBiz {
+
+	public Res4GetPushHomeworkBean selectInitElement(Req4GetPushHomeworkBean req4GetPushHomeworkBean);
+	
+}

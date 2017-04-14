@@ -1,0 +1,8 @@
+httpAction:
+  cbpModule:
+    userCollectRecord: 846549020079813001 #用户收藏录播视频
+    userPlayRecord: 646541020079813002 #用户播放录播视频
+    userLikeRecord: 846549020020816004 #用户点赞录播视频
+    userHateRecord: 846549020020216005 #用户批评录播视频
+    userReadArticle: 846549020079816003 #用户浏览文章
+    userCollectArticle: 846549020079234001 #用户收藏文章

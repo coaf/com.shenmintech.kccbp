@@ -1,0 +1,15 @@
+package com.shenmintech.cbp.service;
+
+import java.util.List;
+
+public interface IHomeworkPushService {
+
+	public void checkAddPushHomework(String homeworkId, String clazzId, List<String> groupIds, String pushFlag);
+	
+	public void addPushHomeworkNow(String homeworkId, List<String> studentIds);//即时推送课后作业
+	
+	public void addPushHomeworkBefore();
+	
+	public void addPushHomeworkAfter();
+	
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+	<classPathEntry
+		location="C:\Users\max\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar" />
+	<context id="context1" targetRuntime="MyBatis3">
+		<commentGenerator>
+			<!-- 去除自动生成的注释 -->
+			<property name="suppressAllComments" value="true" />
+		</commentGenerator>
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://192.168.1.213/sm_cbp_v1?useUnicode=true&amp;characterEncoding=UTF-8"
+			userId="root" password="Ai-34ffd8" />
+		<javaModelGenerator targetPackage="com.shenmintech.cbp.entity"
+			targetProject="com.shenmintech.kccbp/src/main/java" />
+		<sqlMapGenerator targetPackage="config.mybatis.mapper"
+			targetProject="com.shenmintech.kccbp/src/main/resources" />
+		<javaClientGenerator type="XMLMAPPER"
+			targetPackage="com.shenmintech.cbp.mapper" targetProject="com.shenmintech.kccbp/src/main/java" />
+
+		<table tableName="t_tool_account" domainObjectName="TToolAccount"></table>
+
+	</context>
+</generatorConfiguration>

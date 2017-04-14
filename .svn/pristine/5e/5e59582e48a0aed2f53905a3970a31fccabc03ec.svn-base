@@ -1,0 +1,219 @@
+#KC-SERVER模块错误码统一以107打头
+httpErrorMsg:
+  #CompanyController
+    #001
+  addCompany:
+    variMiss:
+      codeFail: 107001001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107001002
+      msgFail: 参数非法
+    sysInnerExc:
+      codeFail: 107001003
+      msgFail: 系统内部异常
+    #002
+  putTKcCompany:
+    variMiss:
+      codeFail: 107002001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107002002
+      msgFail: 参数非法
+    sysInnerExc:
+      codeFail: 107002003
+      msgFail: 系统内部异常
+    #003
+  getTKcCompany:
+    variMiss:
+      codeFail: 107003001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107003002
+      msgFail: 参数非法
+    sysInnerExc:
+      codeFail: 107003003
+      msgFail: 系统内部异常
+    #004
+  getSingleCompany:
+    variMiss:
+      codeFail: 107004001
+      msgFail: 参数缺失
+  #CourseController
+    #005
+  postTKcCourse:
+    variMiss:
+      codeFail: 107005001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107005003
+      msgFail: 系统内部异常
+    #006
+  getTKcCourse:
+    variMiss:
+      codeFail: 107006001
+      msgFail: 参数缺失
+    #007
+  getTKcCourseTable:
+    variMiss:
+      codeFail: 107007001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107007002
+      msgFail: 参数非法
+    #008
+  putCourseTable:
+    variMiss:
+      codeFail: 107008001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107008003
+      msgFail: 系统内部异常
+  #GroupController
+    #009
+  postTKcGroup:
+    variMiss:
+      codeFail: 107009001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107009003
+      msgFail: 系统内部异常:添加小组失败
+    #010
+  putTKcGroup:
+    variMiss:
+      codeFail: 107010001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107010003
+      msgFail: 系统内部异常
+    #011
+  getTKcGroup:
+    variMiss:
+      codeFail: 107011001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107011003
+      msgFail: 系统内部异常
+  #ClazzController
+    #012
+  postTKcClazz:
+    variMiss:
+      codeFail: 107012001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107012002
+      msgFail: 参数非法
+    sysInnerExc:
+      codeFail: 107012003
+      msgFail: 系统内部异常
+    thirdApiExc:
+      codeFail: 107012004
+      msgFail: 调用外部接口失败
+    #013
+  getTKcClazzById:
+    variMiss:
+      codeFail: 107013001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107013003
+      msgFail: 系统内部异常
+  #EmployeeController
+    #014
+  postTKcEmployee:
+    variMiss:
+      codeFail: 107014001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107014003
+      msgFail: 系统内部异常
+    thirdApiExc:
+      codeFail: 107014004
+      msgFail: 调用外部接口失败
+    #015
+  getTKcEmployee:
+    variMiss:
+      codeFail: 107015001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107015003
+      msgFail: 系统内部异常
+    moduleTransExc:
+      codeFail: 107015005
+      msgFail: 业务模块调用异常
+    processExc:
+      codeFail: 107015006
+      msgFail: 业务流程异常
+    #016
+  postUserEmployeeStudent:
+    variMiss:
+      codeFail: 107016001
+      msgFail: 参数缺失
+    variIllegal:
+      codeFail: 107016002
+      msgFail: 参数非法
+    thirdApiExc:
+      codeFail: 107016004
+      msgFail: 调用外部接口失败
+    moduleTransExc:
+      codeFail: 107016005
+      msgFail: 业务模块调用异常
+    #017
+  getUserNtesData:
+    variMiss:
+      codeFail: 107017001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107017003
+      msgFail: 系统内部异常
+  #StudentController
+    #018
+  postTKcStudent:
+    variMiss:
+      codeFail: 107018001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107018003
+      msgFail: 系统内部异常
+    #019
+  deleteTKcStudent:
+    variMiss:
+      codeFail: 107019001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107019003
+      msgFail: 系统内部异常
+    #020
+  putTKcStudent:
+    variMiss:
+      codeFail: 107020001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107020003
+      msgFail: 系统内部异常
+    #021
+  getTKcHSRelation:
+    variMiss:
+      codeFail: 107021001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107021003
+      msgFail: 系统内部异常
+    #022
+  getTUserRelation:
+    variMiss:
+      codeFail: 107022001
+      msgFail: 参数缺失
+    sysInnerExc:
+      codeFail: 107022003
+      msgFail: 系统内部异常
+    #023
+  getTUserInfo:
+    variMiss:
+      codeFail: 107023001
+      msgFail: 参数缺失
+    moduleTransExc:
+      codeFail: 107023005
+      msgFail: 业务模块调用异常
+  
+  
+  

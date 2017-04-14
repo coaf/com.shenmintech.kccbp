@@ -1,0 +1,150 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IClazzBiz;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostClazzVo;
+import com.shenmintech.cbp.biz.vo.ques.SonRelationVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetClazzVo;
+import com.shenmintech.cbp.controller.bean.req.Req4GetTeachClazzBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostTeachClazzBean;
+import com.shenmintech.cbp.controller.bean.req.SonRelationBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetTeachClazzBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostTeachClazzBean;
+import com.shenmintech.cbp.controller.bean.res.Son4GetTeachClazzBean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IClazzService;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@SuppressWarnings("static-access")
+public class ClazzBizImpl implements IClazzBiz {
+	
+	@Autowired
+	IClazzService iClazzService;
+	
+	@Override
+	public Res4PostTeachClazzBean addTeachClazz(Req4PostTeachClazzBean req4TeachClazzBean) {
+		Res4PostTeachClazzBean res4PostTeachClazzBean = new Res4PostTeachClazzBean();
+		Req4PostClazzVo clazzVo = new Req4PostClazzVo();
+		
+		List<SonRelationVo> list = new ArrayList<>();
+		List<SonRelationBean> SonRelationBeans = req4TeachClazzBean.getRelations();
+		Iterator<SonRelationBean> it = SonRelationBeans.iterator();
+		while (it.hasNext()) {
+			SonRelationBean sonRelationBean = it.next();
+			String clazzId = sonRelationBean.getClazzId();
+			if(StringUtil.isBlank(clazzId)){
+				res4PostTeachClazzBean.setError(-1);
+				res4PostTeachClazzBean.setMsg("clazzId不能为空");
+				res4PostTeachClazzBean.setSuccess(false);
+				return res4PostTeachClazzBean;
+			}
+			String startTime = sonRelationBean.getStartTime();
+			Date sTime = null;
+			try {
+				sTime = DateUtil.parse(startTime, DateUtil.DATETYPE_10);
+			} catch (Exception e) {
+				res4PostTeachClazzBean.setError(-1);
+				res4PostTeachClazzBean.setMsg("startTime无法转化为date类型，请检查所传字段是否符合格式");
+				res4PostTeachClazzBean.setSuccess(false);
+				return res4PostTeachClazzBean;
+			}
+			String endTime = sonRelationBean.getEndTime();
+			Date eTime = null;
+			try {
+				eTime = DateUtil.parse(endTime, DateUtil.DATETYPE_10);
+			} catch (Exception e) {
+				res4PostTeachClazzBean.setError(-1);
+				res4PostTeachClazzBean.setMsg("endTime无法转化为date类型，请检查所传字段是否符合格式");
+				res4PostTeachClazzBean.setSuccess(false);
+				return res4PostTeachClazzBean;
+			}
+			
+			SonRelationVo sonRelationVo  = new SonRelationVo().builder()
+					.clazzId(clazzId)
+					.startTime(sTime)
+					.endTime(eTime)
+					.build();
+			list.add(sonRelationVo);
+		}
+		clazzVo.setRelations(list);
+		try {
+			iClazzService.setClazzTime(clazzVo);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PostTeachClazzBean.setError(-1);
+			res4PostTeachClazzBean.setMsg(e.msg);
+			res4PostTeachClazzBean.setSuccess(false);
+			return res4PostTeachClazzBean;
+		}
+		res4PostTeachClazzBean.setError(0);
+		res4PostTeachClazzBean.setMsg("SUCCESS");
+		res4PostTeachClazzBean.setSuccess(true);
+		return res4PostTeachClazzBean;
+	}
+
+	@Override
+	public Res4GetTeachClazzBean selectById(Req4GetTeachClazzBean req4GetTeachClazzBean){
+		Res4GetTeachClazzBean res4GetTeachClazzBean = new Res4GetTeachClazzBean();
+		String groupId = req4GetTeachClazzBean.getGroupId();
+		if(StringUtil.isBlank(groupId)){
+			res4GetTeachClazzBean.setError(-1);
+			res4GetTeachClazzBean.setMsg("groupId不能为空");
+			res4GetTeachClazzBean.setSuccess(false);
+			return res4GetTeachClazzBean;
+		}
+		List<Res4GetClazzVo> res4GetClazzVos = new ArrayList<>();
+		try {
+			res4GetClazzVos = iClazzService.selectByGroupId(groupId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4GetTeachClazzBean.setError(-1);
+			res4GetTeachClazzBean.setMsg(e.msg);
+			res4GetTeachClazzBean.setSuccess(false);
+			return res4GetTeachClazzBean;
+		}
+		
+		List<Son4GetTeachClazzBean> teachClazzList = new ArrayList<>();
+		Iterator<Res4GetClazzVo> it = res4GetClazzVos.iterator();
+		while(it.hasNext()){
+			Son4GetTeachClazzBean son4GetTeachClazzBean = new Son4GetTeachClazzBean();
+			Res4GetClazzVo res4GetClazzVo = it.next();
+			String courseTableGroupRelationId = res4GetClazzVo.getCourseTableGroupRelationId();
+			son4GetTeachClazzBean.setCourseTableGroupRelationId(courseTableGroupRelationId);
+			int clazzNo = res4GetClazzVo.getClazzNo();
+			son4GetTeachClazzBean.setClazzNo(String.valueOf(clazzNo));
+			String clazzName = res4GetClazzVo.getClazzName();
+			son4GetTeachClazzBean.setClazzName(clazzName);
+			Date startTime = res4GetClazzVo.getStartTime();
+			if(null==startTime){
+				son4GetTeachClazzBean.setStartTime("");
+			}else{
+				son4GetTeachClazzBean.setStartTime(DateUtil.format(startTime, DateUtil.DATETYPE_10));
+			}
+			Date endTime = res4GetClazzVo.getEndTime();
+			if(null==endTime){
+				son4GetTeachClazzBean.setEndTime("");
+			}else{
+				son4GetTeachClazzBean.setEndTime(DateUtil.format(endTime, DateUtil.DATETYPE_10));
+			}
+			teachClazzList.add(son4GetTeachClazzBean);
+		}
+		res4GetTeachClazzBean.setTeachClazzList(teachClazzList);
+		res4GetTeachClazzBean.setError(0);
+		res4GetTeachClazzBean.setMsg("SUCCESS");
+		res4GetTeachClazzBean.setSuccess(true);
+		return res4GetTeachClazzBean;
+	}
+	
+}

@@ -1,0 +1,47 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+public class NetEasyRoomResponse {
+
+  private NetEasyChatRoom chatroom;
+
+  private int code;
+
+
+  class NetEasyChatRoom {
+
+    private int roomid;
+
+    public int getRoomid() {
+      return roomid;
+    }
+
+    public void setRoomid(int roomid) {
+      this.roomid = roomid;
+    }
+
+
+  }
+
+
+  public NetEasyChatRoom getChatroom() {
+    return chatroom;
+  }
+
+
+  public void setChatroom(NetEasyChatRoom chatroom) {
+    this.chatroom = chatroom;
+  }
+
+
+  public int getCode() {
+    return code;
+  }
+
+
+  public void setCode(int code) {
+    this.code = code;
+  }
+
+
+
+}

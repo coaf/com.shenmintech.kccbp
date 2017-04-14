@@ -1,0 +1,242 @@
+package com.shenmintech.cbp.controller;
+
+import java.io.UnsupportedEncodingException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.gson.Gson;
+import com.shenmintech.cbp.controller.bean.req.FindFoodKeyWordsReqBean;
+import com.shenmintech.cbp.controller.bean.req.FindFoodResBean;
+import com.shenmintech.cbp.controller.bean.req.SuggestionFoodResBean;
+import com.shenmintech.cbp.controller.bean.res.CaloriaKeysRespBean;
+import com.shenmintech.cbp.controller.bean.res.SuggestionFoodReqBean;
+import com.shenmintech.common.util.AESUtil;
+import com.shenmintech.common.util.GsonUtil;
+import com.shenmintech.common.util.HttpUtils;
+import com.shenmintech.common.util.StringUtil;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/**
+ * @author Allen 食物相关的API
+ *
+ */
+@Controller
+@RequestMapping("food")
+@Api(value = "食物", description = "食物相关API")
+public class FoodController {
+
+  @RequestMapping("suggestionFoods")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "自动提示食物", httpMethod = "POST", value = "自动提示食物")
+  private @ResponseBody SuggestionFoodResBean suggestionFoods(
+      @ApiParam(required = true, value = "用户输入的食物相关信息") @RequestBody SuggestionFoodReqBean food,
+      HttpServletRequest req, HttpServletResponse resp) {
+
+
+
+    String food_search = null;
+    try {
+      System.out.println(StringUtil.getEncoding(food.getQuery()));
+      String[] keys = {"platform_type", "uuid", "app_key", "aLiID", "query", "need_img",
+          "fingerprint", "need_calory"};
+      // String[] values = {food.getPlatform_type(), food.getUuid(), food.getApp_key(),
+      // food.getaLiID(), food.getQuery(), food.getNeed_img(), food.getFingerprint(), "1"};
+
+      String[] values = {"3", "123456", "5acf438704bf0fd014d05f5128100bdf", "123", food.getQuery(),
+          food.getNeed_img(), food.getFingerprint(), "1"};
+
+      food_search = GsonUtil.buildJson(keys, values);
+
+    } catch (Exception e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    // String food_search="";
+    // 1. Json 编码
+    // food_search = JSONUtils.toJasonEncode(food_search);
+    // logger.info("Json encode:"+food_search);
+
+    // 2. AES encrypt
+    try {
+      food_search = AESUtil.encrypt(food_search);
+      // logger.info("AES encrypt:"+food_search);
+    } catch (Exception e) {
+      // logger.error("AES exception:"+e);
+    }
+
+    // 3. URL encode
+    String url = "http://food4ali.shenmintech.cn/food/sugguest";
+    food_search = StringUtil.urlEncodeUTF8(food_search);
+    String param = "data=" + food_search;
+    // logger.info("food search url:"+url+"?"+param);
+
+    // 4. 发送 HTTP 请求
+    String response = HttpUtils.sendGet(url, param);
+
+
+
+    // response=HttpRequest.sendGet(redirectRequest.getUrl(), redirectRequest.getParam());
+
+
+    // 5. AES decrypt
+    try {
+      response = AESUtil.desEncrypt(response);
+      System.out.println("AES decrypted response:" + response);
+    } catch (Exception e) {
+      System.out.println("AES exception:" + e);
+    }
+
+    System.out.println(StringUtil.decodeUnicode(response));
+    // 6. Json 解码
+    // response = CommonUtil.unescapeJava(response).trim();
+    // System.out.println("After json decode response:"+response);
+    String res = StringUtil.decodeUnicode(response);
+
+
+
+    Gson gson = new Gson();
+
+    byte[] b1 = new byte[res.getBytes().length - 6];
+    byte[] b2 = res.getBytes();
+
+    for (int i = 0; i < b2.length - 6; i++) {
+      b1[i] = b2[i];
+    }
+
+    try {
+      res = new String(b1, "UTF-8");
+      System.out.println(new String(b1, "UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    SuggestionFoodResBean bean = gson.fromJson(res, SuggestionFoodResBean.class);
+
+    return bean;
+  }
+
+
+
+  @RequestMapping("findFoods")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "查找具体食物", httpMethod = "POST", value = "查找具体食物")
+  private @ResponseBody FindFoodResBean findFoods(
+      @ApiParam(required = true, value = "用户输入的食物相关信息") @RequestBody SuggestionFoodReqBean food,
+      HttpServletRequest req, HttpServletResponse resp) {
+
+
+
+    String food_search = null;
+    try {
+      System.out.println(StringUtil.getEncoding(food.getQuery()));
+      String[] keys = {"platform_type", "uuid", "app_key", "aLiID", "query", "need_img",
+          "fingerprint", "need_calory"};
+      String[] values = {"3", "123456", "5acf438704bf0fd014d05f5128100bdf", "123", food.getQuery(),
+          food.getNeed_img(), food.getFingerprint(), "1"};
+
+      food_search = GsonUtil.buildJson(keys, values);
+
+
+
+    } catch (Exception e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    // String food_search="";
+    // 1. Json 编码
+    // food_search = JSONUtils.toJasonEncode(food_search);
+    // logger.info("Json encode:"+food_search);
+
+    // 2. AES encrypt
+    try {
+      food_search = AESUtil.encrypt(food_search);
+      // logger.info("AES encrypt:"+food_search);
+    } catch (Exception e) {
+      // logger.error("AES exception:"+e);
+    }
+
+    // 3. URL encode
+    String url = "http://food4ali.shenmintech.cn/food/nutri";
+    food_search = StringUtil.urlEncodeUTF8(food_search);
+    String param = "data=" + food_search;
+    // logger.info("food search url:"+url+"?"+param);
+
+    // 4. 发送 HTTP 请求
+    String response = HttpUtils.sendGet(url, param);
+
+
+
+    // response=HttpRequest.sendGet(redirectRequest.getUrl(), redirectRequest.getParam());
+
+
+    // 5. AES decrypt
+    try {
+      response = AESUtil.desEncrypt(response);
+      System.out.println("AES decrypted response:" + response);
+    } catch (Exception e) {
+      System.out.println("AES exception:" + e);
+    }
+
+    System.out.println(StringUtil.decodeUnicode(response));
+    // 6. Json 解码
+    // response = CommonUtil.unescapeJava(response).trim();
+    // System.out.println("After json decode response:"+response);
+    String res = StringUtil.decodeUnicode(response);
+
+
+
+    Gson gson = new Gson();
+
+    byte[] b1 = new byte[res.getBytes().length - 5];
+    byte[] b2 = res.getBytes();
+
+    for (int i = 0; i < b2.length - 5; i++) {
+      b1[i] = b2[i];
+    }
+
+    try {
+      res = new String(b1, "UTF-8");
+      System.out.println(new String(b1, "UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    FindFoodResBean bean = gson.fromJson(res, FindFoodResBean.class);
+
+    return bean;
+  }
+
+
+
+  @RequestMapping("findFoodsKeyWords")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+  @ApiOperation(notes = "查找热点食物", httpMethod = "POST", value = "查找热点食物")
+  private @ResponseBody CaloriaKeysRespBean findFoodsKeyWords(
+      @ApiParam(required = true, value = "用户输入") @RequestBody FindFoodKeyWordsReqBean findFoodKeyWordsReqBean) {
+
+    String url = "http://42.96.250.131/frontend/tool/calorieQueryKeywords";
+    String param = "userid=1601281100063890&&sessionid=88888888888888888888888888888888";
+    String response = HttpUtils.sendGet(url, param);
+
+
+    Gson gson = new Gson();
+    CaloriaKeysRespBean bean = gson.fromJson(response, CaloriaKeysRespBean.class);
+
+    return bean;
+  }
+
+
+}

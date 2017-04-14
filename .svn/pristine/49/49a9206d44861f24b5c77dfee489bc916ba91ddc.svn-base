@@ -1,0 +1,15 @@
+package com.shenmintech.cbp.service;
+
+import java.util.List;
+
+public interface ITToolAccountService {
+
+  public void addAccount(String activeId, String passiveId, String actionId, String remark);// 添加甲方对乙方的行为流水
+
+  public int countOfActionByPassiveId(String passiveId, String actionId);// 查询乙方被某行为的施行次数
+
+  public void clearAccount(String activeId, String passiveId, String actionId);// 撤销行为
+
+  public List<String> searchPassiveIds(String activeId, String actionId);// 查询activeId施行actionId行为的所有passiveId
+
+}

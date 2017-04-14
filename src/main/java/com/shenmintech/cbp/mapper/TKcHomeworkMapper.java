@@ -1,0 +1,33 @@
+package com.shenmintech.cbp.mapper;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+import com.shenmintech.cbp.entity.TKcHomework;
+import com.shenmintech.cbp.entity.TKcHomeworkExample;
+
+public interface TKcHomeworkMapper {
+  int countByExample(TKcHomeworkExample example);
+
+  int deleteByExample(TKcHomeworkExample example);
+
+  int deleteByPrimaryKey(String id);
+
+  int insert(TKcHomework record);
+
+  int insertSelective(TKcHomework record);
+
+  List<TKcHomework> selectByExample(TKcHomeworkExample example);
+
+  TKcHomework selectByPrimaryKey(String id);
+
+  int updateByExampleSelective(@Param("record") TKcHomework record,
+      @Param("example") TKcHomeworkExample example);
+
+  int updateByExample(@Param("record") TKcHomework record,
+      @Param("example") TKcHomeworkExample example);
+
+  int updateByPrimaryKeySelective(TKcHomework record);
+
+  int updateByPrimaryKey(TKcHomework record);
+}

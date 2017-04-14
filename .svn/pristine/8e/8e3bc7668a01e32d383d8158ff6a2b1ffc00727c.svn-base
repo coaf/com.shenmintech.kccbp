@@ -1,0 +1,31 @@
+package com.shenmintech.cbp.mapper;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+import com.shenmintech.cbp.entity.TKcPushTimeType;
+import com.shenmintech.cbp.entity.TKcPushTimeTypeExample;
+
+public interface TKcPushTimeTypeMapper {
+    int countByExample(TKcPushTimeTypeExample example);
+
+    int deleteByExample(TKcPushTimeTypeExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(TKcPushTimeType record);
+
+    int insertSelective(TKcPushTimeType record);
+
+    List<TKcPushTimeType> selectByExample(TKcPushTimeTypeExample example);
+
+    TKcPushTimeType selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") TKcPushTimeType record, @Param("example") TKcPushTimeTypeExample example);
+
+    int updateByExample(@Param("record") TKcPushTimeType record, @Param("example") TKcPushTimeTypeExample example);
+
+    int updateByPrimaryKeySelective(TKcPushTimeType record);
+
+    int updateByPrimaryKey(TKcPushTimeType record);
+}

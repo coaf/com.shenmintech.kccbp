@@ -1,0 +1,1460 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shenmintech.cbp.mapper.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.shenmintech.cbp.entity.User" >
+    <id column="id" property="id" jdbcType="CHAR" />
+    <result column="inviteCode" property="invitecode" jdbcType="VARCHAR" />
+    <result column="loginName" property="loginname" jdbcType="VARCHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="role" property="role" jdbcType="INTEGER" />
+    <result column="enableManualInput" property="enablemanualinput" jdbcType="TINYINT" />
+    <result column="adress" property="adress" jdbcType="VARCHAR" />
+    <result column="brithday" property="brithday" jdbcType="VARCHAR" />
+    <result column="medicare" property="medicare" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="nickName" property="nickname" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="VARCHAR" />
+    <result column="summary" property="summary" jdbcType="VARCHAR" />
+    <result column="titles" property="titles" jdbcType="VARCHAR" />
+    <result column="workplace" property="workplace" jdbcType="VARCHAR" />
+    <result column="section" property="section" jdbcType="VARCHAR" />
+    <result column="section_type" property="sectionType" jdbcType="BIT" />
+    <result column="healthHistoryId" property="healthhistoryid" jdbcType="VARCHAR" />
+    <result column="imageId" property="imageid" jdbcType="VARCHAR" />
+    <result column="equipmentId" property="equipmentid" jdbcType="VARCHAR" />
+    <result column="sn" property="sn" jdbcType="DOUBLE" />
+    <result column="ew" property="ew" jdbcType="DOUBLE" />
+    <result column="phoneType" property="phonetype" jdbcType="VARCHAR" />
+    <result column="bloodfat" property="bloodfat" jdbcType="REAL" />
+    <result column="bloodpressureH" property="bloodpressureh" jdbcType="INTEGER" />
+    <result column="bloodpressureL" property="bloodpressurel" jdbcType="INTEGER" />
+    <result column="height" property="height" jdbcType="INTEGER" />
+    <result column="weight" property="weight" jdbcType="REAL" />
+    <result column="heartrate" property="heartrate" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="openId" property="openid" jdbcType="VARCHAR" />
+    <result column="firstTryTime" property="firsttrytime" jdbcType="BIGINT" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="contact" property="contact" jdbcType="VARCHAR" />
+    <result column="contactPhone" property="contactphone" jdbcType="VARCHAR" />
+    <result column="newUser" property="newuser" jdbcType="INTEGER" />
+    <result column="triedDays" property="trieddays" jdbcType="INTEGER" />
+    <result column="lastTryTime" property="lasttrytime" jdbcType="BIGINT" />
+    <result column="lastFreePaperTime" property="lastfreepapertime" jdbcType="BIGINT" />
+    <result column="medicineType" property="medicinetype" jdbcType="INTEGER" />
+    <result column="tryNum" property="trynum" jdbcType="INTEGER" />
+    <result column="eventKey" property="eventkey" jdbcType="INTEGER" />
+    <result column="smoke" property="smoke" jdbcType="INTEGER" />
+    <result column="drink" property="drink" jdbcType="INTEGER" />
+    <result column="createDate" property="createdate" jdbcType="TIMESTAMP" />
+    <result column="isBHUser" property="isbhuser" jdbcType="INTEGER" />
+    <result column="wechatImgUrl" property="wechatimgurl" jdbcType="VARCHAR" />
+    <result column="hba1c" property="hba1c" jdbcType="INTEGER" />
+    <result column="hbA1cUpdateTime" property="hba1cupdatetime" jdbcType="TIMESTAMP" />
+    <result column="sourceChannel" property="sourcechannel" jdbcType="INTEGER" />
+    <result column="hospitalId" property="hospitalid" jdbcType="VARCHAR" />
+    <result column="groupId" property="groupid" jdbcType="INTEGER" />
+    <result column="lastSessionId" property="lastsessionid" jdbcType="VARCHAR" />
+    <result column="appVersion" property="appversion" jdbcType="VARCHAR" />
+    <result column="qrCodeImgUrl" property="qrcodeimgurl" jdbcType="VARCHAR" />
+    <result column="qrCodeSeq" property="qrcodeseq" jdbcType="INTEGER" />
+    <result column="testStatusTranslated" property="teststatustranslated" jdbcType="INTEGER" />
+    <result column="patientType" property="patienttype" jdbcType="INTEGER" />
+    <result column="isHotline" property="ishotline" jdbcType="TINYINT" />
+    <result column="is_test" property="isTest" jdbcType="INTEGER" />
+    <result column="isQuitProject" property="isquitproject" jdbcType="TINYINT" />
+    <result column="saleName" property="salename" jdbcType="VARCHAR" />
+    <result column="saleMobile" property="salemobile" jdbcType="VARCHAR" />
+    <result column="privilegeCode" property="privilegecode" jdbcType="INTEGER" />
+    <result column="plCode" property="plcode" jdbcType="INTEGER" />
+    <result column="realMobile" property="realmobile" jdbcType="VARCHAR" />
+    <result column="registerDate" property="registerdate" jdbcType="TIMESTAMP" />
+    <result column="userType" property="usertype" jdbcType="VARCHAR" />
+    <result column="thirdPartyId" property="thirdpartyid" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.shenmintech.cbp.entity.UserWithBLOBs" extends="BaseResultMap" >
+    <result column="expertise" property="expertise" jdbcType="LONGVARCHAR" />
+    <result column="experience" property="experience" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, inviteCode, loginName, mobile, password, role, enableManualInput, adress, brithday, 
+    medicare, name, nickName, sex, summary, titles, workplace, section, section_type, 
+    healthHistoryId, imageId, equipmentId, sn, ew, phoneType, bloodfat, bloodpressureH, 
+    bloodpressureL, height, weight, heartrate, status, openId, firstTryTime, province, 
+    city, contact, contactPhone, newUser, triedDays, lastTryTime, lastFreePaperTime, 
+    medicineType, tryNum, eventKey, smoke, drink, createDate, isBHUser, wechatImgUrl, 
+    hba1c, hbA1cUpdateTime, sourceChannel, hospitalId, groupId, lastSessionId, appVersion, 
+    qrCodeImgUrl, qrCodeSeq, testStatusTranslated, patientType, isHotline, is_test, isQuitProject, 
+    saleName, saleMobile, privilegeCode, plCode, realMobile, registerDate, userType, 
+    thirdPartyId
+  </sql>
+  <sql id="Blob_Column_List" >
+    expertise, experience
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.shenmintech.cbp.entity.UserExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from user
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.shenmintech.cbp.entity.UserExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from user
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from user
+    where id = #{id,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from user
+    where id = #{id,jdbcType=CHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.shenmintech.cbp.entity.UserExample" >
+    delete from user
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.shenmintech.cbp.entity.UserWithBLOBs" >
+    insert into user (id, inviteCode, loginName, 
+      mobile, password, role, 
+      enableManualInput, adress, brithday, 
+      medicare, name, nickName, 
+      sex, summary, titles, 
+      workplace, section, section_type, 
+      healthHistoryId, imageId, equipmentId, 
+      sn, ew, phoneType, bloodfat, 
+      bloodpressureH, bloodpressureL, height, 
+      weight, heartrate, status, 
+      openId, firstTryTime, province, 
+      city, contact, contactPhone, 
+      newUser, triedDays, lastTryTime, 
+      lastFreePaperTime, medicineType, tryNum, 
+      eventKey, smoke, drink, 
+      createDate, isBHUser, wechatImgUrl, 
+      hba1c, hbA1cUpdateTime, sourceChannel, 
+      hospitalId, groupId, lastSessionId, 
+      appVersion, qrCodeImgUrl, qrCodeSeq, 
+      testStatusTranslated, patientType, isHotline, 
+      is_test, isQuitProject, saleName, 
+      saleMobile, privilegeCode, plCode, 
+      realMobile, registerDate, userType, 
+      thirdPartyId, expertise, experience
+      )
+    values (#{id,jdbcType=CHAR}, #{invitecode,jdbcType=VARCHAR}, #{loginname,jdbcType=VARCHAR}, 
+      #{mobile,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{role,jdbcType=INTEGER}, 
+      #{enablemanualinput,jdbcType=TINYINT}, #{adress,jdbcType=VARCHAR}, #{brithday,jdbcType=VARCHAR}, 
+      #{medicare,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=VARCHAR}, #{summary,jdbcType=VARCHAR}, #{titles,jdbcType=VARCHAR}, 
+      #{workplace,jdbcType=VARCHAR}, #{section,jdbcType=VARCHAR}, #{sectionType,jdbcType=BIT}, 
+      #{healthhistoryid,jdbcType=VARCHAR}, #{imageid,jdbcType=VARCHAR}, #{equipmentid,jdbcType=VARCHAR}, 
+      #{sn,jdbcType=DOUBLE}, #{ew,jdbcType=DOUBLE}, #{phonetype,jdbcType=VARCHAR}, #{bloodfat,jdbcType=REAL}, 
+      #{bloodpressureh,jdbcType=INTEGER}, #{bloodpressurel,jdbcType=INTEGER}, #{height,jdbcType=INTEGER}, 
+      #{weight,jdbcType=REAL}, #{heartrate,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{openid,jdbcType=VARCHAR}, #{firsttrytime,jdbcType=BIGINT}, #{province,jdbcType=VARCHAR}, 
+      #{city,jdbcType=VARCHAR}, #{contact,jdbcType=VARCHAR}, #{contactphone,jdbcType=VARCHAR}, 
+      #{newuser,jdbcType=INTEGER}, #{trieddays,jdbcType=INTEGER}, #{lasttrytime,jdbcType=BIGINT}, 
+      #{lastfreepapertime,jdbcType=BIGINT}, #{medicinetype,jdbcType=INTEGER}, #{trynum,jdbcType=INTEGER}, 
+      #{eventkey,jdbcType=INTEGER}, #{smoke,jdbcType=INTEGER}, #{drink,jdbcType=INTEGER}, 
+      #{createdate,jdbcType=TIMESTAMP}, #{isbhuser,jdbcType=INTEGER}, #{wechatimgurl,jdbcType=VARCHAR}, 
+      #{hba1c,jdbcType=INTEGER}, #{hba1cupdatetime,jdbcType=TIMESTAMP}, #{sourcechannel,jdbcType=INTEGER}, 
+      #{hospitalid,jdbcType=VARCHAR}, #{groupid,jdbcType=INTEGER}, #{lastsessionid,jdbcType=VARCHAR}, 
+      #{appversion,jdbcType=VARCHAR}, #{qrcodeimgurl,jdbcType=VARCHAR}, #{qrcodeseq,jdbcType=INTEGER}, 
+      #{teststatustranslated,jdbcType=INTEGER}, #{patienttype,jdbcType=INTEGER}, #{ishotline,jdbcType=TINYINT}, 
+      #{isTest,jdbcType=INTEGER}, #{isquitproject,jdbcType=TINYINT}, #{salename,jdbcType=VARCHAR}, 
+      #{salemobile,jdbcType=VARCHAR}, #{privilegecode,jdbcType=INTEGER}, #{plcode,jdbcType=INTEGER}, 
+      #{realmobile,jdbcType=VARCHAR}, #{registerdate,jdbcType=TIMESTAMP}, #{usertype,jdbcType=VARCHAR}, 
+      #{thirdpartyid,jdbcType=VARCHAR}, #{expertise,jdbcType=LONGVARCHAR}, #{experience,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.shenmintech.cbp.entity.UserWithBLOBs" >
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="invitecode != null" >
+        inviteCode,
+      </if>
+      <if test="loginname != null" >
+        loginName,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="role != null" >
+        role,
+      </if>
+      <if test="enablemanualinput != null" >
+        enableManualInput,
+      </if>
+      <if test="adress != null" >
+        adress,
+      </if>
+      <if test="brithday != null" >
+        brithday,
+      </if>
+      <if test="medicare != null" >
+        medicare,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="nickname != null" >
+        nickName,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="summary != null" >
+        summary,
+      </if>
+      <if test="titles != null" >
+        titles,
+      </if>
+      <if test="workplace != null" >
+        workplace,
+      </if>
+      <if test="section != null" >
+        section,
+      </if>
+      <if test="sectionType != null" >
+        section_type,
+      </if>
+      <if test="healthhistoryid != null" >
+        healthHistoryId,
+      </if>
+      <if test="imageid != null" >
+        imageId,
+      </if>
+      <if test="equipmentid != null" >
+        equipmentId,
+      </if>
+      <if test="sn != null" >
+        sn,
+      </if>
+      <if test="ew != null" >
+        ew,
+      </if>
+      <if test="phonetype != null" >
+        phoneType,
+      </if>
+      <if test="bloodfat != null" >
+        bloodfat,
+      </if>
+      <if test="bloodpressureh != null" >
+        bloodpressureH,
+      </if>
+      <if test="bloodpressurel != null" >
+        bloodpressureL,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="weight != null" >
+        weight,
+      </if>
+      <if test="heartrate != null" >
+        heartrate,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="openid != null" >
+        openId,
+      </if>
+      <if test="firsttrytime != null" >
+        firstTryTime,
+      </if>
+      <if test="province != null" >
+        province,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="contact != null" >
+        contact,
+      </if>
+      <if test="contactphone != null" >
+        contactPhone,
+      </if>
+      <if test="newuser != null" >
+        newUser,
+      </if>
+      <if test="trieddays != null" >
+        triedDays,
+      </if>
+      <if test="lasttrytime != null" >
+        lastTryTime,
+      </if>
+      <if test="lastfreepapertime != null" >
+        lastFreePaperTime,
+      </if>
+      <if test="medicinetype != null" >
+        medicineType,
+      </if>
+      <if test="trynum != null" >
+        tryNum,
+      </if>
+      <if test="eventkey != null" >
+        eventKey,
+      </if>
+      <if test="smoke != null" >
+        smoke,
+      </if>
+      <if test="drink != null" >
+        drink,
+      </if>
+      <if test="createdate != null" >
+        createDate,
+      </if>
+      <if test="isbhuser != null" >
+        isBHUser,
+      </if>
+      <if test="wechatimgurl != null" >
+        wechatImgUrl,
+      </if>
+      <if test="hba1c != null" >
+        hba1c,
+      </if>
+      <if test="hba1cupdatetime != null" >
+        hbA1cUpdateTime,
+      </if>
+      <if test="sourcechannel != null" >
+        sourceChannel,
+      </if>
+      <if test="hospitalid != null" >
+        hospitalId,
+      </if>
+      <if test="groupid != null" >
+        groupId,
+      </if>
+      <if test="lastsessionid != null" >
+        lastSessionId,
+      </if>
+      <if test="appversion != null" >
+        appVersion,
+      </if>
+      <if test="qrcodeimgurl != null" >
+        qrCodeImgUrl,
+      </if>
+      <if test="qrcodeseq != null" >
+        qrCodeSeq,
+      </if>
+      <if test="teststatustranslated != null" >
+        testStatusTranslated,
+      </if>
+      <if test="patienttype != null" >
+        patientType,
+      </if>
+      <if test="ishotline != null" >
+        isHotline,
+      </if>
+      <if test="isTest != null" >
+        is_test,
+      </if>
+      <if test="isquitproject != null" >
+        isQuitProject,
+      </if>
+      <if test="salename != null" >
+        saleName,
+      </if>
+      <if test="salemobile != null" >
+        saleMobile,
+      </if>
+      <if test="privilegecode != null" >
+        privilegeCode,
+      </if>
+      <if test="plcode != null" >
+        plCode,
+      </if>
+      <if test="realmobile != null" >
+        realMobile,
+      </if>
+      <if test="registerdate != null" >
+        registerDate,
+      </if>
+      <if test="usertype != null" >
+        userType,
+      </if>
+      <if test="thirdpartyid != null" >
+        thirdPartyId,
+      </if>
+      <if test="expertise != null" >
+        expertise,
+      </if>
+      <if test="experience != null" >
+        experience,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=CHAR},
+      </if>
+      <if test="invitecode != null" >
+        #{invitecode,jdbcType=VARCHAR},
+      </if>
+      <if test="loginname != null" >
+        #{loginname,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null" >
+        #{role,jdbcType=INTEGER},
+      </if>
+      <if test="enablemanualinput != null" >
+        #{enablemanualinput,jdbcType=TINYINT},
+      </if>
+      <if test="adress != null" >
+        #{adress,jdbcType=VARCHAR},
+      </if>
+      <if test="brithday != null" >
+        #{brithday,jdbcType=VARCHAR},
+      </if>
+      <if test="medicare != null" >
+        #{medicare,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null" >
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null" >
+        #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="titles != null" >
+        #{titles,jdbcType=VARCHAR},
+      </if>
+      <if test="workplace != null" >
+        #{workplace,jdbcType=VARCHAR},
+      </if>
+      <if test="section != null" >
+        #{section,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionType != null" >
+        #{sectionType,jdbcType=BIT},
+      </if>
+      <if test="healthhistoryid != null" >
+        #{healthhistoryid,jdbcType=VARCHAR},
+      </if>
+      <if test="imageid != null" >
+        #{imageid,jdbcType=VARCHAR},
+      </if>
+      <if test="equipmentid != null" >
+        #{equipmentid,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        #{sn,jdbcType=DOUBLE},
+      </if>
+      <if test="ew != null" >
+        #{ew,jdbcType=DOUBLE},
+      </if>
+      <if test="phonetype != null" >
+        #{phonetype,jdbcType=VARCHAR},
+      </if>
+      <if test="bloodfat != null" >
+        #{bloodfat,jdbcType=REAL},
+      </if>
+      <if test="bloodpressureh != null" >
+        #{bloodpressureh,jdbcType=INTEGER},
+      </if>
+      <if test="bloodpressurel != null" >
+        #{bloodpressurel,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=INTEGER},
+      </if>
+      <if test="weight != null" >
+        #{weight,jdbcType=REAL},
+      </if>
+      <if test="heartrate != null" >
+        #{heartrate,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="openid != null" >
+        #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="firsttrytime != null" >
+        #{firsttrytime,jdbcType=BIGINT},
+      </if>
+      <if test="province != null" >
+        #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="contact != null" >
+        #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="contactphone != null" >
+        #{contactphone,jdbcType=VARCHAR},
+      </if>
+      <if test="newuser != null" >
+        #{newuser,jdbcType=INTEGER},
+      </if>
+      <if test="trieddays != null" >
+        #{trieddays,jdbcType=INTEGER},
+      </if>
+      <if test="lasttrytime != null" >
+        #{lasttrytime,jdbcType=BIGINT},
+      </if>
+      <if test="lastfreepapertime != null" >
+        #{lastfreepapertime,jdbcType=BIGINT},
+      </if>
+      <if test="medicinetype != null" >
+        #{medicinetype,jdbcType=INTEGER},
+      </if>
+      <if test="trynum != null" >
+        #{trynum,jdbcType=INTEGER},
+      </if>
+      <if test="eventkey != null" >
+        #{eventkey,jdbcType=INTEGER},
+      </if>
+      <if test="smoke != null" >
+        #{smoke,jdbcType=INTEGER},
+      </if>
+      <if test="drink != null" >
+        #{drink,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null" >
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isbhuser != null" >
+        #{isbhuser,jdbcType=INTEGER},
+      </if>
+      <if test="wechatimgurl != null" >
+        #{wechatimgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="hba1c != null" >
+        #{hba1c,jdbcType=INTEGER},
+      </if>
+      <if test="hba1cupdatetime != null" >
+        #{hba1cupdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sourcechannel != null" >
+        #{sourcechannel,jdbcType=INTEGER},
+      </if>
+      <if test="hospitalid != null" >
+        #{hospitalid,jdbcType=VARCHAR},
+      </if>
+      <if test="groupid != null" >
+        #{groupid,jdbcType=INTEGER},
+      </if>
+      <if test="lastsessionid != null" >
+        #{lastsessionid,jdbcType=VARCHAR},
+      </if>
+      <if test="appversion != null" >
+        #{appversion,jdbcType=VARCHAR},
+      </if>
+      <if test="qrcodeimgurl != null" >
+        #{qrcodeimgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="qrcodeseq != null" >
+        #{qrcodeseq,jdbcType=INTEGER},
+      </if>
+      <if test="teststatustranslated != null" >
+        #{teststatustranslated,jdbcType=INTEGER},
+      </if>
+      <if test="patienttype != null" >
+        #{patienttype,jdbcType=INTEGER},
+      </if>
+      <if test="ishotline != null" >
+        #{ishotline,jdbcType=TINYINT},
+      </if>
+      <if test="isTest != null" >
+        #{isTest,jdbcType=INTEGER},
+      </if>
+      <if test="isquitproject != null" >
+        #{isquitproject,jdbcType=TINYINT},
+      </if>
+      <if test="salename != null" >
+        #{salename,jdbcType=VARCHAR},
+      </if>
+      <if test="salemobile != null" >
+        #{salemobile,jdbcType=VARCHAR},
+      </if>
+      <if test="privilegecode != null" >
+        #{privilegecode,jdbcType=INTEGER},
+      </if>
+      <if test="plcode != null" >
+        #{plcode,jdbcType=INTEGER},
+      </if>
+      <if test="realmobile != null" >
+        #{realmobile,jdbcType=VARCHAR},
+      </if>
+      <if test="registerdate != null" >
+        #{registerdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="usertype != null" >
+        #{usertype,jdbcType=VARCHAR},
+      </if>
+      <if test="thirdpartyid != null" >
+        #{thirdpartyid,jdbcType=VARCHAR},
+      </if>
+      <if test="expertise != null" >
+        #{expertise,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="experience != null" >
+        #{experience,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.shenmintech.cbp.entity.UserExample" resultType="java.lang.Integer" >
+    select count(*) from user
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update user
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=CHAR},
+      </if>
+      <if test="record.invitecode != null" >
+        inviteCode = #{record.invitecode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.loginname != null" >
+        loginName = #{record.loginname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mobile != null" >
+        mobile = #{record.mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="record.password != null" >
+        password = #{record.password,jdbcType=VARCHAR},
+      </if>
+      <if test="record.role != null" >
+        role = #{record.role,jdbcType=INTEGER},
+      </if>
+      <if test="record.enablemanualinput != null" >
+        enableManualInput = #{record.enablemanualinput,jdbcType=TINYINT},
+      </if>
+      <if test="record.adress != null" >
+        adress = #{record.adress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.brithday != null" >
+        brithday = #{record.brithday,jdbcType=VARCHAR},
+      </if>
+      <if test="record.medicare != null" >
+        medicare = #{record.medicare,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nickname != null" >
+        nickName = #{record.nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sex != null" >
+        sex = #{record.sex,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summary != null" >
+        summary = #{record.summary,jdbcType=VARCHAR},
+      </if>
+      <if test="record.titles != null" >
+        titles = #{record.titles,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workplace != null" >
+        workplace = #{record.workplace,jdbcType=VARCHAR},
+      </if>
+      <if test="record.section != null" >
+        section = #{record.section,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sectionType != null" >
+        section_type = #{record.sectionType,jdbcType=BIT},
+      </if>
+      <if test="record.healthhistoryid != null" >
+        healthHistoryId = #{record.healthhistoryid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.imageid != null" >
+        imageId = #{record.imageid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.equipmentid != null" >
+        equipmentId = #{record.equipmentid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sn != null" >
+        sn = #{record.sn,jdbcType=DOUBLE},
+      </if>
+      <if test="record.ew != null" >
+        ew = #{record.ew,jdbcType=DOUBLE},
+      </if>
+      <if test="record.phonetype != null" >
+        phoneType = #{record.phonetype,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bloodfat != null" >
+        bloodfat = #{record.bloodfat,jdbcType=REAL},
+      </if>
+      <if test="record.bloodpressureh != null" >
+        bloodpressureH = #{record.bloodpressureh,jdbcType=INTEGER},
+      </if>
+      <if test="record.bloodpressurel != null" >
+        bloodpressureL = #{record.bloodpressurel,jdbcType=INTEGER},
+      </if>
+      <if test="record.height != null" >
+        height = #{record.height,jdbcType=INTEGER},
+      </if>
+      <if test="record.weight != null" >
+        weight = #{record.weight,jdbcType=REAL},
+      </if>
+      <if test="record.heartrate != null" >
+        heartrate = #{record.heartrate,jdbcType=INTEGER},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.openid != null" >
+        openId = #{record.openid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.firsttrytime != null" >
+        firstTryTime = #{record.firsttrytime,jdbcType=BIGINT},
+      </if>
+      <if test="record.province != null" >
+        province = #{record.province,jdbcType=VARCHAR},
+      </if>
+      <if test="record.city != null" >
+        city = #{record.city,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contact != null" >
+        contact = #{record.contact,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contactphone != null" >
+        contactPhone = #{record.contactphone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.newuser != null" >
+        newUser = #{record.newuser,jdbcType=INTEGER},
+      </if>
+      <if test="record.trieddays != null" >
+        triedDays = #{record.trieddays,jdbcType=INTEGER},
+      </if>
+      <if test="record.lasttrytime != null" >
+        lastTryTime = #{record.lasttrytime,jdbcType=BIGINT},
+      </if>
+      <if test="record.lastfreepapertime != null" >
+        lastFreePaperTime = #{record.lastfreepapertime,jdbcType=BIGINT},
+      </if>
+      <if test="record.medicinetype != null" >
+        medicineType = #{record.medicinetype,jdbcType=INTEGER},
+      </if>
+      <if test="record.trynum != null" >
+        tryNum = #{record.trynum,jdbcType=INTEGER},
+      </if>
+      <if test="record.eventkey != null" >
+        eventKey = #{record.eventkey,jdbcType=INTEGER},
+      </if>
+      <if test="record.smoke != null" >
+        smoke = #{record.smoke,jdbcType=INTEGER},
+      </if>
+      <if test="record.drink != null" >
+        drink = #{record.drink,jdbcType=INTEGER},
+      </if>
+      <if test="record.createdate != null" >
+        createDate = #{record.createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.isbhuser != null" >
+        isBHUser = #{record.isbhuser,jdbcType=INTEGER},
+      </if>
+      <if test="record.wechatimgurl != null" >
+        wechatImgUrl = #{record.wechatimgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.hba1c != null" >
+        hba1c = #{record.hba1c,jdbcType=INTEGER},
+      </if>
+      <if test="record.hba1cupdatetime != null" >
+        hbA1cUpdateTime = #{record.hba1cupdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.sourcechannel != null" >
+        sourceChannel = #{record.sourcechannel,jdbcType=INTEGER},
+      </if>
+      <if test="record.hospitalid != null" >
+        hospitalId = #{record.hospitalid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.groupid != null" >
+        groupId = #{record.groupid,jdbcType=INTEGER},
+      </if>
+      <if test="record.lastsessionid != null" >
+        lastSessionId = #{record.lastsessionid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.appversion != null" >
+        appVersion = #{record.appversion,jdbcType=VARCHAR},
+      </if>
+      <if test="record.qrcodeimgurl != null" >
+        qrCodeImgUrl = #{record.qrcodeimgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.qrcodeseq != null" >
+        qrCodeSeq = #{record.qrcodeseq,jdbcType=INTEGER},
+      </if>
+      <if test="record.teststatustranslated != null" >
+        testStatusTranslated = #{record.teststatustranslated,jdbcType=INTEGER},
+      </if>
+      <if test="record.patienttype != null" >
+        patientType = #{record.patienttype,jdbcType=INTEGER},
+      </if>
+      <if test="record.ishotline != null" >
+        isHotline = #{record.ishotline,jdbcType=TINYINT},
+      </if>
+      <if test="record.isTest != null" >
+        is_test = #{record.isTest,jdbcType=INTEGER},
+      </if>
+      <if test="record.isquitproject != null" >
+        isQuitProject = #{record.isquitproject,jdbcType=TINYINT},
+      </if>
+      <if test="record.salename != null" >
+        saleName = #{record.salename,jdbcType=VARCHAR},
+      </if>
+      <if test="record.salemobile != null" >
+        saleMobile = #{record.salemobile,jdbcType=VARCHAR},
+      </if>
+      <if test="record.privilegecode != null" >
+        privilegeCode = #{record.privilegecode,jdbcType=INTEGER},
+      </if>
+      <if test="record.plcode != null" >
+        plCode = #{record.plcode,jdbcType=INTEGER},
+      </if>
+      <if test="record.realmobile != null" >
+        realMobile = #{record.realmobile,jdbcType=VARCHAR},
+      </if>
+      <if test="record.registerdate != null" >
+        registerDate = #{record.registerdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.usertype != null" >
+        userType = #{record.usertype,jdbcType=VARCHAR},
+      </if>
+      <if test="record.thirdpartyid != null" >
+        thirdPartyId = #{record.thirdpartyid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.expertise != null" >
+        expertise = #{record.expertise,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.experience != null" >
+        experience = #{record.experience,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update user
+    set id = #{record.id,jdbcType=CHAR},
+      inviteCode = #{record.invitecode,jdbcType=VARCHAR},
+      loginName = #{record.loginname,jdbcType=VARCHAR},
+      mobile = #{record.mobile,jdbcType=VARCHAR},
+      password = #{record.password,jdbcType=VARCHAR},
+      role = #{record.role,jdbcType=INTEGER},
+      enableManualInput = #{record.enablemanualinput,jdbcType=TINYINT},
+      adress = #{record.adress,jdbcType=VARCHAR},
+      brithday = #{record.brithday,jdbcType=VARCHAR},
+      medicare = #{record.medicare,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      nickName = #{record.nickname,jdbcType=VARCHAR},
+      sex = #{record.sex,jdbcType=VARCHAR},
+      summary = #{record.summary,jdbcType=VARCHAR},
+      titles = #{record.titles,jdbcType=VARCHAR},
+      workplace = #{record.workplace,jdbcType=VARCHAR},
+      section = #{record.section,jdbcType=VARCHAR},
+      section_type = #{record.sectionType,jdbcType=BIT},
+      healthHistoryId = #{record.healthhistoryid,jdbcType=VARCHAR},
+      imageId = #{record.imageid,jdbcType=VARCHAR},
+      equipmentId = #{record.equipmentid,jdbcType=VARCHAR},
+      sn = #{record.sn,jdbcType=DOUBLE},
+      ew = #{record.ew,jdbcType=DOUBLE},
+      phoneType = #{record.phonetype,jdbcType=VARCHAR},
+      bloodfat = #{record.bloodfat,jdbcType=REAL},
+      bloodpressureH = #{record.bloodpressureh,jdbcType=INTEGER},
+      bloodpressureL = #{record.bloodpressurel,jdbcType=INTEGER},
+      height = #{record.height,jdbcType=INTEGER},
+      weight = #{record.weight,jdbcType=REAL},
+      heartrate = #{record.heartrate,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      openId = #{record.openid,jdbcType=VARCHAR},
+      firstTryTime = #{record.firsttrytime,jdbcType=BIGINT},
+      province = #{record.province,jdbcType=VARCHAR},
+      city = #{record.city,jdbcType=VARCHAR},
+      contact = #{record.contact,jdbcType=VARCHAR},
+      contactPhone = #{record.contactphone,jdbcType=VARCHAR},
+      newUser = #{record.newuser,jdbcType=INTEGER},
+      triedDays = #{record.trieddays,jdbcType=INTEGER},
+      lastTryTime = #{record.lasttrytime,jdbcType=BIGINT},
+      lastFreePaperTime = #{record.lastfreepapertime,jdbcType=BIGINT},
+      medicineType = #{record.medicinetype,jdbcType=INTEGER},
+      tryNum = #{record.trynum,jdbcType=INTEGER},
+      eventKey = #{record.eventkey,jdbcType=INTEGER},
+      smoke = #{record.smoke,jdbcType=INTEGER},
+      drink = #{record.drink,jdbcType=INTEGER},
+      createDate = #{record.createdate,jdbcType=TIMESTAMP},
+      isBHUser = #{record.isbhuser,jdbcType=INTEGER},
+      wechatImgUrl = #{record.wechatimgurl,jdbcType=VARCHAR},
+      hba1c = #{record.hba1c,jdbcType=INTEGER},
+      hbA1cUpdateTime = #{record.hba1cupdatetime,jdbcType=TIMESTAMP},
+      sourceChannel = #{record.sourcechannel,jdbcType=INTEGER},
+      hospitalId = #{record.hospitalid,jdbcType=VARCHAR},
+      groupId = #{record.groupid,jdbcType=INTEGER},
+      lastSessionId = #{record.lastsessionid,jdbcType=VARCHAR},
+      appVersion = #{record.appversion,jdbcType=VARCHAR},
+      qrCodeImgUrl = #{record.qrcodeimgurl,jdbcType=VARCHAR},
+      qrCodeSeq = #{record.qrcodeseq,jdbcType=INTEGER},
+      testStatusTranslated = #{record.teststatustranslated,jdbcType=INTEGER},
+      patientType = #{record.patienttype,jdbcType=INTEGER},
+      isHotline = #{record.ishotline,jdbcType=TINYINT},
+      is_test = #{record.isTest,jdbcType=INTEGER},
+      isQuitProject = #{record.isquitproject,jdbcType=TINYINT},
+      saleName = #{record.salename,jdbcType=VARCHAR},
+      saleMobile = #{record.salemobile,jdbcType=VARCHAR},
+      privilegeCode = #{record.privilegecode,jdbcType=INTEGER},
+      plCode = #{record.plcode,jdbcType=INTEGER},
+      realMobile = #{record.realmobile,jdbcType=VARCHAR},
+      registerDate = #{record.registerdate,jdbcType=TIMESTAMP},
+      userType = #{record.usertype,jdbcType=VARCHAR},
+      thirdPartyId = #{record.thirdpartyid,jdbcType=VARCHAR},
+      expertise = #{record.expertise,jdbcType=LONGVARCHAR},
+      experience = #{record.experience,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update user
+    set id = #{record.id,jdbcType=CHAR},
+      inviteCode = #{record.invitecode,jdbcType=VARCHAR},
+      loginName = #{record.loginname,jdbcType=VARCHAR},
+      mobile = #{record.mobile,jdbcType=VARCHAR},
+      password = #{record.password,jdbcType=VARCHAR},
+      role = #{record.role,jdbcType=INTEGER},
+      enableManualInput = #{record.enablemanualinput,jdbcType=TINYINT},
+      adress = #{record.adress,jdbcType=VARCHAR},
+      brithday = #{record.brithday,jdbcType=VARCHAR},
+      medicare = #{record.medicare,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      nickName = #{record.nickname,jdbcType=VARCHAR},
+      sex = #{record.sex,jdbcType=VARCHAR},
+      summary = #{record.summary,jdbcType=VARCHAR},
+      titles = #{record.titles,jdbcType=VARCHAR},
+      workplace = #{record.workplace,jdbcType=VARCHAR},
+      section = #{record.section,jdbcType=VARCHAR},
+      section_type = #{record.sectionType,jdbcType=BIT},
+      healthHistoryId = #{record.healthhistoryid,jdbcType=VARCHAR},
+      imageId = #{record.imageid,jdbcType=VARCHAR},
+      equipmentId = #{record.equipmentid,jdbcType=VARCHAR},
+      sn = #{record.sn,jdbcType=DOUBLE},
+      ew = #{record.ew,jdbcType=DOUBLE},
+      phoneType = #{record.phonetype,jdbcType=VARCHAR},
+      bloodfat = #{record.bloodfat,jdbcType=REAL},
+      bloodpressureH = #{record.bloodpressureh,jdbcType=INTEGER},
+      bloodpressureL = #{record.bloodpressurel,jdbcType=INTEGER},
+      height = #{record.height,jdbcType=INTEGER},
+      weight = #{record.weight,jdbcType=REAL},
+      heartrate = #{record.heartrate,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      openId = #{record.openid,jdbcType=VARCHAR},
+      firstTryTime = #{record.firsttrytime,jdbcType=BIGINT},
+      province = #{record.province,jdbcType=VARCHAR},
+      city = #{record.city,jdbcType=VARCHAR},
+      contact = #{record.contact,jdbcType=VARCHAR},
+      contactPhone = #{record.contactphone,jdbcType=VARCHAR},
+      newUser = #{record.newuser,jdbcType=INTEGER},
+      triedDays = #{record.trieddays,jdbcType=INTEGER},
+      lastTryTime = #{record.lasttrytime,jdbcType=BIGINT},
+      lastFreePaperTime = #{record.lastfreepapertime,jdbcType=BIGINT},
+      medicineType = #{record.medicinetype,jdbcType=INTEGER},
+      tryNum = #{record.trynum,jdbcType=INTEGER},
+      eventKey = #{record.eventkey,jdbcType=INTEGER},
+      smoke = #{record.smoke,jdbcType=INTEGER},
+      drink = #{record.drink,jdbcType=INTEGER},
+      createDate = #{record.createdate,jdbcType=TIMESTAMP},
+      isBHUser = #{record.isbhuser,jdbcType=INTEGER},
+      wechatImgUrl = #{record.wechatimgurl,jdbcType=VARCHAR},
+      hba1c = #{record.hba1c,jdbcType=INTEGER},
+      hbA1cUpdateTime = #{record.hba1cupdatetime,jdbcType=TIMESTAMP},
+      sourceChannel = #{record.sourcechannel,jdbcType=INTEGER},
+      hospitalId = #{record.hospitalid,jdbcType=VARCHAR},
+      groupId = #{record.groupid,jdbcType=INTEGER},
+      lastSessionId = #{record.lastsessionid,jdbcType=VARCHAR},
+      appVersion = #{record.appversion,jdbcType=VARCHAR},
+      qrCodeImgUrl = #{record.qrcodeimgurl,jdbcType=VARCHAR},
+      qrCodeSeq = #{record.qrcodeseq,jdbcType=INTEGER},
+      testStatusTranslated = #{record.teststatustranslated,jdbcType=INTEGER},
+      patientType = #{record.patienttype,jdbcType=INTEGER},
+      isHotline = #{record.ishotline,jdbcType=TINYINT},
+      is_test = #{record.isTest,jdbcType=INTEGER},
+      isQuitProject = #{record.isquitproject,jdbcType=TINYINT},
+      saleName = #{record.salename,jdbcType=VARCHAR},
+      saleMobile = #{record.salemobile,jdbcType=VARCHAR},
+      privilegeCode = #{record.privilegecode,jdbcType=INTEGER},
+      plCode = #{record.plcode,jdbcType=INTEGER},
+      realMobile = #{record.realmobile,jdbcType=VARCHAR},
+      registerDate = #{record.registerdate,jdbcType=TIMESTAMP},
+      userType = #{record.usertype,jdbcType=VARCHAR},
+      thirdPartyId = #{record.thirdpartyid,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.shenmintech.cbp.entity.UserWithBLOBs" >
+    update user
+    <set >
+      <if test="invitecode != null" >
+        inviteCode = #{invitecode,jdbcType=VARCHAR},
+      </if>
+      <if test="loginname != null" >
+        loginName = #{loginname,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null" >
+        role = #{role,jdbcType=INTEGER},
+      </if>
+      <if test="enablemanualinput != null" >
+        enableManualInput = #{enablemanualinput,jdbcType=TINYINT},
+      </if>
+      <if test="adress != null" >
+        adress = #{adress,jdbcType=VARCHAR},
+      </if>
+      <if test="brithday != null" >
+        brithday = #{brithday,jdbcType=VARCHAR},
+      </if>
+      <if test="medicare != null" >
+        medicare = #{medicare,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null" >
+        nickName = #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null" >
+        summary = #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="titles != null" >
+        titles = #{titles,jdbcType=VARCHAR},
+      </if>
+      <if test="workplace != null" >
+        workplace = #{workplace,jdbcType=VARCHAR},
+      </if>
+      <if test="section != null" >
+        section = #{section,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionType != null" >
+        section_type = #{sectionType,jdbcType=BIT},
+      </if>
+      <if test="healthhistoryid != null" >
+        healthHistoryId = #{healthhistoryid,jdbcType=VARCHAR},
+      </if>
+      <if test="imageid != null" >
+        imageId = #{imageid,jdbcType=VARCHAR},
+      </if>
+      <if test="equipmentid != null" >
+        equipmentId = #{equipmentid,jdbcType=VARCHAR},
+      </if>
+      <if test="sn != null" >
+        sn = #{sn,jdbcType=DOUBLE},
+      </if>
+      <if test="ew != null" >
+        ew = #{ew,jdbcType=DOUBLE},
+      </if>
+      <if test="phonetype != null" >
+        phoneType = #{phonetype,jdbcType=VARCHAR},
+      </if>
+      <if test="bloodfat != null" >
+        bloodfat = #{bloodfat,jdbcType=REAL},
+      </if>
+      <if test="bloodpressureh != null" >
+        bloodpressureH = #{bloodpressureh,jdbcType=INTEGER},
+      </if>
+      <if test="bloodpressurel != null" >
+        bloodpressureL = #{bloodpressurel,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        height = #{height,jdbcType=INTEGER},
+      </if>
+      <if test="weight != null" >
+        weight = #{weight,jdbcType=REAL},
+      </if>
+      <if test="heartrate != null" >
+        heartrate = #{heartrate,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="openid != null" >
+        openId = #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="firsttrytime != null" >
+        firstTryTime = #{firsttrytime,jdbcType=BIGINT},
+      </if>
+      <if test="province != null" >
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="contact != null" >
+        contact = #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="contactphone != null" >
+        contactPhone = #{contactphone,jdbcType=VARCHAR},
+      </if>
+      <if test="newuser != null" >
+        newUser = #{newuser,jdbcType=INTEGER},
+      </if>
+      <if test="trieddays != null" >
+        triedDays = #{trieddays,jdbcType=INTEGER},
+      </if>
+      <if test="lasttrytime != null" >
+        lastTryTime = #{lasttrytime,jdbcType=BIGINT},
+      </if>
+      <if test="lastfreepapertime != null" >
+        lastFreePaperTime = #{lastfreepapertime,jdbcType=BIGINT},
+      </if>
+      <if test="medicinetype != null" >
+        medicineType = #{medicinetype,jdbcType=INTEGER},
+      </if>
+      <if test="trynum != null" >
+        tryNum = #{trynum,jdbcType=INTEGER},
+      </if>
+      <if test="eventkey != null" >
+        eventKey = #{eventkey,jdbcType=INTEGER},
+      </if>
+      <if test="smoke != null" >
+        smoke = #{smoke,jdbcType=INTEGER},
+      </if>
+      <if test="drink != null" >
+        drink = #{drink,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null" >
+        createDate = #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isbhuser != null" >
+        isBHUser = #{isbhuser,jdbcType=INTEGER},
+      </if>
+      <if test="wechatimgurl != null" >
+        wechatImgUrl = #{wechatimgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="hba1c != null" >
+        hba1c = #{hba1c,jdbcType=INTEGER},
+      </if>
+      <if test="hba1cupdatetime != null" >
+        hbA1cUpdateTime = #{hba1cupdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sourcechannel != null" >
+        sourceChannel = #{sourcechannel,jdbcType=INTEGER},
+      </if>
+      <if test="hospitalid != null" >
+        hospitalId = #{hospitalid,jdbcType=VARCHAR},
+      </if>
+      <if test="groupid != null" >
+        groupId = #{groupid,jdbcType=INTEGER},
+      </if>
+      <if test="lastsessionid != null" >
+        lastSessionId = #{lastsessionid,jdbcType=VARCHAR},
+      </if>
+      <if test="appversion != null" >
+        appVersion = #{appversion,jdbcType=VARCHAR},
+      </if>
+      <if test="qrcodeimgurl != null" >
+        qrCodeImgUrl = #{qrcodeimgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="qrcodeseq != null" >
+        qrCodeSeq = #{qrcodeseq,jdbcType=INTEGER},
+      </if>
+      <if test="teststatustranslated != null" >
+        testStatusTranslated = #{teststatustranslated,jdbcType=INTEGER},
+      </if>
+      <if test="patienttype != null" >
+        patientType = #{patienttype,jdbcType=INTEGER},
+      </if>
+      <if test="ishotline != null" >
+        isHotline = #{ishotline,jdbcType=TINYINT},
+      </if>
+      <if test="isTest != null" >
+        is_test = #{isTest,jdbcType=INTEGER},
+      </if>
+      <if test="isquitproject != null" >
+        isQuitProject = #{isquitproject,jdbcType=TINYINT},
+      </if>
+      <if test="salename != null" >
+        saleName = #{salename,jdbcType=VARCHAR},
+      </if>
+      <if test="salemobile != null" >
+        saleMobile = #{salemobile,jdbcType=VARCHAR},
+      </if>
+      <if test="privilegecode != null" >
+        privilegeCode = #{privilegecode,jdbcType=INTEGER},
+      </if>
+      <if test="plcode != null" >
+        plCode = #{plcode,jdbcType=INTEGER},
+      </if>
+      <if test="realmobile != null" >
+        realMobile = #{realmobile,jdbcType=VARCHAR},
+      </if>
+      <if test="registerdate != null" >
+        registerDate = #{registerdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="usertype != null" >
+        userType = #{usertype,jdbcType=VARCHAR},
+      </if>
+      <if test="thirdpartyid != null" >
+        thirdPartyId = #{thirdpartyid,jdbcType=VARCHAR},
+      </if>
+      <if test="expertise != null" >
+        expertise = #{expertise,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="experience != null" >
+        experience = #{experience,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.shenmintech.cbp.entity.UserWithBLOBs" >
+    update user
+    set inviteCode = #{invitecode,jdbcType=VARCHAR},
+      loginName = #{loginname,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      role = #{role,jdbcType=INTEGER},
+      enableManualInput = #{enablemanualinput,jdbcType=TINYINT},
+      adress = #{adress,jdbcType=VARCHAR},
+      brithday = #{brithday,jdbcType=VARCHAR},
+      medicare = #{medicare,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      nickName = #{nickname,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      summary = #{summary,jdbcType=VARCHAR},
+      titles = #{titles,jdbcType=VARCHAR},
+      workplace = #{workplace,jdbcType=VARCHAR},
+      section = #{section,jdbcType=VARCHAR},
+      section_type = #{sectionType,jdbcType=BIT},
+      healthHistoryId = #{healthhistoryid,jdbcType=VARCHAR},
+      imageId = #{imageid,jdbcType=VARCHAR},
+      equipmentId = #{equipmentid,jdbcType=VARCHAR},
+      sn = #{sn,jdbcType=DOUBLE},
+      ew = #{ew,jdbcType=DOUBLE},
+      phoneType = #{phonetype,jdbcType=VARCHAR},
+      bloodfat = #{bloodfat,jdbcType=REAL},
+      bloodpressureH = #{bloodpressureh,jdbcType=INTEGER},
+      bloodpressureL = #{bloodpressurel,jdbcType=INTEGER},
+      height = #{height,jdbcType=INTEGER},
+      weight = #{weight,jdbcType=REAL},
+      heartrate = #{heartrate,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      openId = #{openid,jdbcType=VARCHAR},
+      firstTryTime = #{firsttrytime,jdbcType=BIGINT},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      contact = #{contact,jdbcType=VARCHAR},
+      contactPhone = #{contactphone,jdbcType=VARCHAR},
+      newUser = #{newuser,jdbcType=INTEGER},
+      triedDays = #{trieddays,jdbcType=INTEGER},
+      lastTryTime = #{lasttrytime,jdbcType=BIGINT},
+      lastFreePaperTime = #{lastfreepapertime,jdbcType=BIGINT},
+      medicineType = #{medicinetype,jdbcType=INTEGER},
+      tryNum = #{trynum,jdbcType=INTEGER},
+      eventKey = #{eventkey,jdbcType=INTEGER},
+      smoke = #{smoke,jdbcType=INTEGER},
+      drink = #{drink,jdbcType=INTEGER},
+      createDate = #{createdate,jdbcType=TIMESTAMP},
+      isBHUser = #{isbhuser,jdbcType=INTEGER},
+      wechatImgUrl = #{wechatimgurl,jdbcType=VARCHAR},
+      hba1c = #{hba1c,jdbcType=INTEGER},
+      hbA1cUpdateTime = #{hba1cupdatetime,jdbcType=TIMESTAMP},
+      sourceChannel = #{sourcechannel,jdbcType=INTEGER},
+      hospitalId = #{hospitalid,jdbcType=VARCHAR},
+      groupId = #{groupid,jdbcType=INTEGER},
+      lastSessionId = #{lastsessionid,jdbcType=VARCHAR},
+      appVersion = #{appversion,jdbcType=VARCHAR},
+      qrCodeImgUrl = #{qrcodeimgurl,jdbcType=VARCHAR},
+      qrCodeSeq = #{qrcodeseq,jdbcType=INTEGER},
+      testStatusTranslated = #{teststatustranslated,jdbcType=INTEGER},
+      patientType = #{patienttype,jdbcType=INTEGER},
+      isHotline = #{ishotline,jdbcType=TINYINT},
+      is_test = #{isTest,jdbcType=INTEGER},
+      isQuitProject = #{isquitproject,jdbcType=TINYINT},
+      saleName = #{salename,jdbcType=VARCHAR},
+      saleMobile = #{salemobile,jdbcType=VARCHAR},
+      privilegeCode = #{privilegecode,jdbcType=INTEGER},
+      plCode = #{plcode,jdbcType=INTEGER},
+      realMobile = #{realmobile,jdbcType=VARCHAR},
+      registerDate = #{registerdate,jdbcType=TIMESTAMP},
+      userType = #{usertype,jdbcType=VARCHAR},
+      thirdPartyId = #{thirdpartyid,jdbcType=VARCHAR},
+      expertise = #{expertise,jdbcType=LONGVARCHAR},
+      experience = #{experience,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.shenmintech.cbp.entity.User" >
+    update user
+    set inviteCode = #{invitecode,jdbcType=VARCHAR},
+      loginName = #{loginname,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      role = #{role,jdbcType=INTEGER},
+      enableManualInput = #{enablemanualinput,jdbcType=TINYINT},
+      adress = #{adress,jdbcType=VARCHAR},
+      brithday = #{brithday,jdbcType=VARCHAR},
+      medicare = #{medicare,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      nickName = #{nickname,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      summary = #{summary,jdbcType=VARCHAR},
+      titles = #{titles,jdbcType=VARCHAR},
+      workplace = #{workplace,jdbcType=VARCHAR},
+      section = #{section,jdbcType=VARCHAR},
+      section_type = #{sectionType,jdbcType=BIT},
+      healthHistoryId = #{healthhistoryid,jdbcType=VARCHAR},
+      imageId = #{imageid,jdbcType=VARCHAR},
+      equipmentId = #{equipmentid,jdbcType=VARCHAR},
+      sn = #{sn,jdbcType=DOUBLE},
+      ew = #{ew,jdbcType=DOUBLE},
+      phoneType = #{phonetype,jdbcType=VARCHAR},
+      bloodfat = #{bloodfat,jdbcType=REAL},
+      bloodpressureH = #{bloodpressureh,jdbcType=INTEGER},
+      bloodpressureL = #{bloodpressurel,jdbcType=INTEGER},
+      height = #{height,jdbcType=INTEGER},
+      weight = #{weight,jdbcType=REAL},
+      heartrate = #{heartrate,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      openId = #{openid,jdbcType=VARCHAR},
+      firstTryTime = #{firsttrytime,jdbcType=BIGINT},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      contact = #{contact,jdbcType=VARCHAR},
+      contactPhone = #{contactphone,jdbcType=VARCHAR},
+      newUser = #{newuser,jdbcType=INTEGER},
+      triedDays = #{trieddays,jdbcType=INTEGER},
+      lastTryTime = #{lasttrytime,jdbcType=BIGINT},
+      lastFreePaperTime = #{lastfreepapertime,jdbcType=BIGINT},
+      medicineType = #{medicinetype,jdbcType=INTEGER},
+      tryNum = #{trynum,jdbcType=INTEGER},
+      eventKey = #{eventkey,jdbcType=INTEGER},
+      smoke = #{smoke,jdbcType=INTEGER},
+      drink = #{drink,jdbcType=INTEGER},
+      createDate = #{createdate,jdbcType=TIMESTAMP},
+      isBHUser = #{isbhuser,jdbcType=INTEGER},
+      wechatImgUrl = #{wechatimgurl,jdbcType=VARCHAR},
+      hba1c = #{hba1c,jdbcType=INTEGER},
+      hbA1cUpdateTime = #{hba1cupdatetime,jdbcType=TIMESTAMP},
+      sourceChannel = #{sourcechannel,jdbcType=INTEGER},
+      hospitalId = #{hospitalid,jdbcType=VARCHAR},
+      groupId = #{groupid,jdbcType=INTEGER},
+      lastSessionId = #{lastsessionid,jdbcType=VARCHAR},
+      appVersion = #{appversion,jdbcType=VARCHAR},
+      qrCodeImgUrl = #{qrcodeimgurl,jdbcType=VARCHAR},
+      qrCodeSeq = #{qrcodeseq,jdbcType=INTEGER},
+      testStatusTranslated = #{teststatustranslated,jdbcType=INTEGER},
+      patientType = #{patienttype,jdbcType=INTEGER},
+      isHotline = #{ishotline,jdbcType=TINYINT},
+      is_test = #{isTest,jdbcType=INTEGER},
+      isQuitProject = #{isquitproject,jdbcType=TINYINT},
+      saleName = #{salename,jdbcType=VARCHAR},
+      saleMobile = #{salemobile,jdbcType=VARCHAR},
+      privilegeCode = #{privilegecode,jdbcType=INTEGER},
+      plCode = #{plcode,jdbcType=INTEGER},
+      realMobile = #{realmobile,jdbcType=VARCHAR},
+      registerDate = #{registerdate,jdbcType=TIMESTAMP},
+      userType = #{usertype,jdbcType=VARCHAR},
+      thirdPartyId = #{thirdpartyid,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+</mapper>

@@ -1,0 +1,60 @@
+package com.shenmintech.common.util;
+
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.codec.digest.DigestUtils;
+
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@NoArgsConstructor
+public class CheckSignUtil {
+	@SuppressWarnings("deprecation")
+	public static String crmCheckSign1(String method, String version, String appid, String format, String timestamp, String nonce, String secret , String data) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("data", data);
+		map.put("method", method);
+		map.put("version", version);
+		map.put("appid", appid);
+		map.put("format", format);
+		map.put("timestamp", timestamp);
+		map.put("nonce", nonce);
+		String str = createLinkString(map);
+		log.info("md5之前的数据:" + URLEncoder.encode(str).toLowerCase() + secret);
+		return DigestUtils.md5Hex(URLEncoder.encode(str).toLowerCase() + secret);
+	}
+	@SuppressWarnings("deprecation")
+	public static String crmCheckSign2(String method, String version, String appid, String format, String timestamp, String nonce, String secret) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("method", method);
+		map.put("version", version);
+		map.put("appid", appid);
+		map.put("format", format);
+		map.put("timestamp", timestamp);
+		map.put("nonce", nonce);
+		String str = createLinkString(map);
+		log.info("md5之前的数据:" + URLEncoder.encode(str).toLowerCase() + secret);
+		return DigestUtils.md5Hex(URLEncoder.encode(str).toLowerCase() + secret);
+	}
+	
+	/* 按照字母顺序,外加"&"连接进行排列key-value */
+	public static String createLinkString(Map<String, String> params) {
+		List<String> keys = new ArrayList<String>(params.keySet());
+		Collections.sort(keys);
+		String prestr = "";
+		for (int i = 0; i < keys.size(); i++) {
+			if (i < keys.size() - 1) {
+				prestr = prestr + ((String) keys.get(i)) + "=" + (String) params.get(keys.get(i)) + "&";
+			} else {
+				prestr = prestr + ((String) keys.get(i)) + "=" + (String) params.get(keys.get(i));
+			}
+		}
+		return prestr;
+	}
+}

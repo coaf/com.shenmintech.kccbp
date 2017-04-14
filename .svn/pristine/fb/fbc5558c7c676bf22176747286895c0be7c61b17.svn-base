@@ -1,0 +1,81 @@
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.1.213/sm_cbp_v1?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+    data-source-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: Ai-34ffd8
+    initial-size: 10
+    maximum-pool-size: 300
+    max-idle: 30
+    min-idle: 2
+    max-wait: 60000
+    max-active: 1000
+    connection-test-query: select 1
+    validation-interval: 30000
+    validation-query: select 1
+    time-between-eviction-runs-millis: 3600000
+    min-evictable-idle-time-millis: 18000000
+    default-read-only: false
+    test-on-borrow: true
+    test-on-return: true
+    test-while-idle: true
+    read-only: true
+    jdbc-interceptors: org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer
+  redis:
+    host: test3.shenmin.com
+    port: 6379
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+  pid:
+    fail-on-write-error: true
+  application: 
+    name: kc-server
+server:
+  port: 7011
+  tomcat:
+    accesslog:
+      enabled: true
+  error:
+    whitelabel:
+      enabled: false
+eureka: 
+  client: 
+    serviceUrl:
+      defaultZone: http://user:8888@localhost:8761/eureka #,http://user:8888@localhost:8762/eureka,http://user:8888@localhost:8763/eureka
+      #defaultZone: http://user:8888@127.0.0.1:8761/eureka #,http://user:8888@localhost:8762/eureka,http://user:8888@localhost:8763/eureka
+    healthcheck:
+      enable: true
+  instance:
+    hostname: wj-1
+    prefer-ip-address: true
+mybatis:
+  mapper-locations: classpath*:config/mybatis/mapper/*.xml
+  type-aliases-package: com.shenmintech.cbp.entity
+logging:
+  file: info.log
+  path: /opt/sprintcloud_sm/cbp
+  level:
+    com:
+      shenmintech:
+        cbp:
+          mapper: DEBUG
+files:
+  vedio:
+    path: D:/video
+springfox:
+  documentation: 
+    swagger: 
+      v2:
+        path: /api-docs
+swagger:
+  shenmin:
+    author: 刘丁源
+endpoints:
+  jmx:
+    unique-names: true
+  restart:
+    enabled: true
+client:
+  address: 132.168.1.132:8380/taskCRM

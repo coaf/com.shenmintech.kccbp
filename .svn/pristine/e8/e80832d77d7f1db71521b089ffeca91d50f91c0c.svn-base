@@ -1,0 +1,66 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.ICompanyBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetComBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetSingleComBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostCompanyBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutComBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetComBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetSingleComBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostCompanyBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutComBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/**
+ * 
+ * @author max
+ * 
+ */
+
+@Controller
+@Api(value = "公司", description = "公司的相关操作")
+public class CompanyController {
+	
+	@Autowired
+	ICompanyBiz iCompanyBiz;
+	
+	@PostMapping("/tkcCompany/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师创建一个新的公司，公司名字不能重复", httpMethod = "POST", value = "添加新的公司（OK）")
+	public @ResponseBody Res4PostCompanyBean postTKcCompany(@ApiParam(required = true, value = "添加公司") @RequestBody Req4PostCompanyBean req4PostCompanyBean){
+		return iCompanyBiz.addCompany(req4PostCompanyBean);
+	}
+	
+	@PostMapping("/tkcCompany/put")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师更新一个公司的名字/预计人数", httpMethod = "POST", value = "更新公司信息（OK）")
+	public @ResponseBody Res4PutComBean putTKcCompany(@ApiParam(required = true, value = "更新公司") @RequestBody Req4PutComBean req4PutComBean){
+		return iCompanyBiz.updateCompany(req4PutComBean);
+	}
+	
+	@PostMapping("/tkcCompany/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师查询所有已添加的共享公司列表--https://pro.modao.cc/app/VFuOsakmpa0sQ4k9ckc34EyvlitafYB#screen=s05234021C91481878442400", httpMethod = "POST", value = "查询公司信息（OK）")
+	public @ResponseBody Res4GetComBean getTKcCompany(@ApiParam(required = true, value = "查询对象") @RequestBody Req4GetComBean Req4GetComBean){
+		return iCompanyBiz.selectCompany(Req4GetComBean);
+	}
+	
+	@PostMapping("/tkcCompany/id/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "", httpMethod = "POST", value = "查询公司名字和公司图标（OK）")
+	public @ResponseBody Res4GetSingleComBean getSingleCompany(@ApiParam(required = true, value = "查询对象") @RequestBody Req4GetSingleComBean Req4GetSingleComBean){
+		return iCompanyBiz.selectCompanyById(Req4GetSingleComBean);
+	}
+	
+}

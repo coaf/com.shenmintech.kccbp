@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: shenmin-kc
+  cloud:
+    config:
+      env: uat
+      label: master
+      discovery:
+        enabled: true
+        serviceId: configserver
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://user:8888@uat.shenmintech.com:8761/eureka

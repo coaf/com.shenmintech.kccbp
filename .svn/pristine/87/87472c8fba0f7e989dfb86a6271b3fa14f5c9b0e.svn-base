@@ -1,0 +1,91 @@
+package com.shenmintech.common.util;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+public class AESUtil {
+
+  public static String EKEY = "shenmin20150908!";
+
+  /**
+   * @param args
+   */
+//  public static void main(String[] args) {
+//    // TODO Auto-generated method stub
+//    // String data = "{\"platform_type\": \"3\", \"uuid\": \"123456\", \"app_key\":
+//    // \"9ba2c11f85b22295bf10dfb57d7ebf25\", \"query\": \"\u997a\u5b50\"}";
+//    // String resp =
+//    // "+XWKaPARtCF4djapN38BxBe42vvXiZiV6Ukx7DdpFpwePt8AhBkgbYuIXge+PLwIUDEYkftJmfwrwz0hygrmH0PmAsaqMqUbNmVNP5acbqKonkG2DR7QlSC7ls3PnV2o4LlqKD2cG+dxdd8HSqHH8enMjWdY5CkdjEQ9/Q49N/ynut2ZhZjRk38clEjv+3WuQPGQTmIEtk4pySPNvA/kCL8ZJ1nwXKweIkm8VDjBlCHH/T2N/EUdxH4ITZ6vXrUrn3pnKrGiF9e2rN2HxlSfIX4TUICQHLIEQ6skOK22s//I06Z0bylIRAEIHu09WwIjQhD8C3gCNNsLE07+XsU2XLdPoNTUSZOK1Qh6fSjix9gRZVAPO2o/ISVIAtsOhu2wE7Ir8Fx6E3qsNY6Xi7CAc+pDfL4rVxyfWL0pX5U5jtBp6oDPASqdy9zYgDqFbdEJwwcc+wr7shz6HQjOWQ+WUhNAV/GT9MhJfiLVS6X6d3U6OnrOzDXdCuOnHiuCx0xcW0FCFGetpCa+6DEzEs/7Q0U/a3gynydpNRJg2ZFDmxTIah+s3G7BSaFYqpoAaNXUfH8E0cIBSECJlVI8NPWxmrTF94N2RDsawXda4xBoqg6Ef9vWdb3ZDzFX7I54JWRVdKJCZL9zWHiIVPOZ6HOsINwMoRM3VyfwXsWoc3YunTZXt8IUNYXKpsagUt29KLL2Dvr5JjCXe1OVornSkTpvB5f8hXu7M/b8E/FSZZJbx7cVuI8xoVX1wbTPJR0DV/LUWS8cWPLrn5cfTsQQ+uwOZWSZaROC48zKOx+pMEaZuPL8UYlOGBjc+OuoNtxAbISJoW3wJdsPC65oUzNZOOfxhJTG9EHqn09ur4kPqd0k09eyCv+yiEGgsMIUczbAmj2Ow37EuFOYzOUIR6XutsYUhceCj2gTda0IATo8SJqQcMs=";
+//    String resp =
+//        "QRm5T2TFiN+ZNzkTOOftLvMklYonV/bw5P70d8JEc2LyyrjPl1Cj+CUvUE8gozsKBUlYWIl1SbVv8sjS9HqFUsKAVpbCmZoZYDj3Z9bMRrc=";
+//    String data =
+//        "<p>$FN，不错，你的血糖达标。你成功的秘诀是什么？一位朋友曾写道：“我的丈夫扎克曾努力的控制他的糖尿病。他购物我做饭，然后我们还报班去学习食物对血糖的影响。结果呢，他买的东西都是不对的，随之我也是错上加错了！而今，我们有了成功的秘诀，一切都变得更好了。”<e2>--克里斯提 49岁 </e2></p>";
+//    String key = "shenmin20150908!";
+//    try {
+//      String result = encrypt(data, key);
+//      System.out.println(result);
+//      System.out.println(desEncrypt(resp, key));
+//    } catch (Exception e) {
+//      // TODO Auto-generated catch block
+//      e.printStackTrace();
+//    }
+//
+//  }
+
+  public static String encrypt(String data) throws Exception {
+    return encrypt(data, null);
+  }
+
+
+
+  public static String encrypt(String data, String key) throws Exception {
+    try {
+      String iv = "xxxxxxxxxxxxxxxx";
+      if (key == null || key.trim().length() == 0) key = "xxxxxxxxxxxxxxxx";
+      Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+      int blockSize = cipher.getBlockSize();
+      byte[] dataBytes = data.getBytes("UTF-8");
+      int plaintextLength = dataBytes.length;
+      if (plaintextLength % blockSize != 0) {
+        plaintextLength = plaintextLength + (blockSize - (plaintextLength % blockSize));
+      }
+      byte[] plaintext = new byte[plaintextLength];
+      System.arraycopy(dataBytes, 0, plaintext, 0, dataBytes.length);
+
+      SecretKeySpec keyspec = new SecretKeySpec(key.getBytes(), "AES");
+      IvParameterSpec ivspec = new IvParameterSpec(iv.getBytes());
+      cipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
+      byte[] encrypted = cipher.doFinal(plaintext);
+      return new sun.misc.BASE64Encoder().encode(encrypted);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public static String desEncrypt(String data) throws Exception {
+    return desEncrypt(data, null);
+  }
+
+  public static String desEncrypt(String data, String key) throws Exception {
+    try {
+      String iv = "xxxxxxxxxxxxxxxx";
+      if (key == null || key.trim().length() == 0) key = "xxxxxxxxxxxxxxxx";
+
+      byte[] encrypted1 = new sun.misc.BASE64Decoder().decodeBuffer(data);
+
+      Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+      SecretKeySpec keyspec = new SecretKeySpec(key.getBytes(), "AES");
+      IvParameterSpec ivspec = new IvParameterSpec(iv.getBytes());
+
+      cipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+      byte[] original = cipher.doFinal(encrypted1);
+      String originalString = new String(original);
+      return originalString;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+}

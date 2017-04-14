@@ -1,0 +1,99 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.IRoomAndVideoBiz;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostRollingPicVo;
+import com.shenmintech.cbp.controller.bean.req.NetEasyRoomCreateRoomReq;
+import com.shenmintech.cbp.controller.bean.res.NetEasyRoomResponse;
+import com.shenmintech.cbp.entity.TKcPubCourse;
+import com.shenmintech.cbp.entity.TKcRollingPic;
+import com.shenmintech.cbp.entity.TKcRollingPlacehd;
+import com.shenmintech.cbp.entity.TKcRollingPlacehdExample;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcPubCourseMapper;
+import com.shenmintech.cbp.mapper.TKcRollingPicMapper;
+import com.shenmintech.cbp.mapper.TKcRollingPlacehdMapper;
+import com.shenmintech.cbp.service.IRollingPictureService;
+import com.shenmintech.common.util.Constants;
+
+@Service
+@Transactional
+public class RollingPictureServiceImpl implements IRollingPictureService {
+
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Autowired
+	TKcRollingPicMapper tKcRollingPicMapper;
+	
+	@Autowired
+	TKcRollingPlacehdMapper tKcRollingPlacehdMapper;
+	
+	@Autowired
+	IRoomAndVideoBiz iRoomAndVideoBiz;
+	
+	@Autowired
+	TKcPubCourseMapper tKcPubCourseMapper;
+	
+	@Override
+	public void addRollingPic(Req4PostRollingPicVo rollingPicVo) {
+		//入轮播图表
+		TKcRollingPic tKcRollingPic = new TKcRollingPic();
+		String id = idWorkerTemplate.generateId();
+		tKcRollingPic.setId(id);
+		int renderType = rollingPicVo.getRenderType();
+		tKcRollingPic.setRollTypeFlag(renderType);
+		String remark = rollingPicVo.getRemark();
+		tKcRollingPic.setRemark(remark);
+		String picId = rollingPicVo.getPicId();
+		tKcRollingPic.setPicId(picId);
+		String renderUrl = rollingPicVo.getRenderUrl();
+		tKcRollingPic.setRenderUrl(renderUrl);
+		int status = rollingPicVo.getStatus();
+		tKcRollingPic.setStatus(status);
+		tKcRollingPicMapper.insert(tKcRollingPic);
+		
+		//更新排序栏位表
+		int hisIndex = rollingPicVo.getHisIndex();
+		TKcRollingPlacehdExample tKcRollingPlacehdExample = new TKcRollingPlacehdExample();
+		tKcRollingPlacehdExample.or().andHisIndexEqualTo(hisIndex);
+		TKcRollingPlacehd tKcRollingPlacehd = new TKcRollingPlacehd();
+		tKcRollingPlacehd.setRollingPicFid(id);
+		tKcRollingPlacehdMapper.updateByExampleSelective(tKcRollingPlacehd, tKcRollingPlacehdExample);
+		
+		//如果是公开课，则插入公开课表
+		if(1==renderType) return;
+		TKcPubCourse tKcPubCourse = new TKcPubCourse();
+		String pubCourseId = idWorkerTemplate.generateId();
+		tKcPubCourse.setId(pubCourseId);
+		tKcPubCourse.setRollingFid(id);
+		String pubCourseName = rollingPicVo.getPubCourseName();
+		tKcPubCourse.setCourseName(pubCourseName);
+		Date preStartTime = rollingPicVo.getPreStartTime();
+		tKcPubCourse.setPreStime(preStartTime);
+		tKcPubCourse.setPicId(picId);;//轮播图图片默认给公开课做封面
+		tKcPubCourse.setStatus(0);
+		NetEasyRoomCreateRoomReq req = new NetEasyRoomCreateRoomReq();//开始申请网易视频房间
+		req.setOperatorUserId(rollingPicVo.getOperatorUserId());
+		req.setGroupId(pubCourseId);
+		req.setRoomName(pubCourseName);
+		NetEasyRoomResponse res = iRoomAndVideoBiz.createNetEasyRoom(req);
+		if(200!=res.getCode()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"生成用户在网易的第三方房间接口报错",Constants.BLANKSTR);
+		String roomId = res.getChatroom().getRoomid();
+		String rtmpPullUrl = res.getChatroom().getRtmpPullUrl();
+		String httpPullUrl = res.getChatroom().getHttpPullUrl();
+		String pushUrl = res.getChatroom().getPushUrl();
+		tKcPubCourse.setNtesRoomId(roomId);
+		tKcPubCourse.setNtesRtmpPullUrl(rtmpPullUrl);
+		tKcPubCourse.setNtesHttpPullUrl(httpPullUrl);
+		tKcPubCourse.setNtesPushUrl(pushUrl);
+		tKcPubCourseMapper.insertSelective(tKcPubCourse);
+	}
+	
+}

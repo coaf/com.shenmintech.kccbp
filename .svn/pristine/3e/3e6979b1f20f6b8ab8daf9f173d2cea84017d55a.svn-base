@@ -1,0 +1,69 @@
+package com.shenmintech.cbp.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+
+/**
+ * 接口访问错误信息加载类
+ * 
+ * @author pengzhiheng
+ *
+ */
+@Data
+@Component
+@ConfigurationProperties(locations = "classpath:error-msg.yml", prefix = "httpErrorMsg")
+public class HttpErrorMsg {
+
+	@Data
+	public static class BaseFailData{
+		private Integer codeFail;
+		private String msgFail;
+	}
+
+	private AddCompany addCompany;
+	@Data
+	public static class AddCompany {
+		public VariMiss variMiss;
+		public static class VariMiss extends BaseFailData{}
+		public VariIllegal variIllegal;
+		public static class VariIllegal extends BaseFailData{}
+		public SysInnerExc sysInnerExc;
+		public static class SysInnerExc extends BaseFailData{}
+	}
+
+	private PutTKcCompany putTKcCompany;
+	@Data
+	public static class PutTKcCompany {
+		public VariMiss variMiss;
+		public static class VariMiss extends BaseFailData{}
+		public VariIllegal variIllegal;
+		public static class VariIllegal extends BaseFailData{}
+		public SysInnerExc sysInnerExc;
+		public static class SysInnerExc extends BaseFailData{}
+	}
+
+	private GetTKcCompany getTKcCompany;
+	@Data
+	public static class GetTKcCompany {
+		public VariMiss variMiss;
+		public static class VariMiss extends BaseFailData{}
+		public VariIllegal variIllegal;
+		public static class VariIllegal extends BaseFailData{}
+		public SysInnerExc sysInnerExc;
+		public static class SysInnerExc extends BaseFailData{}
+	}
+	
+	private GetSingleCompany getSingleCompany;
+	@Data
+	public static class GetSingleCompany {
+		public VariMiss variMiss;
+		public static class VariMiss extends BaseFailData{}
+		public VariIllegal variIllegal;
+		public static class VariIllegal extends BaseFailData{}
+		public SysInnerExc sysInnerExc;
+		public static class SysInnerExc extends BaseFailData{}
+	}
+}

@@ -1,0 +1,18 @@
+package com.shenmintech.cbp.client.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class LoginWithPasswordReq {
+
+  public String loginName;
+  public String password;
+  public String platformCode;
+
+}

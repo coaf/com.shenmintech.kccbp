@@ -1,0 +1,5 @@
+package com.shenmintech.cbp.service;
+
+public interface IRecordService {
+
+}

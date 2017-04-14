@@ -1,0 +1,19 @@
+package com.shenmintech.cbp.service;
+
+import java.util.List;
+
+import com.shenmintech.cbp.biz.vo.ques.Req4PostClazzVo;
+import com.shenmintech.cbp.biz.vo.res.ClazzVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetClazzVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetRoomVo;
+
+public interface IClazzService {
+	
+	public List<Res4GetClazzVo> selectByGroupId(String groupId);
+	
+	public List<ClazzVo> setClazzTime(Req4PostClazzVo clazzVo);
+	
+	public void setRoomData(String clazzId,String roomId,String rtmpPullUrl,String httpPullUrl,String pushUrl);
+	
+	public Res4GetRoomVo selectRoomsByTeacherId(String teacherId);
+}

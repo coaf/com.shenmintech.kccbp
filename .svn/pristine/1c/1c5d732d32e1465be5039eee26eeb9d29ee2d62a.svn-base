@@ -1,0 +1,12 @@
+package com.shenmintech.cbp.biz.vo.res;
+
+import lombok.Data;
+
+@Data
+public class CourseVo {
+
+	public String courseId;
+	
+	public String courseName;
+	
+}

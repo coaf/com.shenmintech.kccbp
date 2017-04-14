@@ -1,0 +1,14 @@
+package com.shenmintech.cbp.service;
+
+import com.shenmintech.cbp.biz.vo.res.Res4GetEmployeeVo;
+
+public interface IEmpolyeeService {
+
+	public String addEmpolyee(String userId ,String companyId);
+	
+	public Res4GetEmployeeVo selectByCompanyId(int pageNo,int rowsPerPage, String courseId);
+	
+	public String selectByUserId(String userId);
+	
+	public int countByCompanyId(String companyId);
+}

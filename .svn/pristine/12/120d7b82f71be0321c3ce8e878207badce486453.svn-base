@@ -1,0 +1,18 @@
+package com.shenmintech.cbp.biz;
+
+import com.shenmintech.cbp.controller.bean.req.Req4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetPushHomeworksBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostPushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPrePushHomeworkBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetPushHomeworksBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostPushHomeworkBean;
+
+public interface IHomeworkPushBiz {
+
+	public Res4GetPrePushHomeworkBean selectInitElement(Req4GetPrePushHomeworkBean req4GetPrePushHomeworkBean);
+	
+	public Res4PostPushHomeworkBean postPushHomework(Req4PostPushHomeworkBean req4PostPushHomeworkBean);
+	
+	public Res4GetPushHomeworksBean getPushHomeworks(Req4GetPushHomeworksBean req4GetPushHomeworksBean);
+	
+}

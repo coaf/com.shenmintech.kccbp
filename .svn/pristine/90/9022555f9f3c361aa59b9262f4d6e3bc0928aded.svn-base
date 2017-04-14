@@ -1,0 +1,311 @@
+package com.shenmintech.common.util;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
+
+@SuppressWarnings("deprecation")
+@Slf4j
+public class HttpUtils {
+
+	public static String pushAsynOrder(String url, Map<String, String> hashMap) {
+		log.info("异步订单回执地址url=【" + url+"】");
+		if (null == url || "".equals((url + "").trim())) {
+			return "该订单对应的平台尚未提供URL进行回调通知";
+		}
+		String result = null;
+		try {
+			result = sendPost(url, hashMap);
+			return result;
+		} catch (Exception e) {
+			log.error("POST失败", e);
+		}
+		return result;
+	}
+	
+	/**
+	 * 向指定URL发送GET方法的请求
+	 * 
+	 * @param url
+	 *            发送请求的URL
+	 * 
+	 * @param param
+	 *            请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
+	 * 
+	 * @return URL 所代表远程资源的响应结果
+	 */
+	public static String sendGet(String url, String param) {
+		String result = "";
+		BufferedReader in = null;
+		try {
+			String urlNameString = url + "?" + param;
+			URL realUrl = new URL(urlNameString);
+			// 打开和URL之间的连接
+			URLConnection connection = realUrl.openConnection();
+			// 设置通用的请求属性
+			connection.setRequestProperty("accept", "*/*");
+			connection.setRequestProperty("connection", "Keep-Alive");
+			connection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+			// 建立实际的连接
+			connection.connect();
+			// 获取所有响应头字段
+			// Map<String, List<String>> map = connection.getHeaderFields();
+			// 遍历所有的响应头字段
+			/*
+			 * for (String key : map.keySet()) { // log.info(key +
+			 * "--->" + map.get(key)); }
+			 */
+			// 定义 BufferedReader输入流来读取URL的响应
+			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			String line;
+			while ((line = in.readLine()) != null) {
+				result += line;
+			}
+		} catch (Exception e) {
+			log.info("HttpUtils中发送GET请求出现异常！【" + e +"】");
+			log.error("context", e);
+		}
+		// 使用finally块来关闭输入流
+		finally {
+			try {
+				if (in != null) {
+					in.close();
+				}
+			} catch (Exception e2) {
+				log.error("context", e2);
+			}
+		}
+		return result;
+	}
+
+	public static String sendPost(String url, Map<String, String> paramMap) throws UnsupportedEncodingException {
+		HttpClient client = new HttpClient();
+		// 设置代理服务器地坿和端叿
+		// client.getHostConfiguration().setProxy("proxy_host_addr",proxy_port);
+		// 使用GET方法，如果服务器霿要鿚过HTTPS连接，那只需要将下面URL中的http换成https
+		// HttpMethod method = new
+		// GetMethod("http://10.1.14.20:8088/workflowController/service/todo/addTask");
+		// 使用POST方法
+		PostMethod method = new PostMethod(url);
+		method.addRequestHeader("accept", "*/*");
+		method.addRequestHeader("Accept-Charset", "UTF-8");
+		method.addRequestHeader("connection", "Keep-Alive");
+		method.addRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+		method.addRequestHeader("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+
+		if (paramMap != null) {
+			Set<String> keySet = paramMap.keySet();
+			Iterator<String> it = keySet.iterator();
+			while (it.hasNext()) {
+				String str = it.next();
+				String value = paramMap.get(str);
+				if (value == null) {
+					value = "";
+				}
+				method.addParameter(str, value);
+			}
+		}
+		HttpMethodParams params = method.getParams();
+		params.setContentCharset("UTF-8");
+		StringBuffer buf = new StringBuffer();
+		try {
+			int status = client.executeMethod(method);
+			log.info("返回状态:【" + status+"】");
+			// 打印服务器返回的状濿
+			InputStream stream = method.getResponseBodyAsStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+			String line;
+			while (null != (line = br.readLine())) {
+				log.info("返回的参数:【" + br.toString()+"】");
+				buf.append(line);
+			}
+			log.info("HttpUtils 的 response:【" + buf.toString()+"】");
+			method.releaseConnection();
+
+		} catch (IOException e) {
+			log.error("response error", e);
+		}
+		return buf.toString();
+	}
+
+	@SuppressWarnings("unused")
+	public static String sendPostWithEntity(String url, Map<String, String> paramMap) throws UnsupportedEncodingException {
+		HttpClient client = new HttpClient();
+		// 设置代理服务器地坿和端叿
+		// client.getHostConfiguration().setProxy("proxy_host_addr",proxy_port);
+		// 使用GET方法，如果服务器霿要鿚过HTTPS连接，那只需要将下面URL中的http换成https
+		// HttpMethod method = new
+		// GetMethod("http://10.1.14.20:8088/workflowController/service/todo/addTask");
+		// 使用POST方法
+		PostMethod method = new PostMethod(url);
+		method.addRequestHeader("accept", "*/*");
+		method.addRequestHeader("Accept-Charset", "UTF-8");
+		method.addRequestHeader("connection", "Keep-Alive");
+		method.addRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+		method.addRequestHeader("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+		StringBuffer sf = new StringBuffer();
+
+		if (paramMap != null) {
+			Set<String> keySet = paramMap.keySet();
+			Iterator<String> it = keySet.iterator();
+			while (it.hasNext()) {
+				String str = it.next();
+				String value = paramMap.get(str);
+				if (value == null) {
+					value = "";
+				}
+				sf.append(str).append("=").append(value);
+				if (it.hasNext())
+					sf.append("&");
+			}
+		}
+		log.info("HttpUtils 中推出去的参数到底又是啥:【" + sf.toString()+"】");
+		HttpMethodParams params = method.getParams();
+		params.setContentCharset("UTF-8");
+		StringRequestEntity entity = new StringRequestEntity(sf.toString());
+		method.setRequestEntity(entity);
+		StringBuffer buf = new StringBuffer();
+		try {
+			int status = client.executeMethod(method);
+			// 打印服务器返回的状濿
+			// log.error("服务器返回的状濿" + method.getStatusLine().getStatusCode());
+			InputStream stream = method.getResponseBodyAsStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+			String line;
+			while (null != (line = br.readLine())) {
+				buf.append(line);
+			}
+			log.info("HttpUtils 的 response:【" + buf.toString()+"】");
+			method.releaseConnection();
+
+		} catch (IOException e) {
+			log.error("response error", e);
+		}
+		return buf.toString();
+	}
+
+	@SuppressWarnings("unused")
+	public static String sendPostWithEntityNoHead(String url, String paramMap) throws UnsupportedEncodingException {
+		HttpClient client = new HttpClient();
+		// 设置代理服务器地坿和端叿
+		// client.getHostConfiguration().setProxy("proxy_host_addr",proxy_port);
+		// 使用GET方法，如果服务器霿要鿚过HTTPS连接，那只需要将下面URL中的http换成https
+		// HttpMethod method = new
+		// GetMethod("http://10.1.14.20:8088/workflowController/service/todo/addTask");
+		// 使用POST方法
+		PostMethod method = new PostMethod(url);
+		// method.addRequestHeader("accept", "*/*");
+		/*
+		 * method.addRequestHeader("Accept-Charset", "UTF-8");
+		 * method.addRequestHeader("connection", "Keep-Alive");
+		 * method.addRequestHeader("Content-Type",
+		 * "application/x-www-form-urlencoded;charset=UTF-8");
+		 * method.addRequestHeader("user-agent",
+		 * "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+		 */
+
+		HttpMethodParams params = method.getParams();
+		params.setContentCharset("UTF-8");
+		StringRequestEntity entity = new StringRequestEntity(paramMap);
+		method.setRequestEntity(entity);
+		StringBuffer buf = new StringBuffer();
+		try {
+			int status = client.executeMethod(method);
+			// 打印服务器返回的状濿
+			// log.error("服务器返回的状濿" + method.getStatusLine().getStatusCode());
+			InputStream stream = method.getResponseBodyAsStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+			String line;
+			while (null != (line = br.readLine())) {
+				buf.append(line);
+			}
+			log.info("HttpUtils 的 response:【" + buf.toString()+"】");
+			method.releaseConnection();
+
+		} catch (IOException e) {
+			log.error("response error", e);
+		}
+		return buf.toString();
+	}
+
+	@SuppressWarnings({ "resource", "unchecked" })
+	public static String httpPost(String url,JSONObject headerParam, JSONObject jsonParam, boolean noNeedResponse) {
+		String str = "";
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		HttpPost method = new HttpPost(url);
+		try {
+			if(headerParam != null){
+				Map<String, String> headMap = (Map<String, String>) JSONObject.toBean(headerParam, Map.class);
+				for(Entry<String, String> entry : headMap.entrySet()){
+					String key = entry.getKey();
+					String value = entry.getValue();
+					if((key != null && !"".equals(key)) && (value != null && !"".equals(value))){
+						method.setHeader(key, value);
+					}
+				}
+			}
+			
+			if (null != jsonParam) {
+				StringEntity entity = new StringEntity(jsonParam.toString(), "utf-8");
+				entity.setContentEncoding("UTF-8");
+				entity.setContentType("application/json");
+				method.setEntity(entity);
+			}
+			HttpResponse result = httpClient.execute(method);
+			url = URLDecoder.decode(url, "UTF-8");
+			if (result.getStatusLine().getStatusCode() == 200) {
+				try {
+					str = EntityUtils.toString(result.getEntity());
+					if (noNeedResponse) {
+						return null;
+					}
+				} catch (Exception e) {
+					System.out.println("post请求提交失败:" + e);
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("post请求提交失败:" + e);
+		}
+		return str;
+	}
+
+	public static JSONObject requestHeader(String dateStr){
+		String accept = "application/json";
+		String contentType = "application/json;charset=utf-8";
+		Map<String,String> headerMap = new HashMap<String,String>();
+		headerMap.put("Accept", accept);
+		headerMap.put("Content-Type", contentType);
+		JSONObject headerJson = JSONObject.fromObject(headerMap);
+		return headerJson;
+	}
+	
+	public static String sendPost(String url,String jsonHeaderStr,String jsonBodyStr){
+		JSONObject headerParam = requestHeader(jsonHeaderStr);
+		JSONObject jsonParam = JSONObject.fromObject(jsonBodyStr);
+		return httpPost(url, headerParam, jsonParam, false);
+	}
+	
+}

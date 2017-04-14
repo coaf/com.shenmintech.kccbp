@@ -1,0 +1,589 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IRollingPictureBiz;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostRollingPicVo;
+import com.shenmintech.cbp.biz.vo.ques.Req4PutRollingPicVo;
+import com.shenmintech.cbp.biz.vo.res.RollingPicAndIndexVo;
+import com.shenmintech.cbp.controller.bean.req.Req4GetRPs4AppBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetRollingPicBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetRollingPicsBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostRollingPicBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutRollingPicBean;
+import com.shenmintech.cbp.controller.bean.res.RP4App;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRPs4AppBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRollingPicBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRollingPicsBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostRollingPicBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutRollingPicBean;
+import com.shenmintech.cbp.controller.bean.res.RollingPicture;
+import com.shenmintech.cbp.entity.TKcPubCourse;
+import com.shenmintech.cbp.entity.TKcPubCourseExample;
+import com.shenmintech.cbp.entity.TKcRollingPic;
+import com.shenmintech.cbp.entity.TKcRollingPicExample;
+import com.shenmintech.cbp.entity.TKcRollingPlacehd;
+import com.shenmintech.cbp.entity.TKcRollingPlacehdExample;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcPubCourseMapper;
+import com.shenmintech.cbp.mapper.TKcRollingPicMapper;
+import com.shenmintech.cbp.mapper.TKcRollingPlacehdMapper;
+import com.shenmintech.cbp.service.IRollingPictureService;
+import com.shenmintech.common.util.Constants;
+import com.shenmintech.common.util.DateUtil;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@SuppressWarnings("static-access")
+public class RollingPictureBizImpl implements IRollingPictureBiz {
+
+	@Autowired
+	IRollingPictureService iRollingPictureService;
+	
+	@Autowired
+	TKcRollingPlacehdMapper tKcRollingPlacehdMapper;
+	
+	@Autowired
+	TKcRollingPicMapper tKcRollingPicMapper;
+	
+	@Autowired
+	TKcPubCourseMapper tKcPubCourseMapper;
+	
+	@Override
+	public Res4PostRollingPicBean postRollingPic(Req4PostRollingPicBean req4PostRollingPicBean) {
+		Res4PostRollingPicBean resBean = new Res4PostRollingPicBean();
+		
+		String rollingPicName = req4PostRollingPicBean.getRollingPicName();
+		if(StringUtil.isBlank(rollingPicName)){
+			resBean.setError(-1);
+			resBean.setMsg("rollingPicName不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String renderType = req4PostRollingPicBean.getRenderType();
+		if(StringUtil.isAnyBlank(renderType)){
+			resBean.setError(-1);
+			resBean.setMsg("renderType不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String pubCourseName ="";
+		String preStartTime ="";
+		Date preStime = new Date();
+		String renderUrl ="";
+		switch (renderType) {
+		case "0"://公开课
+			pubCourseName = req4PostRollingPicBean.getPubCourseName();
+			if(StringUtil.isBlank(pubCourseName)){
+				resBean.setError(-1);
+				resBean.setMsg("公开课的课名pubCourseName不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			preStartTime = req4PostRollingPicBean.getPreStartTime();
+			if(StringUtil.isBlank(preStartTime)){
+				resBean.setError(-1);
+				resBean.setMsg("公开课的开课时间preStartTime不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			try {
+				preStime = DateUtil.parse(preStartTime, DateUtil.DATETYPE_10);
+			} catch (ParseException e) {
+				resBean.setError(-1);
+				resBean.setMsg("公开课的开课时间preStartTime格式有误，必须是yyyy-MM-dd HH:mm");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			break;
+		case "1"://链接
+			renderUrl = req4PostRollingPicBean.getRenderUrl();
+			if(StringUtil.isBlank(renderUrl)){
+				resBean.setError(-1);
+				resBean.setMsg("跳转renderUrl不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			break;
+		default:
+			resBean.setError(-1);
+			resBean.setMsg("renderType只能是0直播公开课，1链接");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String remark = req4PostRollingPicBean.getRemark();//备注信息
+		
+		String hisIndex = req4PostRollingPicBean.getHisIndex();
+		if(StringUtil.isBlank(hisIndex)){
+			resBean.setError(-1);
+			resBean.setMsg("hisIndex不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(!Constants.l01234.contains(hisIndex)){
+			resBean.setError(-1);
+			resBean.setMsg("hisIndex必须是0/1/2/3/4");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String picId = req4PostRollingPicBean.getPicId();
+		if(StringUtil.isBlank(picId)){
+			resBean.setError(-1);
+			resBean.setMsg("picId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String status = req4PostRollingPicBean.getStatus();
+		if(StringUtil.isBlank(status)){
+			resBean.setError(-1);
+			resBean.setMsg("status不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(!"0".equals(status) && !"1".equals(status)){
+			resBean.setError(-1);
+			resBean.setMsg("status必须为0或者1");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String operatorUserId = req4PostRollingPicBean.getOperatorUserId();
+		Req4PostRollingPicVo rollingPicVo = new Req4PostRollingPicVo().builder()
+				.rollingPicName(rollingPicName)
+				.renderType(Integer.parseInt(renderType))
+				.pubCourseName(pubCourseName)
+				.preStartTime(preStime)
+				.renderUrl(renderUrl)
+				.remark(remark)
+				.hisIndex(Integer.parseInt(hisIndex))
+				.picId(picId)
+				.status(0)
+				.operatorUserId(operatorUserId)
+				.build();
+		
+		try {
+			iRollingPictureService.addRollingPic(rollingPicVo);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		} catch (Exception e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.getMessage());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public Res4GetRollingPicsBean getRollingPics(Req4GetRollingPicsBean req4GetRollingPicsBean) {
+		Res4GetRollingPicsBean resBean = new Res4GetRollingPicsBean();
+		List<RollingPicture> allRollingPics = new ArrayList<>();
+		
+		//组织占位轮播图
+		List<RollingPicture> showRollingPics = new ArrayList<>();
+		List<RollingPicAndIndexVo> rollingPictures = this.getShowsRollingPics();//获取占位轮播图
+		Iterator<RollingPicAndIndexVo> it = rollingPictures.iterator();
+		while (it.hasNext()) {
+			RollingPicAndIndexVo rollingPicAndIndexVo = it.next();
+			int hisIndex = rollingPicAndIndexVo.getHisIndex();
+			String rollingPicId =rollingPicAndIndexVo.getRollingPicId();
+			TKcRollingPic tKcRollingPic = tKcRollingPicMapper.selectByPrimaryKey(rollingPicId);
+			if(null==tKcRollingPic){
+				resBean.setError(-1);
+				resBean.setMsg("查询失败,脏数据，轮播占位表中的rollingPicId："+rollingPicId+"在轮播表中不存在");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			String rollingPicName = tKcRollingPic.getRollName();
+			Integer rollTypeFlag = tKcRollingPic.getRollTypeFlag();
+			String renderUrl = "";
+			if(1==rollTypeFlag) renderUrl = tKcRollingPic.getRenderUrl();
+			String remark = tKcRollingPic.getRemark();
+			String createTimeStr = DateUtil.format(tKcRollingPic.getCreateTime(), DateUtil.DATETYPE_4);
+			String picId = tKcRollingPic.getPicId();
+			int status = tKcRollingPic.getStatus();
+			RollingPicture rollingPicture = new RollingPicture().builder()
+					.rollingPicId(rollingPicId)
+					.rollingPicName(rollingPicName)
+					.renderType(String.valueOf(rollTypeFlag))
+					.renderUrl(renderUrl)
+					.remark(remark)
+					.hisIndex(String.valueOf(hisIndex))
+					.createTime(createTimeStr)
+					.picId(picId)
+					.status(String.valueOf(status))
+					.build();
+			showRollingPics.add(rollingPicture);
+		}
+		
+		//组织备选轮播图
+		List<RollingPicture> unshowRollingPics = new ArrayList<>();
+		List<String> excludeRollingPicIds = new ArrayList<>();
+		if(0<rollingPictures.size()) excludeRollingPicIds = rollingPictures.stream().map(n->n.getRollingPicId()).collect(Collectors.toList());
+		TKcRollingPicExample tKcRollingPicExample = new TKcRollingPicExample();
+		TKcRollingPicExample.Criteria criteria = tKcRollingPicExample.createCriteria();
+		criteria.andStatusNotEqualTo(-1);
+		if(0<excludeRollingPicIds.size()) criteria.andIdNotIn(excludeRollingPicIds);
+		tKcRollingPicExample.setOrderByClause("create_time desc");
+		List<TKcRollingPic> tKcRollingPics = tKcRollingPicMapper.selectByExample(tKcRollingPicExample);
+		Iterator<TKcRollingPic> ita = tKcRollingPics.iterator();
+		while (ita.hasNext()) {
+			TKcRollingPic tKcRollingPic = ita.next();
+			String rollingPicId = tKcRollingPic.getPicId();
+			String rollingPicName = tKcRollingPic.getRollName();
+			Integer rollTypeFlag = tKcRollingPic.getRollTypeFlag();
+			String renderUrl = "";
+			if(1==rollTypeFlag) renderUrl = tKcRollingPic.getRenderUrl();
+			String remark = tKcRollingPic.getRemark();
+			String createTimeStr = DateUtil.format(tKcRollingPic.getCreateTime(), DateUtil.DATETYPE_4);
+			String picId = tKcRollingPic.getPicId();
+			int status = tKcRollingPic.getStatus();
+			RollingPicture rollingPicture = new RollingPicture().builder()
+					.rollingPicId(rollingPicId)
+					.rollingPicName(rollingPicName)
+					.renderType(String.valueOf(rollTypeFlag))
+					.renderUrl(renderUrl)
+					.remark(remark)
+					.hisIndex("--")
+					.createTime(createTimeStr)
+					.picId(picId)
+					.status(String.valueOf(status))
+					.build();
+			unshowRollingPics.add(rollingPicture);
+		}
+		
+		allRollingPics.addAll(showRollingPics);
+		allRollingPics.addAll(unshowRollingPics);
+		
+		int pageNo = req4GetRollingPicsBean.getPageNo();
+		int rowsPerPage = req4GetRollingPicsBean.getRowsPerPage();
+		if(rowsPerPage < 1 ){
+			resBean.setError(-1);
+			resBean.setMsg("每页行数不能小于1");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		int recordCount = allRollingPics.size();
+		int pageSumCount = (recordCount+rowsPerPage-1)/rowsPerPage;//一共几页
+		List<RollingPicture> rollingPicture = allRollingPics.stream().skip((pageNo-1)*rowsPerPage).limit(rowsPerPage).collect(Collectors.toList());
+		
+		resBean.setPageNo(pageNo);
+		resBean.setPageSumCount(pageSumCount);
+		resBean.setRecordCount(recordCount);
+		resBean.setRollingPics(rollingPicture);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public List<RollingPicAndIndexVo> getShowsRollingPics() {//获取轮播图显示列id和index
+		List<RollingPicAndIndexVo> rollingPicAndIndexVos = new ArrayList<>();
+		TKcRollingPlacehdExample tKcRollingPlacehdExample = new TKcRollingPlacehdExample();
+		tKcRollingPlacehdExample.or().andRollingPicFidIsNotNull();
+		tKcRollingPlacehdExample.setOrderByClause("his_index");
+		List<TKcRollingPlacehd> tKcRollingPlacehds = tKcRollingPlacehdMapper.selectByExample(tKcRollingPlacehdExample);
+		Iterator<TKcRollingPlacehd> it = tKcRollingPlacehds.iterator();
+		while (it.hasNext()) {
+			TKcRollingPlacehd tKcRollingPlacehd = it.next();
+			RollingPicAndIndexVo vo = new RollingPicAndIndexVo().builder()
+					.rollingPicId(tKcRollingPlacehd.getRollingPicFid())
+					.hisIndex(tKcRollingPlacehd.getHisIndex())
+					.build();
+			rollingPicAndIndexVos.add(vo);
+		}
+		return rollingPicAndIndexVos;
+	}
+
+	@Override
+	public Res4GetRollingPicBean getRollingPic(Req4GetRollingPicBean req4GetRollingPicBean) {
+		Res4GetRollingPicBean resBean = new Res4GetRollingPicBean();
+		String rollingPicId = req4GetRollingPicBean.getRollingPicId();
+		if(StringUtil.isBlank(rollingPicId)){
+			resBean.setError(-1);
+			resBean.setMsg("rollingPicId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		TKcRollingPic tKcRollingPic = tKcRollingPicMapper.selectByPrimaryKey(rollingPicId);
+		if(null==tKcRollingPic){
+			resBean.setError(-1);
+			resBean.setMsg("没有rollingPicId为"+rollingPicId+"的轮播图");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		resBean.setPicId(rollingPicId);
+		String rollName = tKcRollingPic.getRollName();
+		resBean.setRollingPicName(rollName);
+		Integer rollTypeFlag = tKcRollingPic.getRollTypeFlag();
+		switch (rollTypeFlag) {
+		case 0://跳公开课
+			TKcPubCourseExample tKcPubCourseExample = new TKcPubCourseExample();
+			tKcPubCourseExample.or().andStatusNotEqualTo(-1).andRollingFidEqualTo(rollingPicId);
+			List<TKcPubCourse> tKcPubCourses = tKcPubCourseMapper.selectByExample(tKcPubCourseExample);
+			if(null==tKcPubCourses||0==tKcPubCourses.size()){
+				resBean.setError(-1);
+				resBean.setMsg("rollingPicId为"+rollingPicId+"的轮播图没有对应的公开课");
+				resBean.setSuccess(false);
+				return resBean;
+			}else if(1<tKcPubCourses.size()){
+				resBean.setError(-1);
+				resBean.setMsg("rollingPicId为"+rollingPicId+"的轮播图对应的公开课数量大于1");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			TKcPubCourse tKcPubCourse = tKcPubCourses.get(0);
+			String pubCourseName = tKcPubCourse.getCourseName();
+			Date preStime = tKcPubCourse.getPreStime();
+			String preStartTime = DateUtil.format(preStime, DateUtil.DATETYPE_10);
+			resBean.setPubCourseName(pubCourseName);
+			resBean.setPreStartTime(preStartTime);
+			break;
+		case 1://跳连接
+			String renderUrl = tKcRollingPic.getRenderUrl();
+			resBean.setRenderUrl(renderUrl);
+			break;
+		default:
+			resBean.setError(-1);
+			resBean.setMsg("rollTypeFlag只能为0或者1");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		String remark = tKcRollingPic.getRemark();
+		resBean.setRemark(remark);
+		TKcRollingPlacehdExample tKcRollingPlacehdExample = new TKcRollingPlacehdExample();
+		tKcRollingPlacehdExample.or().andStatusNotEqualTo(-1).andRollingPicFidEqualTo(rollingPicId);
+		List<TKcRollingPlacehd> tKcRollingPlacehds = tKcRollingPlacehdMapper.selectByExample(tKcRollingPlacehdExample);
+		if(null==tKcRollingPlacehds||0==tKcRollingPlacehds.size()){
+			resBean.setHisIndex("--");
+		}else if(1==tKcRollingPlacehds.size()){
+			Integer hisIndex = tKcRollingPlacehds.get(0).getHisIndex();
+			resBean.setHisIndex(String.valueOf(hisIndex));
+		}else{
+			resBean.setError(-1);
+			resBean.setMsg("rollingPicId为"+rollingPicId+"的轮播图在展位表中占有两个位置");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		String picId = tKcRollingPic.getPicId();
+		resBean.setPicId(picId);
+		Integer status = tKcRollingPic.getStatus();
+		resBean.setStatus(String.valueOf(status));
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public Res4PutRollingPicBean putRollingPic(Req4PutRollingPicBean req4PutRollingPicBean) {
+		Res4PutRollingPicBean resBean = new Res4PutRollingPicBean();
+		
+		String rollingPicId = req4PutRollingPicBean.getRollingPicId();
+		if(StringUtil.isBlank(rollingPicId)){
+			resBean.setError(-1);
+			resBean.setMsg("rollingPicId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String rollingPicName = req4PutRollingPicBean.getRollingPicName();
+		String renderType = req4PutRollingPicBean.getRenderType();
+		if(StringUtil.isBlank(renderType)){
+			resBean.setError(-1);
+			resBean.setMsg("renderType不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String pubCourseName ="";
+		String preStartTime ="";
+		Date preStime = new Date();
+		String renderUrl ="";
+		switch (renderType) {
+		case "0"://公开课
+			pubCourseName = req4PutRollingPicBean.getPubCourseName();
+			if(StringUtil.isBlank(pubCourseName)){
+				resBean.setError(-1);
+				resBean.setMsg("公开课的课名pubCourseName不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			preStartTime = req4PutRollingPicBean.getPreStartTime();
+			if(StringUtil.isBlank(preStartTime)){
+				resBean.setError(-1);
+				resBean.setMsg("公开课的开课时间preStartTime不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			try {
+				preStime = DateUtil.parse(preStartTime, DateUtil.DATETYPE_10);
+			} catch (ParseException e) {
+				resBean.setError(-1);
+				resBean.setMsg("公开课的开课时间preStartTime格式有误，必须是yyyy-MM-dd HH:mm");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			break;
+		case "1"://链接
+			renderUrl = req4PutRollingPicBean.getRenderUrl();
+			if(StringUtil.isBlank(renderUrl)){
+				resBean.setError(-1);
+				resBean.setMsg("跳转renderUrl不能为空");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			break;
+		default:
+			resBean.setError(-1);
+			resBean.setMsg("renderType只能是0直播公开课，1链接");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String remark = req4PutRollingPicBean.getRemark();//备注信息
+		
+		String hisIndex = req4PutRollingPicBean.getHisIndex();
+		if(StringUtil.isBlank(hisIndex)){
+			resBean.setError(-1);
+			resBean.setMsg("hisIndex不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(!Constants.l01234.contains(hisIndex)){
+			resBean.setError(-1);
+			resBean.setMsg("hisIndex必须是0/1/2/3/4");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String picId = req4PutRollingPicBean.getPicId();
+		if(StringUtil.isBlank(picId)){
+			resBean.setError(-1);
+			resBean.setMsg("picId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String status = req4PutRollingPicBean.getStatus();
+		if(StringUtil.isBlank(status)){
+			resBean.setError(-1);
+			resBean.setMsg("status不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}else if(!"0".equals(status) && !"1".equals(status)){
+			resBean.setError(-1);
+			resBean.setMsg("status必须为0或者1");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		String operatorUserId = req4PutRollingPicBean.getOperatorUserId();
+		Req4PutRollingPicVo rollingPicVo = new Req4PutRollingPicVo().builder()
+				.rollingPicId(rollingPicId)
+				.rollingPicName(rollingPicName)
+				.renderType(Integer.parseInt(renderType))
+				.pubCourseName(pubCourseName)
+				.preStartTime(preStime)
+				.renderUrl(renderUrl)
+				.remark(remark)
+				.hisIndex(Integer.parseInt(hisIndex))
+				.picId(picId)
+				.status(0)
+				.operatorUserId(operatorUserId)
+				.build();
+		
+		try {
+			iRollingPictureService.updateRollingPic(rollingPicVo);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		} catch (Exception e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.getMessage());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	}
+
+	@Override
+	public Res4GetRPs4AppBean getRPs4App(Req4GetRPs4AppBean req4GetRPs4AppBean) {
+		Res4GetRPs4AppBean resBean = new Res4GetRPs4AppBean();
+		
+		//组织占位轮播图
+		List<RP4App> rp4Apps = new ArrayList<>();
+		List<RollingPicAndIndexVo> rollingPictures = this.getShowsRollingPics();//获取占位轮播图
+		Iterator<RollingPicAndIndexVo> it = rollingPictures.iterator();
+		while (it.hasNext()) {
+			RollingPicAndIndexVo rollingPicAndIndexVo = it.next();
+			int hisIndex = rollingPicAndIndexVo.getHisIndex();
+			String rollingPicId =rollingPicAndIndexVo.getRollingPicId();
+			TKcRollingPic tKcRollingPic = tKcRollingPicMapper.selectByPrimaryKey(rollingPicId);
+			if(null==tKcRollingPic){
+				resBean.setError(-1);
+				resBean.setMsg("查询失败,脏数据，轮播占位表中的rollingPicId："+rollingPicId+"在轮播表中不存在");
+				resBean.setSuccess(false);
+				return resBean;
+			}
+			if(2==tKcRollingPic.getStatus()) continue;//2为关闭状态
+			String rollingPicName = tKcRollingPic.getRollName();
+			Integer rollTypeFlag = tKcRollingPic.getRollTypeFlag();
+			String renderUrl = "";
+			if(1==rollTypeFlag) renderUrl = tKcRollingPic.getRenderUrl();
+			String remark = tKcRollingPic.getRemark();
+			String createTimeStr = DateUtil.format(tKcRollingPic.getCreateTime(), DateUtil.DATETYPE_4);
+			String picId = tKcRollingPic.getPicId();
+			int status = tKcRollingPic.getStatus();
+			RP4App rp4App = new RP4App().builder()
+					.rollingPicId(rollingPicId)
+					.rollingPicName(rollingPicName)
+					.renderType(String.valueOf(rollTypeFlag))
+					.renderUrl(renderUrl)
+					.remark(remark)
+					.hisIndex(String.valueOf(hisIndex))
+					.createTime(createTimeStr)
+					.picId(picId)
+					.status(String.valueOf(status))
+					.build();
+			rp4Apps.add(rp4App);
+		}
+		resBean.setRp4Apps(rp4Apps);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean; 
+	}
+
+}

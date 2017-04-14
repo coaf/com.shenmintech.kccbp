@@ -1,0 +1,95 @@
+package com.shenmintech.common.util;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.Minutes;
+import org.joda.time.Seconds;
+import org.junit.Test;
+
+public class DateUtil {
+
+  public static final String DATETYPE_1 = "yyyy-MM-dd HH:mm:ss";
+
+  public static final String DATETYPE_2 = "yyyyMMddHHmmssSSS";
+
+  public static final String DATETYPE_3 = "yyyyMMddHHmmss";
+
+  public static final String DATETYPE_4 = "yyyy-MM-dd";
+
+  public static final String DATETYPE_5 = "yyyyMMdd";
+
+  public static final String DATETYPE_6 = "yyMMdd";
+
+  public static final String DATETYPE_7 = "yyyyMMddHH";
+
+  public static final String DATETYPE_8 = "yyyy/MM/dd";
+
+  public static final String DATETYPE_9 = "yyyy-MM-dd EEEE";
+
+  public static final String DATETYPE_10 = "yyyy-MM-dd HH:mm";
+
+  public static final String DATETYPE_11 = "HH:mm yyyy-MM-dd";
+
+  public static final String DATETYPE_12 = "HH:mm";
+
+  public static String format(Date date, String date_type) {
+    SimpleDateFormat sdf = new SimpleDateFormat(date_type, Locale.CHINA);
+    return sdf.format(date);
+  }
+
+  public static Date parse(String date, String date_type) throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat(date_type);
+    return sdf.parse(date);
+  }
+
+  public static Date dateToDate(Date date, String type, String toType) throws ParseException {
+    String dateStr = format(date, type);
+    return parse(dateStr, toType);
+  }
+
+  public static String stringToString(String date, String type, String toType)
+      throws ParseException {
+    Date dateTime = parse(date, type);
+    return format(dateTime, toType);
+  }
+
+  public static String deltaDate(Date date1, Date date2) {
+    DateTime dateTime1 = new DateTime(date1);
+    DateTime dateTime2 = new DateTime(date2);
+    int daysBetween = Days.daysBetween(dateTime1, dateTime2).getDays();
+    if (0 != daysBetween) return daysBetween + "天后";
+    int hoursBetween = Hours.hoursBetween(dateTime1, dateTime2).getHours();
+    if (0 != hoursBetween) return hoursBetween + "小时后";
+    int minsBetween = Minutes.minutesBetween(dateTime1, dateTime2).getMinutes();
+    if (0 != minsBetween) return minsBetween + "分钟后";
+    int secondsBetween = Seconds.secondsBetween(dateTime1, dateTime2).getSeconds();
+    return secondsBetween + "秒后";
+  }
+
+  @Test
+  public static Date getrecent2weeksDate() {
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); // 获取本周一的日期
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    // System.out.println(df.format(cal.getTime()));
+    // cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);// 这种输出的是上个星期周日的日期，因为老外那边把周日当成第一天
+    cal.add(Calendar.WEEK_OF_YEAR, -1);// 增加一个星期，才是我们中国人理解的本周日的日期
+    System.out.println(df.format(cal.getTime()));
+    return cal.getTime();
+  }
+
+  public static void main(String[] args) {
+    getrecent2weeksDate();
+  }
+}

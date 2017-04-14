@@ -1,0 +1,70 @@
+package com.shenmintech.cbp.controller.bean.res;
+
+import io.swagger.annotations.ApiModelProperty;
+
+public class NetEasyUserResponse {
+
+  @ApiModelProperty(value = "状态码,414表示已存在，200表示ok", required = true)
+  private int code;
+
+  @ApiModelProperty(value = "用户信息", required = true)
+  private Info info;
+
+
+  class Info {
+    @ApiModelProperty(value = "用户token", required = true)
+    private String token;
+
+    @ApiModelProperty(value = "用户accid", required = true)
+    private String accid;
+
+    public String getToken() {
+      return token;
+    }
+
+    public void setToken(String token) {
+      this.token = token;
+    }
+
+    public String getAccid() {
+      return accid;
+    }
+
+    public void setAccid(String accid) {
+      this.accid = accid;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    private String name;
+  }
+
+
+  public int getCode() {
+    return code;
+  }
+
+
+  public void setCode(int code) {
+    this.code = code;
+  }
+
+
+  public Info getInfo() {
+    return info;
+  }
+
+
+  public void setInfo(Info info) {
+    this.info = info;
+  }
+
+
+
+}

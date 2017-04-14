@@ -1,0 +1,145 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.entity.TKcCourseTable;
+import com.shenmintech.cbp.entity.TKcCourseTableGroupRelationExample;
+import com.shenmintech.cbp.entity.TKcGroup;
+import com.shenmintech.cbp.entity.TKcGroupExample;
+import com.shenmintech.cbp.entity.TKcHomework;
+import com.shenmintech.cbp.entity.TKcHomeworkPicTxt;
+import com.shenmintech.cbp.entity.TKcHomeworkStudentRelation;
+import com.shenmintech.cbp.entity.TKcHomeworkType;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcCourseTableGroupRelationMapper;
+import com.shenmintech.cbp.mapper.TKcCourseTableMapper;
+import com.shenmintech.cbp.mapper.TKcGroupMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkPicTxtMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkStudentRelationMapper;
+import com.shenmintech.cbp.mapper.TKcHomeworkTypeMapper;
+import com.shenmintech.cbp.service.IHomeworkPushService;
+import com.shenmintech.common.util.Constants;
+
+@Service
+@Transactional
+public class HomeworkPushServiceImpl implements IHomeworkPushService {
+
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Autowired
+	TKcCourseTableMapper tKcCourseTableMapper;
+	
+	@Autowired
+	TKcGroupMapper tKcGroupMapper;
+	
+	@Autowired
+	TKcHomeworkMapper tKcHomeworkMapper;
+	
+	@Autowired
+	TKcCourseTableGroupRelationMapper tKcCourseTableGroupRelationMapper;
+	
+	@Autowired
+	TKcHomeworkStudentRelationMapper tKcHomeworkStudentRelationMapper;
+	
+	@Autowired
+	TKcHomeworkTypeMapper tKcHomeworkTypeMapper;
+	
+	@Autowired
+	TKcHomeworkPicTxtMapper tKcHomeworkPicTxtMapper;
+	
+	@Override
+	public void checkAddPushHomework(String homeworkId, String clazzId, List<String> groupIds, String pushFlag) {
+		//校验推送的课后任务和小组是不是归属于同一个课程内
+		TKcCourseTable courseTable = tKcCourseTableMapper.selectByPrimaryKey(clazzId);
+		String courseFid = courseTable.getCourseFid();
+		
+		TKcGroupExample example = new TKcGroupExample();
+		example.or().andStatusNotEqualTo(-1).andIdIn(groupIds);
+		List<TKcGroup> groups = tKcGroupMapper.selectByExample(example);
+		if(!groups.stream().allMatch(n->n.getCourseFid().equals(courseFid))) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"存在不属于同一课程下的小组，不能添加！",Constants.BLANKSTR);
+		
+		//如果不是即时推送，需要校验绑定的课针对所要推送的小组是否都已经设定上课时间
+		if(!"0".equals(pushFlag)){//课程前/后推送
+			TKcCourseTableGroupRelationExample courseTableGroupRelationExample = new TKcCourseTableGroupRelationExample();
+			courseTableGroupRelationExample.or().andStatusNotEqualTo(-1).andCourseTableFidEqualTo(clazzId).andGroupFidIn(groupIds);
+			int count = tKcCourseTableGroupRelationMapper.countByExample(courseTableGroupRelationExample);
+			if(count != groupIds.size()) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"小组针对课程没有都制定上课时间，故添加推送任务失败",Constants.BLANKSTR);
+		}
+	}
+
+	@Override
+	public void addPushHomeworkNow(String homeworkId, List<String> studentIds) {
+		List<TKcHomeworkStudentRelation> list = new ArrayList<>();
+		String[] idStr = idWorkerTemplate.generateIds(studentIds.size());
+		for (int i = 0; i < idStr.length; i++) {
+			TKcHomeworkStudentRelation homeworkStudentRelation = new TKcHomeworkStudentRelation();
+			String studentFid = studentIds.get(i);
+			homeworkStudentRelation.setId(idStr[i]);
+			homeworkStudentRelation.setStudentFid(studentFid);
+			homeworkStudentRelation.setHomeworkFid(homeworkId);
+			homeworkStudentRelation.setStatus(0);
+			list.add(homeworkStudentRelation);
+		}
+		tKcHomeworkStudentRelationMapper.insertList(list);
+		
+		TKcHomework homework = tKcHomeworkMapper.selectByPrimaryKey(homeworkId);
+		String workTypeId = homework.getWorkTypeFid();
+		TKcHomeworkType homeworkType = tKcHomeworkTypeMapper.selectByPrimaryKey(workTypeId);
+		if("文字拍照类".endsWith(homeworkType.getTypeName())){
+			String[] ptIdStr = idWorkerTemplate.generateIds(studentIds.size());
+			List<TKcHomeworkPicTxt> picTxts = new ArrayList<>();
+			for (int i = 0; i < ptIdStr.length; i++) {
+				TKcHomeworkPicTxt tKcHomeworkPicTxt = new TKcHomeworkPicTxt();
+				tKcHomeworkPicTxt.setId(ptIdStr[i]);
+				tKcHomeworkPicTxt.setHomeworkStudentRelationFid(idStr[i]);
+				tKcHomeworkPicTxt.setStatus(0);
+				picTxts.add(tKcHomeworkPicTxt);
+			}
+			tKcHomeworkPicTxtMapper.insertList(picTxts);
+		}else if("打卡类".endsWith(homeworkType.getTypeName())){
+			
+			String[] ptIdStr = idWorkerTemplate.generateIds(7);
+			for (int i = 0; i < ptIdStr.length; i++) {
+				
+			}
+			
+			
+		}else if("课后任务卡".endsWith(homeworkType.getTypeName())){
+			
+			
+			
+			
+		}
+		
+		
+		
+		//TODO:
+		
+		
+		
+		
+		
+		
+	}
+
+	@Override
+	public void addPushHomeworkBefore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addPushHomeworkAfter() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

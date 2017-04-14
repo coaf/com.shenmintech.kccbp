@@ -1,0 +1,47 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IActionBiz;
+import com.shenmintech.cbp.controller.bean.req.ReqUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.req.ReqUserPlayRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserCollectRecordBean;
+import com.shenmintech.cbp.controller.bean.res.ResUserPlayRecordBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Api(value = "公用动作", description = "记录一切行为流水")
+@Controller
+public class ActionController {
+
+	@Autowired
+	IActionBiz iActionBiz;
+	
+	//用户收藏录播视频
+	@PostMapping("/user/collect/record")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户对录播视频收藏流水记录", httpMethod = "POST", value = "用户收藏一下录播视频（OK）")
+	public @ResponseBody ResUserCollectRecordBean postUCR(@ApiParam(required = true, value = "收藏录播视频入参对象") @RequestBody ReqUserCollectRecordBean reqUserCollectRecordBean){
+		return iActionBiz.postUCR(reqUserCollectRecordBean);
+	}
+	
+	//用户播放录播视频
+	@PostMapping("/user/play/record")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "用户对录播视频播放流水记录", httpMethod = "POST", value = "用户播放一下录播视频（OK）")
+	public @ResponseBody ResUserPlayRecordBean postUPR(@ApiParam(required = true, value = "播放录播视频入参对象") @RequestBody ReqUserPlayRecordBean reqUserPlayRecordBean){
+		return iActionBiz.postUPR(reqUserPlayRecordBean);
+	}
+	
+	
+	
+	
+}

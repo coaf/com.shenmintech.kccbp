@@ -1,0 +1,166 @@
+package com.shenmintech.cbp.biz.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IStudentBiz;
+import com.shenmintech.cbp.biz.vo.res.HSRelationVo;
+import com.shenmintech.cbp.biz.vo.res.HomeworkStudentRelationVo;
+import com.shenmintech.cbp.controller.bean.req.Req4DelStudentBean;
+import com.shenmintech.cbp.controller.bean.req.Req4GetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostStudentBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutStudentBean;
+import com.shenmintech.cbp.controller.bean.res.PushedHomework;
+import com.shenmintech.cbp.controller.bean.res.Res4DelStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetHomeworkStudentRelationBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostStudentBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutStudentBean;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.service.IStudentService;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class StudentBizImpl implements IStudentBiz {
+
+	@Autowired
+	IStudentService iStudentService;
+	
+	@Override
+	public Res4PostStudentBean addStudent(Req4PostStudentBean req4PostStudentBean) {
+		Res4PostStudentBean res4PostStudentBean = new Res4PostStudentBean();
+		String employeeId = req4PostStudentBean.getEmployeeId();
+		String groupId = req4PostStudentBean.getGroupId();
+		if(StringUtil.checkBlank(employeeId,groupId)){
+			res4PostStudentBean.setError(-1);
+			res4PostStudentBean.setMsg("employeeId,groupId不能为空");
+			res4PostStudentBean.setSuccess(false);
+			return res4PostStudentBean;
+		}
+		String studentId = "";
+		try {
+			studentId = iStudentService.add(employeeId, groupId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PostStudentBean.setError(-1);
+			res4PostStudentBean.setMsg(e.msg);
+			res4PostStudentBean.setSuccess(false);
+			return res4PostStudentBean;
+		}
+		res4PostStudentBean.setStudentId(studentId);
+		res4PostStudentBean.setError(0);
+		res4PostStudentBean.setMsg("SUCCESS");
+		res4PostStudentBean.setSuccess(true);
+		return res4PostStudentBean;
+	}
+
+	@Override
+	public Res4DelStudentBean deleteById(Req4DelStudentBean req4DelStudentBean) {
+		Res4DelStudentBean res4DelStudentBean = new Res4DelStudentBean();
+		String studentId = req4DelStudentBean.getStudentId();
+		if(StringUtil.isBlank(studentId)){
+			res4DelStudentBean.setError(-1);
+			res4DelStudentBean.setMsg("studentId不能为空");
+			res4DelStudentBean.setSuccess(false);
+			return res4DelStudentBean;
+		}
+		try {
+			iStudentService.deleteById(studentId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4DelStudentBean.setError(-1);
+			res4DelStudentBean.setMsg(e.msg);
+			res4DelStudentBean.setSuccess(false);
+			return res4DelStudentBean;
+		}
+		res4DelStudentBean.setError(0);
+		res4DelStudentBean.setMsg("SUCCESS");
+		res4DelStudentBean.setSuccess(true);
+		return res4DelStudentBean;
+	}
+
+	@Override
+	public Res4PutStudentBean updateById(Req4PutStudentBean req4PutStudentBean) {
+		Res4PutStudentBean res4PutStudentBean = new Res4PutStudentBean();
+		
+		String groupId = req4PutStudentBean.getGroupId();
+		String studentId = req4PutStudentBean.getStudentId();
+		if(StringUtil.checkBlank(groupId,studentId)){
+			res4PutStudentBean.setError(-1);
+			res4PutStudentBean.setMsg("groupId,studentId不能为空");
+			res4PutStudentBean.setSuccess(false);
+			return res4PutStudentBean;
+		}
+		try {
+			iStudentService.updateById(groupId,studentId);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			res4PutStudentBean.setError(-1);
+			res4PutStudentBean.setMsg(e.msg);
+			res4PutStudentBean.setSuccess(false);
+			return res4PutStudentBean;
+		}
+		res4PutStudentBean.setError(0);
+		res4PutStudentBean.setMsg("SUCCESS");
+		res4PutStudentBean.setSuccess(true);
+		return res4PutStudentBean;
+	}
+
+	@SuppressWarnings("static-access")
+	@Override
+	public Res4GetHomeworkStudentRelationBean selectByTaskId(Req4GetHomeworkStudentRelationBean req4GetHomeworkStudentRelationBean) {
+		Res4GetHomeworkStudentRelationBean resBean = new Res4GetHomeworkStudentRelationBean();
+		
+		String taskId = req4GetHomeworkStudentRelationBean.getTaskId();
+		if(StringUtil.checkBlank(taskId)){
+			resBean.setError(-1);
+			resBean.setMsg("taskId不能为空");
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		int pageNo = -1==req4GetHomeworkStudentRelationBean.getPageNo()?1:req4GetHomeworkStudentRelationBean.getPageNo();
+		int rowsPerPage = -1==req4GetHomeworkStudentRelationBean.getPageNo()?99999:req4GetHomeworkStudentRelationBean.getRowsPerPage();
+		
+		HomeworkStudentRelationVo resVo = new HomeworkStudentRelationVo();
+		try {
+			resVo = iStudentService.selectHomeworkStudentTrlationByTaskId(taskId, pageNo, rowsPerPage);
+		} catch (ApplicationException e) {
+			log.error("context", e);
+			resBean.setError(-1);
+			resBean.setMsg(e.msg);
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		List<HSRelationVo> relationVos = resVo.getList();
+		Iterator<HSRelationVo> it = relationVos.iterator();
+		List<PushedHomework> list = new ArrayList<>();
+		while (it.hasNext()) {
+			HSRelationVo hsRelationVo = it.next();
+			String relationId = hsRelationVo.getRelationId();
+			String studentId = hsRelationVo.getStudentId();
+			String remark1 = hsRelationVo.getRemark1();
+			PushedHomework pushedHomework = new PushedHomework().builder()
+					.relationId(relationId)
+					.studentName(studentId)
+					.finishedTime(StringUtil.isBlank(remark1)?"":remark1)
+					.build(); 
+			list.add(pushedHomework);
+		}
+		int recordCount = resVo.getRecordCount();
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		resBean.setPageNo(pageNo);
+		resBean.setRecordCount(recordCount);
+		resBean.setPageSumCount((recordCount+rowsPerPage-1)/rowsPerPage);
+		resBean.setList(list);
+		return resBean;
+	}
+
+}

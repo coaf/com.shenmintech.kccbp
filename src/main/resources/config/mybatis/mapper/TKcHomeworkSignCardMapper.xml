@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shenmintech.cbp.mapper.TKcHomeworkSignCardMapper">
+	<resultMap id="BaseResultMap"
+		type="com.shenmintech.cbp.entity.TKcHomeworkSignCard">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="homework_student_relation_fid" property="homeworkStudentRelationFid"
+			jdbcType="VARCHAR" />
+		<result column="mark_date" property="markDate" jdbcType="VARCHAR" />
+		<result column="breakfast_flag" property="breakfastFlag"
+			jdbcType="INTEGER" />
+		<result column="lunch_flag" property="lunchFlag" jdbcType="INTEGER" />
+		<result column="supper_flag" property="supperFlag" jdbcType="INTEGER" />
+		<result column="drink_water" property="drinkWater" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="remark_1" property="remark1" jdbcType="VARCHAR" />
+		<result column="remark_2" property="remark2" jdbcType="VARCHAR" />
+		<result column="remark_3" property="remark3" jdbcType="VARCHAR" />
+		<result column="remark_4" property="remark4" jdbcType="VARCHAR" />
+		<result column="remark_5" property="remark5" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, homework_student_relation_fid, mark_date,
+		breakfast_flag, lunch_flag,
+		supper_flag,
+		drink_water, create_time,
+		update_time, status, remark_1, remark_2, remark_3,
+		remark_4,
+		remark_5
+	</sql>
+	<select id="selectByExample" resultMap="BaseResultMap"
+		parameterType="com.shenmintech.cbp.entity.TKcHomeworkSignCardExample">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from t_kc_homework_sign_card
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_kc_homework_sign_card
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from
+		t_kc_homework_sign_card
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteByExample"
+		parameterType="com.shenmintech.cbp.entity.TKcHomeworkSignCardExample">
+		delete from t_kc_homework_sign_card
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.shenmintech.cbp.entity.TKcHomeworkSignCard">
+		insert into
+		t_kc_homework_sign_card (id,
+		homework_student_relation_fid, mark_date,
+		breakfast_flag, lunch_flag, supper_flag,
+		drink_water, create_time,
+		update_time,
+		status, remark_1, remark_2,
+		remark_3, remark_4, remark_5
+		)
+		values (#{id,jdbcType=VARCHAR},
+		#{homeworkStudentRelationFid,jdbcType=VARCHAR},
+		#{markDate,jdbcType=VARCHAR},
+		#{breakfastFlag,jdbcType=INTEGER},
+		#{lunchFlag,jdbcType=INTEGER}, #{supperFlag,jdbcType=INTEGER},
+		#{drinkWater,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP},
+		#{status,jdbcType=INTEGER},
+		#{remark1,jdbcType=VARCHAR}, #{remark2,jdbcType=VARCHAR},
+		#{remark3,jdbcType=VARCHAR}, #{remark4,jdbcType=VARCHAR},
+		#{remark5,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.shenmintech.cbp.entity.TKcHomeworkSignCard">
+		insert into t_kc_homework_sign_card
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="homeworkStudentRelationFid != null">
+				homework_student_relation_fid,
+			</if>
+			<if test="markDate != null">
+				mark_date,
+			</if>
+			<if test="breakfastFlag != null">
+				breakfast_flag,
+			</if>
+			<if test="lunchFlag != null">
+				lunch_flag,
+			</if>
+			<if test="supperFlag != null">
+				supper_flag,
+			</if>
+			<if test="drinkWater != null">
+				drink_water,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="remark1 != null">
+				remark_1,
+			</if>
+			<if test="remark2 != null">
+				remark_2,
+			</if>
+			<if test="remark3 != null">
+				remark_3,
+			</if>
+			<if test="remark4 != null">
+				remark_4,
+			</if>
+			<if test="remark5 != null">
+				remark_5,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="homeworkStudentRelationFid != null">
+				#{homeworkStudentRelationFid,jdbcType=VARCHAR},
+			</if>
+			<if test="markDate != null">
+				#{markDate,jdbcType=VARCHAR},
+			</if>
+			<if test="breakfastFlag != null">
+				#{breakfastFlag,jdbcType=INTEGER},
+			</if>
+			<if test="lunchFlag != null">
+				#{lunchFlag,jdbcType=INTEGER},
+			</if>
+			<if test="supperFlag != null">
+				#{supperFlag,jdbcType=INTEGER},
+			</if>
+			<if test="drinkWater != null">
+				#{drinkWater,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="remark1 != null">
+				#{remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="remark2 != null">
+				#{remark2,jdbcType=VARCHAR},
+			</if>
+			<if test="remark3 != null">
+				#{remark3,jdbcType=VARCHAR},
+			</if>
+			<if test="remark4 != null">
+				#{remark4,jdbcType=VARCHAR},
+			</if>
+			<if test="remark5 != null">
+				#{remark5,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="countByExample"
+		parameterType="com.shenmintech.cbp.entity.TKcHomeworkSignCardExample"
+		resultType="java.lang.Integer">
+		select count(*) from t_kc_homework_sign_card
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update t_kc_homework_sign_card
+		<set>
+			<if test="record.id != null">
+				id = #{record.id,jdbcType=VARCHAR},
+			</if>
+			<if test="record.homeworkStudentRelationFid != null">
+				homework_student_relation_fid =
+				#{record.homeworkStudentRelationFid,jdbcType=VARCHAR},
+			</if>
+			<if test="record.markDate != null">
+				mark_date = #{record.markDate,jdbcType=VARCHAR},
+			</if>
+			<if test="record.breakfastFlag != null">
+				breakfast_flag =
+				#{record.breakfastFlag,jdbcType=INTEGER},
+			</if>
+			<if test="record.lunchFlag != null">
+				lunch_flag = #{record.lunchFlag,jdbcType=INTEGER},
+			</if>
+			<if test="record.supperFlag != null">
+				supper_flag = #{record.supperFlag,jdbcType=INTEGER},
+			</if>
+			<if test="record.drinkWater != null">
+				drink_water = #{record.drinkWater,jdbcType=VARCHAR},
+			</if>
+			<if test="record.createTime != null">
+				create_time = #{record.createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.updateTime != null">
+				update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.status != null">
+				status = #{record.status,jdbcType=INTEGER},
+			</if>
+			<if test="record.remark1 != null">
+				remark_1 = #{record.remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark2 != null">
+				remark_2 = #{record.remark2,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark3 != null">
+				remark_3 = #{record.remark3,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark4 != null">
+				remark_4 = #{record.remark4,jdbcType=VARCHAR},
+			</if>
+			<if test="record.remark5 != null">
+				remark_5 = #{record.remark5,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update t_kc_homework_sign_card
+		set id = #{record.id,jdbcType=VARCHAR},
+		homework_student_relation_fid =
+		#{record.homeworkStudentRelationFid,jdbcType=VARCHAR},
+		mark_date =
+		#{record.markDate,jdbcType=VARCHAR},
+		breakfast_flag =
+		#{record.breakfastFlag,jdbcType=INTEGER},
+		lunch_flag =
+		#{record.lunchFlag,jdbcType=INTEGER},
+		supper_flag =
+		#{record.supperFlag,jdbcType=INTEGER},
+		drink_water =
+		#{record.drinkWater,jdbcType=VARCHAR},
+		create_time =
+		#{record.createTime,jdbcType=TIMESTAMP},
+		update_time =
+		#{record.updateTime,jdbcType=TIMESTAMP},
+		status =
+		#{record.status,jdbcType=INTEGER},
+		remark_1 =
+		#{record.remark1,jdbcType=VARCHAR},
+		remark_2 =
+		#{record.remark2,jdbcType=VARCHAR},
+		remark_3 =
+		#{record.remark3,jdbcType=VARCHAR},
+		remark_4 =
+		#{record.remark4,jdbcType=VARCHAR},
+		remark_5 =
+		#{record.remark5,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.shenmintech.cbp.entity.TKcHomeworkSignCard">
+		update t_kc_homework_sign_card
+		<set>
+			<if test="homeworkStudentRelationFid != null">
+				homework_student_relation_fid =
+				#{homeworkStudentRelationFid,jdbcType=VARCHAR},
+			</if>
+			<if test="markDate != null">
+				mark_date = #{markDate,jdbcType=VARCHAR},
+			</if>
+			<if test="breakfastFlag != null">
+				breakfast_flag = #{breakfastFlag,jdbcType=INTEGER},
+			</if>
+			<if test="lunchFlag != null">
+				lunch_flag = #{lunchFlag,jdbcType=INTEGER},
+			</if>
+			<if test="supperFlag != null">
+				supper_flag = #{supperFlag,jdbcType=INTEGER},
+			</if>
+			<if test="drinkWater != null">
+				drink_water = #{drinkWater,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="remark1 != null">
+				remark_1 = #{remark1,jdbcType=VARCHAR},
+			</if>
+			<if test="remark2 != null">
+				remark_2 = #{remark2,jdbcType=VARCHAR},
+			</if>
+			<if test="remark3 != null">
+				remark_3 = #{remark3,jdbcType=VARCHAR},
+			</if>
+			<if test="remark4 != null">
+				remark_4 = #{remark4,jdbcType=VARCHAR},
+			</if>
+			<if test="remark5 != null">
+				remark_5 = #{remark5,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.shenmintech.cbp.entity.TKcHomeworkSignCard">
+		update
+		t_kc_homework_sign_card
+		set homework_student_relation_fid =
+		#{homeworkStudentRelationFid,jdbcType=VARCHAR},
+		mark_date =
+		#{markDate,jdbcType=VARCHAR},
+		breakfast_flag =
+		#{breakfastFlag,jdbcType=INTEGER},
+		lunch_flag =
+		#{lunchFlag,jdbcType=INTEGER},
+		supper_flag =
+		#{supperFlag,jdbcType=INTEGER},
+		drink_water =
+		#{drinkWater,jdbcType=VARCHAR},
+		create_time =
+		#{createTime,jdbcType=TIMESTAMP},
+		update_time =
+		#{updateTime,jdbcType=TIMESTAMP},
+		status = #{status,jdbcType=INTEGER},
+		remark_1 = #{remark1,jdbcType=VARCHAR},
+		remark_2 =
+		#{remark2,jdbcType=VARCHAR},
+		remark_3 = #{remark3,jdbcType=VARCHAR},
+		remark_4 = #{remark4,jdbcType=VARCHAR},
+		remark_5 =
+		#{remark5,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+	<insert id="insertList" parameterType="java.util.List">
+		insert into t_kc_homework_sign_card
+		(id,homework_student_relation_fid,mark_date,status) values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id},#{item.homeworkStudentRelationFid},#{item.markDate},#{item.status})
+		</foreach>
+	</insert>
+</mapper>

@@ -1,0 +1,69 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostRecordVo;
+import com.shenmintech.cbp.entity.PagingExample;
+import com.shenmintech.cbp.entity.TKcRecord;
+import com.shenmintech.cbp.entity.TKcRecordExample;
+import com.shenmintech.cbp.mapper.TKcRecordMapper;
+import com.shenmintech.cbp.service.IRecordService;
+
+@Service
+@Transactional
+public class RecordServiceImpl implements IRecordService {
+
+	@Autowired
+	TKcRecordMapper tKcRecordMapper;
+	
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Override
+	public void delById(String id) {
+		TKcRecord tKcRecord = new TKcRecord();
+		tKcRecord.setId(id);
+		tKcRecord.setStatus(-1);
+		tKcRecordMapper.updateByPrimaryKeySelective(tKcRecord);
+	}
+
+	@Override
+	public void addRecord(Req4PostRecordVo recordVo) {
+		TKcRecord tKcRecord = new TKcRecord();
+		String id = idWorkerTemplate.generateId();
+		tKcRecord.setId(id);
+		tKcRecord.setRecordName(recordVo.getRecordName());
+		tKcRecord.setRecordTypeFid(recordVo.getRecordTypeId());
+		tKcRecord.setViewPermission(Integer.parseInt(recordVo.getViewPermission()));
+		tKcRecord.setTitle1(recordVo.getTitle1());
+		tKcRecord.setTitle2(recordVo.getTitle2());
+		tKcRecord.setTitle3(recordVo.getTitle3());
+		tKcRecord.setCoverPictureId(recordVo.getCoverPictureId());
+		tKcRecord.setFileId(recordVo.getFileId());
+		tKcRecord.setFormat(".MP3");
+		tKcRecord.setDuration(recordVo.getDuration());
+		tKcRecord.setHideFlag(Integer.parseInt(recordVo.getHideFlag()));
+		tKcRecord.setRecordSize(recordVo.getRecordSizeDb());
+		tKcRecord.setRecordDescribe(recordVo.getRecordSynopsis());//复文本框对应url
+		tKcRecord.setStatus(0);
+		
+		TKcRecordExample tKcRecordExample = new TKcRecordExample();
+		tKcRecordExample.or().andIdIsNotNull();
+		tKcRecordExample.setOrderByClause("record_index desc");
+		PagingExample pagingExample = new PagingExample(1, 1);
+		tKcRecordExample.setPagingExample(pagingExample);
+		List<TKcRecord> tKcRecords = tKcRecordMapper.selectByExample(tKcRecordExample);
+		if(null==tKcRecords||0==tKcRecords.size()){
+			tKcRecord.setRecordIndex(0l);
+		}
+		tKcRecord.setRecordIndex(tKcRecords.get(0).getRecordIndex()+1);
+		
+		tKcRecordMapper.insertSelective(tKcRecord);
+	}
+	
+}

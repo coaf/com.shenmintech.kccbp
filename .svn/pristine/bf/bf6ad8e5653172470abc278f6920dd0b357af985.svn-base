@@ -1,0 +1,307 @@
+package com.shenmintech.cbp.service.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.shenmintech.base.template.IdWorkerTemplate;
+import com.shenmintech.cbp.biz.vo.ques.Req4PostCourseVo;
+import com.shenmintech.cbp.biz.vo.res.CompanyVo;
+import com.shenmintech.cbp.biz.vo.res.CourseVo;
+import com.shenmintech.cbp.biz.vo.res.Res4CourseTypeVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourseTableVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourseVo;
+import com.shenmintech.cbp.biz.vo.res.Res4GetCourzeVo;
+import com.shenmintech.cbp.biz.vo.res.Sons4GetCourseVo;
+import com.shenmintech.cbp.controller.bean.req.ClazzObj;
+import com.shenmintech.cbp.entity.PagingExample;
+import com.shenmintech.cbp.entity.TKcCompany;
+import com.shenmintech.cbp.entity.TKcCompanyExample;
+import com.shenmintech.cbp.entity.TKcCourse;
+import com.shenmintech.cbp.entity.TKcCourseExample;
+import com.shenmintech.cbp.entity.TKcCourseTable;
+import com.shenmintech.cbp.entity.TKcCourseTableExample;
+import com.shenmintech.cbp.entity.TKcCourseType;
+import com.shenmintech.cbp.entity.TKcCourseTypeExample;
+import com.shenmintech.cbp.entity.TKcGroup;
+import com.shenmintech.cbp.entity.TKcStudent;
+import com.shenmintech.cbp.entity.TKcTeacher;
+import com.shenmintech.cbp.exception.ApplicationException;
+import com.shenmintech.cbp.mapper.TKcCompanyMapper;
+import com.shenmintech.cbp.mapper.TKcCourseMapper;
+import com.shenmintech.cbp.mapper.TKcCourseTableMapper;
+import com.shenmintech.cbp.mapper.TKcCourseTypeMapper;
+import com.shenmintech.cbp.mapper.TKcGroupMapper;
+import com.shenmintech.cbp.mapper.TKcStudentMapper;
+import com.shenmintech.cbp.mapper.TKcTeacherMapper;
+import com.shenmintech.cbp.service.ICourseService;
+import com.shenmintech.common.util.Constants;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+@SuppressWarnings("static-access")
+public class CourseServiceImpl implements ICourseService {
+	
+	@Autowired
+	TKcCourseTypeMapper tKcCourseTypeMapper;
+	
+	@Autowired
+	TKcCourseMapper tKcCourseMapper;
+	
+	@Autowired
+	TKcCompanyMapper tKcCompanyMapper;
+	
+	@Autowired
+	TKcTeacherMapper tKcTeacherMapper;
+	
+	@Autowired
+	TKcGroupMapper tKcGroupMapper;
+	
+	@Autowired
+	TKcStudentMapper tKcStudentMapper;
+	
+	@Autowired
+	TKcCourseTableMapper tKcCourseTableMapper;
+	
+	@Autowired
+	IdWorkerTemplate idWorkerTemplate;
+	
+	@Override
+	public List<Res4CourseTypeVo> selectCourseType() {
+		TKcCourseTypeExample example = new TKcCourseTypeExample();
+		example.or().andStatusNotEqualTo(-1);
+		List<TKcCourseType> courseTypes = tKcCourseTypeMapper.selectByExample(example);
+		Iterator<TKcCourseType> it = courseTypes.iterator();
+		List<Res4CourseTypeVo> courseTypeList = new ArrayList<>();
+		while (it.hasNext()) {
+			Res4CourseTypeVo res4CourseTypeVo = new Res4CourseTypeVo();
+			TKcCourseType courseType = it.next();
+			String id = courseType.getId();
+			res4CourseTypeVo.setId(id);
+			String typeName = courseType.getTypeName();
+			res4CourseTypeVo.setTypeName(typeName);
+			courseTypeList.add(res4CourseTypeVo);
+		}
+		return courseTypeList;
+	}
+
+	@Override
+	public int countByCompanyId(String companyId) {
+		TKcCourseExample example = new TKcCourseExample();
+		example.or().andStatusNotEqualTo(-1).andCompanyFidEqualTo(companyId);
+		return tKcCourseMapper.countByExample(example);
+	}
+
+	@Override
+	public void add(List<Req4PostCourseVo> list) {
+		Iterator<Req4PostCourseVo> it = list.iterator();
+		while (it.hasNext()) {
+			Req4PostCourseVo courseVo = it.next();
+			TKcCourse course = new TKcCourse();
+			course.setId(idWorkerTemplate.generateId());
+			String companyId = courseVo.getCompanyId();
+			TKcCompany company = tKcCompanyMapper.selectByPrimaryKey(companyId);
+			if(null == company) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加课程失败:t_kc_company中没有id为"+companyId+"的公司记录",Constants.BLANKSTR);
+			String courseTypeId = courseVo.getCourseTypeId();
+			TKcCourseType courseType = tKcCourseTypeMapper.selectByPrimaryKey(courseTypeId);
+			if(null == courseType) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加课程失败:t_kc_course_type中没有id为"+courseTypeId+"的类型记录",Constants.BLANKSTR);
+			String teacherId = courseVo.getTeacherId();
+			TKcTeacher teacher = tKcTeacherMapper.selectByPrimaryKey(teacherId);
+			if(null == teacher) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加课程失败:t_kc_teacher中没有id为"+teacherId+"的导师记录",Constants.BLANKSTR);
+			course.setCompanyFid(companyId);
+			course.setCourseTypeFid(courseTypeId);
+			course.setTeacherFid(teacherId);
+			course.setCourseName(courseVo.getCourseName());
+			course.setStatus(0);
+			try {
+				tKcCourseMapper.insertSelective(course);
+			} catch (Exception e) {
+				log.error("context", e);
+				throw new ApplicationException(Constants.META_STATUS_CODE_D1,"添加课程失败",Constants.BLANKSTR);
+			}
+			TKcCompany com = new TKcCompany();
+			com.setStatus(1);
+			TKcCompanyExample example = new TKcCompanyExample();
+			example.or().andStatusEqualTo(0).andIdEqualTo(companyId);
+			tKcCompanyMapper.updateByExampleSelective(com, example);
+		}
+	}
+
+	@Override
+	public Res4GetCourseVo selectByTeacherIdPages(String teacherId, int pageNo, int rowsPerPage) {
+		Res4GetCourseVo res4GetCourseVo = new Res4GetCourseVo();
+		TKcCourseExample example = new TKcCourseExample();
+		example.or().andStatusNotEqualTo(-1).andTeacherFidEqualTo(teacherId);
+		int recordCount = tKcCourseMapper.countByExample(example);//总数
+		PagingExample pagingExample = new PagingExample(pageNo, rowsPerPage);
+		example.setPagingExample(pagingExample);
+		List<TKcCourse> courses = tKcCourseMapper.selectByExample(example);
+		Iterator<TKcCourse> it = courses.iterator();
+		List<Sons4GetCourseVo> list = new ArrayList<>();
+		while (it.hasNext()) {
+			Sons4GetCourseVo sons4GetCourseVo = new Sons4GetCourseVo();
+			TKcCourse course = it.next();
+			BeanUtils.copyProperties(course, sons4GetCourseVo);
+			list.add(sons4GetCourseVo);
+		}
+		res4GetCourseVo.setList(list);
+		res4GetCourseVo.setRecordCount(recordCount);
+		return res4GetCourseVo;
+	}
+
+	@Override
+	public Res4GetCourzeVo selectByCourseId(String id) {
+		TKcCourse course = tKcCourseMapper.selectByPrimaryKey(id);
+		if(null == course) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"t_kc_course中不存在id为："+id+"的课程记录",Constants.BLANKSTR);
+		String courseName = course.getCourseName();
+		String courseTypeId = course.getCourseTypeFid();
+		String remark = course.getRemark1();
+		Res4GetCourzeVo res4GetCourzeVo = new Res4GetCourzeVo().builder()
+				.Id(id)
+				.courseTypeId(courseTypeId)
+				.courseName(courseName)
+				.remark(remark)
+				.build();
+		return res4GetCourzeVo;
+	}
+
+	@Override
+	public void updateCourseTableById(String courseId, String courseTypeId, String remark, List<ClazzObj> clazzList) {
+		
+		TKcCourse course = tKcCourseMapper.selectByPrimaryKey(courseId);
+		if(null == course) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新课程失败:t_kc_course中没有id为"+courseId+"的课程记录",Constants.BLANKSTR);
+		Integer courseStatus = course.getStatus();
+		if(-1 == courseStatus) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新课程失败:t_kc_course中id为"+courseId+"的课程已经删除",Constants.BLANKSTR);
+		
+		TKcCourseType courseType = tKcCourseTypeMapper.selectByPrimaryKey(courseTypeId);//课程和课程表一一对应
+		if(null == courseType) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新课程失败:t_kc_course_type中没有id为"+courseTypeId+"的课程类型记录",Constants.BLANKSTR);
+		Integer typeStatus = courseType.getStatus();
+		if(-1 == typeStatus) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新课程失败:t_kc_course_type中id为"+courseTypeId+"的课程类型已经删除",Constants.BLANKSTR);
+		
+		/**校验该课程的课表中是存在已经上了的小课，有的话则不允许修改**/
+		TKcCourseTableExample courseTableExample = new TKcCourseTableExample();//课表中有 状态为已经使用
+		courseTableExample.or().andStatusNotBetween(-1, 0).andCourseFidEqualTo(courseId);
+		int tableCount = tKcCourseTableMapper.countByExample(courseTableExample);
+		if(tableCount > 0) throw new ApplicationException(Constants.META_STATUS_CODE_D1,"更新课程失败:t_kc_course_table中id为"+courseTypeId+"的课程类型已经有不是初始状态的课，故不允许更新",Constants.BLANKSTR);
+		
+		TKcCourse tKcCourse = new TKcCourse();
+		tKcCourse.setId(courseId);
+		tKcCourse.setCourseTypeFid(courseTypeId);
+		tKcCourse.setRemark1(remark);
+		tKcCourseMapper.updateByPrimaryKeySelective(tKcCourse);
+		
+		/**逻辑删除所有初始状态的小课**/
+		TKcCourseTableExample tableExample = new TKcCourseTableExample();
+		tableExample.or().andStatusEqualTo(0).andCourseFidEqualTo(courseId);
+		TKcCourseTable tKcCourseTable = new TKcCourseTable();
+		tKcCourseTable.setStatus(-1);
+		tKcCourseTableMapper.updateByExampleSelective(tKcCourseTable, tableExample);
+		
+		for (int i = 0; i < clazzList.size(); i++) {
+			ClazzObj clazzObj = clazzList.get(i);
+			String clazzName = clazzObj.getClazzName();
+			String picId = clazzObj.getPicId();
+			TKcCourseTable courseTable = new TKcCourseTable();
+			String id = idWorkerTemplate.generateId();
+			courseTable.setId(id);
+			courseTable.setClazzNo(i+1);
+			courseTable.setClazzName(clazzName);
+			courseTable.setPicId(picId);
+			courseTable.setCourseFid(courseId);
+			courseTable.setStatus(0);
+			tKcCourseTableMapper.insertSelective(courseTable);
+		}
+		if(0 < clazzList.size()){
+			TKcCourse curCourse = new TKcCourse();
+			curCourse.setId(courseId);
+			curCourse.setStatus(1);
+			tKcCourseMapper.updateByPrimaryKeySelective(curCourse);
+		}
+	}
+
+	@Override
+	public List<Res4GetCourseTableVo> selectCourseTableByCourseId(String courseId) {
+		TKcCourseTableExample example = new TKcCourseTableExample();
+		example.or().andStatusNotEqualTo(-1).andCourseFidEqualTo(courseId);
+		List<TKcCourseTable> courseTables = tKcCourseTableMapper.selectByExample(example);
+		Iterator<TKcCourseTable> it = courseTables.iterator();
+		List<Res4GetCourseTableVo> courseTableList = new ArrayList<>();
+		while (it.hasNext()) {
+			Res4GetCourseTableVo courseTable = new Res4GetCourseTableVo();
+			TKcCourseTable clazz = it.next();
+			String clazzId = clazz.getId();
+			courseTable.setClazzId(clazzId);
+			Integer clazzNo = clazz.getClazzNo();
+			courseTable.setClazzNo(null == clazzNo?"":String.valueOf(clazzNo));
+			String clazzName = clazz.getClazzName();
+			courseTable.setClazzName(null == clazzName?"":clazzName);
+			String picId = clazz.getPicId();
+			courseTable.setPicId(picId);
+			courseTableList.add(courseTable);
+		}
+		return courseTableList;
+	}
+
+	@Override
+	public List<CourseVo> selectCourseByTeacherIdAndCompanyId(String teacherId, String companyId) {
+		TKcCourseExample example = new TKcCourseExample();
+		example.or().andStatusNotEqualTo(-1).andTeacherFidEqualTo(teacherId).andCompanyFidEqualTo(companyId);
+		List<TKcCourse> courses = tKcCourseMapper.selectByExample(example);
+		List<CourseVo> courseVos = new ArrayList<>();
+		Iterator<TKcCourse> it = courses.iterator();
+		while (it.hasNext()) {
+			TKcCourse course = it.next();
+			CourseVo courseVo = new CourseVo().builder()
+					.courseId(course.getId())
+					.courseName(course.getCourseName())
+					.build();
+			courseVos.add(courseVo);
+		}
+		return courseVos;
+	}
+
+	@Override
+	public CourseVo selectCourseByStudentId(String studentId) {
+		log.info("===========开始根据studentId追溯课程，后期可优化sql============");
+		TKcStudent student = tKcStudentMapper.selectByPrimaryKey(studentId);
+		String groupId = student.getGroupFid();
+		TKcGroup group = tKcGroupMapper.selectByPrimaryKey(groupId);
+		String courseId = group.getCourseFid();
+		TKcCourse course = tKcCourseMapper.selectByPrimaryKey(courseId);
+		String courseTypeId = course.getCourseTypeFid();
+		TKcCourseType courseType = tKcCourseTypeMapper.selectByPrimaryKey(courseTypeId);
+		log.info("===========结束根据studentId追溯课程，后期可优化sql============");
+		CourseVo vo = new CourseVo().builder()
+				.courseId(courseId)
+				.courseName(course.getCourseName())
+				.courseTypeId(courseTypeId)
+				.courseTypeName(courseType.getTypeName())
+				.build();
+		return vo;
+	}
+
+	@Override
+	public String selectCourseTypeNameById(String id) {
+		TKcCourseType courseTyoe = tKcCourseTypeMapper.selectByPrimaryKey(id);
+		return courseTyoe.getTypeName();
+	}
+
+	@Override
+	public CompanyVo selectCompanyBelongByCourseId(String courseId) {
+		TKcCourse course = tKcCourseMapper.selectByPrimaryKey(courseId);
+		String companyId = course.getCompanyFid();
+		CompanyVo vo = new CompanyVo().builder()
+				.companyId(companyId)
+				.build();
+		return vo;
+	}
+
+}

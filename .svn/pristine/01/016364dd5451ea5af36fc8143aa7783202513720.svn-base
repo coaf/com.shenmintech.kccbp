@@ -1,0 +1,17 @@
+package com.shenmintech.cbp.biz;
+
+import java.util.List;
+
+import com.shenmintech.cbp.biz.vo.res.RollingPicAndIndexVo;
+import com.shenmintech.cbp.controller.bean.req.Req4PostRollingPicBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetRollingPicsBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostRollingPicBean;
+
+public interface IRollingPictureBiz {
+
+	public Res4PostRollingPicBean postRollingPic(Req4PostRollingPicBean req4PostRollingPicBean);
+	
+	public Res4GetRollingPicsBean getRollingPics(Res4GetRollingPicsBean res4GetRollingPicsBean);
+	
+	public List<RollingPicAndIndexVo> getShowsRollingPics();
+}

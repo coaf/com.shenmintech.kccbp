@@ -1,0 +1,87 @@
+package com.shenmintech.cbp.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+
+
+/**
+ * 接口访问错误信息加载类
+ * 
+ * @author max
+ *
+ */
+@Data
+@Component
+@ConfigurationProperties(locations = "classpath:error-msg.yml", prefix = "httpErrorMsg")
+public class HttpErrorMsg {
+
+	@Data
+	public static class BaseFailData{//错误码+错误信息
+		private Integer codeFail;
+		private String msgFail;
+	}
+
+	public static class FErrors {//公共异常
+		public VariMiss variMiss;//参数缺失--------------------------------001
+		public static class VariMiss extends BaseFailData{}
+		public VariIllegal variIllegal;//参数非法--------------------------002
+		public static class VariIllegal extends BaseFailData{}
+		public SysInnerExc sysInnerExc;//内部异常--------------------------003
+		public static class SysInnerExc extends BaseFailData{}
+		public ThirdApiExc thirdApiExc;//第三方接口调用异常-----------------004
+		public static class ThirdApiExc extends BaseFailData{}
+		public ModuleTransExc moduleTransExc;//模块间互相调用失败-----------005
+		public static class ModuleTransExc extends BaseFailData{}
+		public ProcessExc processExc;//业务流程异常-------------------------006
+		public static class ProcessExc extends BaseFailData{}
+	}
+
+	//CompanyController
+	private AddCompany addCompany;
+	public static class AddCompany extends FErrors{}
+	private PutTKcCompany putTKcCompany;
+	public static class PutTKcCompany extends FErrors{}
+	private GetTKcCompany getTKcCompany;
+	public static class GetTKcCompany extends FErrors{}
+	private GetSingleCompany getSingleCompany;
+	public static class GetSingleCompany extends FErrors{}
+	//CourseController
+	private PostTKcCourse postTKcCourse;
+	public static class PostTKcCourse extends FErrors{}
+	private GetTKcCourse getTKcCourse;
+	public static class GetTKcCourse extends FErrors{}
+	private GetTKcCourseTable getTKcCourseTable;
+	public static class GetTKcCourseTable extends FErrors{}
+	private PutCourseTable putCourseTable;
+	public static class PutCourseTable extends FErrors{}
+	//GroupController
+	private PostTKcGroup postTKcGroup;
+	public static class PostTKcGroup extends FErrors{}
+	private PutTKcGroup putTKcGroup;
+	public static class PutTKcGroup extends FErrors{}
+	private GetTKcGroup getTKcGroup;
+	public static class GetTKcGroup extends FErrors{}
+	//ClazzController
+	private PostTKcClazz postTKcClazz;
+	public static class PostTKcClazz extends FErrors{}
+	private GetTKcClazzById getTKcClazzById;
+	public static class GetTKcClazzById extends FErrors{}
+	//EmployeeController
+	private PostTKcEmployee postTKcEmployee;
+	public static class PostTKcEmployee extends FErrors{}
+	private GetTKcEmployee getTKcEmployee;
+	public static class GetTKcEmployee extends FErrors{}
+	private PostUserEmployeeStudent postUserEmployeeStudent;
+	public static class PostUserEmployeeStudent extends FErrors{}
+	private GetUserNtesData getUserNtesData;
+	public static class GetUserNtesData extends FErrors{}
+	//StudentController
+	private PostTKcStudent postTKcStudent;
+	public static class PostTKcStudent extends FErrors{}
+	private DeleteTKcStudent deleteTKcStudent;
+	public static class DeleteTKcStudent extends FErrors{}
+	
+	
+}

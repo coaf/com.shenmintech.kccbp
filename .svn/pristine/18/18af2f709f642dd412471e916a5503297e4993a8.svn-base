@@ -1,0 +1,33 @@
+package com.shenmintech.crm;
+
+import java.io.UnsupportedEncodingException;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+
+import com.shenmintech.cbp.ShenminKCApplication;
+
+
+/**
+ * Created by mywu on 2016/4/21.
+ */
+@SuppressWarnings("deprecation")
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = ShenminKCApplication.class,initializers = ConfigFileApplicationContextInitializer.class )
+@WebAppConfiguration
+public class BaseTests {
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void teee() throws UnsupportedEncodingException{
+		
+		
+		
+	}
+	
+
+}

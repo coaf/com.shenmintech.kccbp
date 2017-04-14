@@ -1,0 +1,46 @@
+package com.shenmintech.cbp.biz.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.shenmintech.cbp.biz.IActionBiz;
+import com.shenmintech.cbp.config.HttpErrorMsg;
+import com.shenmintech.cbp.controller.bean.req.ReqActionCountBean;
+import com.shenmintech.cbp.controller.bean.res.ResActionCountBean;
+import com.shenmintech.cbp.service.ITToolAccountService;
+import com.shenmintech.common.util.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class ActionBizImpl implements IActionBiz {
+
+	@Autowired
+	HttpErrorMsg httpErrorMsg;
+	
+	@Autowired
+	ITToolAccountService iTToolAccountService;
+	
+	@Override
+	public ResActionCountBean patchRecordAccount4App(ReqActionCountBean reqActionCountBean){
+		ResActionCountBean resBean = new ResActionCountBean();
+		String activeId = reqActionCountBean.getActiveId();
+		String passiveId = reqActionCountBean.getPassiveId();
+		String actionId = reqActionCountBean.getActionId();
+		
+		if(StringUtil.checkBlank(activeId,passiveId,actionId)){
+			log.error("activeId,passiveId,actionId不能为空");
+			resBean.setError(httpErrorMsg.getPatchRecordAccount().variMiss.getCodeFail());
+			resBean.setMsg(httpErrorMsg.getPatchRecordAccount().variMiss.getMsgFail());
+			resBean.setSuccess(false);
+			return resBean;
+		}
+		iTToolAccountService.addAccount(activeId, passiveId, actionId);
+		resBean.setError(0);
+		resBean.setMsg("SUCCESS");
+		resBean.setSuccess(true);
+		return resBean;
+	};
+	
+}

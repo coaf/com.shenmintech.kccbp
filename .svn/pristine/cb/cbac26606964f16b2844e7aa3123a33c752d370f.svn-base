@@ -1,0 +1,33 @@
+package com.shenmintech.cbp.mapper;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+import com.shenmintech.cbp.entity.TKcCompany;
+import com.shenmintech.cbp.entity.TKcCompanyExample;
+
+public interface TKcCompanyMapper {
+  int countByExample(TKcCompanyExample example);
+
+  int deleteByExample(TKcCompanyExample example);
+
+  int deleteByPrimaryKey(String id);
+
+  int insert(TKcCompany record);
+
+  int insertSelective(TKcCompany record);
+
+  List<TKcCompany> selectByExample(TKcCompanyExample example);
+
+  TKcCompany selectByPrimaryKey(String id);
+
+  int updateByExampleSelective(@Param("record") TKcCompany record,
+      @Param("example") TKcCompanyExample example);
+
+  int updateByExample(@Param("record") TKcCompany record,
+      @Param("example") TKcCompanyExample example);
+
+  int updateByPrimaryKeySelective(TKcCompany record);
+
+  int updateByPrimaryKey(TKcCompany record);
+}

@@ -1,0 +1,22 @@
+package com.shenmintech.cbp.controller.bean.req;
+
+import com.shenmintech.base.bean.BaseReqBean;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@ApiModel
+public class Req4GetGroupBean extends BaseReqBean {
+
+  @ApiModelProperty(value = "课程id", required = true, example = "aa38c642-29f2-4eef-9811-f67ca491")
+  public String courseId;
+
+}

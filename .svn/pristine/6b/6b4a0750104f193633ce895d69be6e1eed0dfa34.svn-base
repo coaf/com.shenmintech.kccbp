@@ -1,0 +1,9 @@
+package com.shenmintech.cbp.service;
+
+import com.shenmintech.cbp.biz.vo.res.Res4GetUserVo;
+
+public interface IUserService {
+	
+	public Res4GetUserVo selectByUserId(String userId);
+	
+}

@@ -1,0 +1,291 @@
+package com.shenmintech.common.util;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class Constants {
+
+  public static final String TIMESTR =
+      "20\\d\\d(0[1-9]|1[012])(0[1-9]|[12]\\d|3[01])(0\\d|1\\d|2[0-4])([0-5]\\d){2}";// 日期格式yyyyMMddHHmmss
+  public static final String TIMESTR_2 =
+      "^([1][7-9][0-9][0-9]|[2][0][0-9][0-9])([0][1-9]|[1][0-2])([0][1-9]|[1-2][0-9]|[3][0-1])([0-1][0-9]|[2][0-3])([0-5][0-9])([0-5][0-9])$";// 日期格式yyyy-MM-dd
+                                                                                                                                              // HH:mm:ss
+  public static final String PHONE_NO = "^1[3|4|5|7|8]\\d{9}$";// 手机号正则
+  // public static final String[] VERARR = {"1.0", "2.0", "3.0"};//version版本
+  private static final String[] ANSWER_TYPE_ID = {"1", "2", "3"};
+  public static final List<String> ANSWER_TYPE_ID_LIST = Arrays.asList(ANSWER_TYPE_ID);
+  private static final String[] SHOOSE_TYPE_ID = {"1", "2"};
+  public static final List<String> SHOOSE_TYPE_ID_LIST = Arrays.asList(SHOOSE_TYPE_ID);
+
+  private static final String[] PIC_PRE = {"jpg", "bmp", "GIF", "psd", "png", "pcx", "DXF", "cdr",
+      "tiff", "tga", "ufo", "eps", "ai", "raw", "exif", "fpx", "svg"};// 图片格式
+  private static final String[] TYPELIST_13 = {"1", "3"};// 批次版本
+  private static final String[] TYPELIST_02 = {"0", "2"};// 批次版本
+  private static final String[] TYPELIST_0123 = {"0", "1", "2", "3"};// 批次版本
+  private static final String[] PUSHLIST_012 = {"0", "1", "2"};
+  public static final List<String> IMG_FORMAT = Arrays.asList(PIC_PRE);
+  public static final List<String> l13 = Arrays.asList(TYPELIST_13);
+  public static final List<String> l02 = Arrays.asList(TYPELIST_02);
+  public static final List<String> l0123 = Arrays.asList(TYPELIST_0123);
+  public static final List<String> l012 = Arrays.asList(PUSHLIST_012);
+
+  /**************************
+   * START CODE
+   ***********************************************************************************************************/
+  public static final String META_STATUS_CODE_0 = "0";// metaorder状态码：初始状态
+  public static final String META_STATUS_CODE_1 = "1";// metaorder状态码：成功
+  public static final String META_STATUS_CODE_2 = "2";// metaorder状态码：初始状态
+  public static final String META_STATUS_CODE_3 = "3";
+  public static final String META_STATUS_CODE_4 = "3";
+  public static final String META_STATUS_CODE_5 = "5";
+  public static final String META_STATUS_CODE_1115 = "1115";
+  public static final String META_STATUS_CODE_D1 = "-1";// metaorder状态码：前处理失败
+  public static final String META_STATUS_CODE_D2 = "-2";// metaorder状态码：后处理失败
+  public static final String META_STATUS_CODE_D3 = "-3";
+  public static final String META_STATUS_CODE_D4 = "-4";
+  public static final String META_STATUS_CODE_D5 = "-5";
+  public static final String META_STATUS_CODE_D6 = "-6";
+  public static final String META_STATUS_CODE_D7 = "-7";
+  public static final String META_STATUS_CODE_D8 = "-8";
+  public static final String META_STATUS_CODE_D9 = "-9";
+  public static final String META_STATUS_CODE_D10 = "-10";
+  public static final String META_STATUS_CODE_D11 = "-11";
+  public static final String META_STATUS_CODE_D12 = "-12";
+  public static final String META_STATUS_CODE_D13 = "-13";
+  public static final String META_STATUS_CODE_D14 = "-14";
+  public static final String META_STATUS_CODE_D15 = "-15";
+  public static final String META_STATUS_CODE_D16 = "-16";
+  public static final String META_STATUS_CODE_D17 = "-17";
+  public static final String META_STATUS_CODE_D18 = "-18";
+  public static final String META_STATUS_CODE_D19 = "-19";
+  public static final String META_STATUS_CODE_D20 = "-20";
+  public static final String META_STATUS_CODE_D21 = "-21";
+  public static final String META_STATUS_CODE_D22 = "-22";
+  public static final String META_STATUS_CODE_D23 = "-23";
+  public static final String META_STATUS_CODE_D24 = "-24";
+  public static final String META_STATUS_CODE_D25 = "-25";
+  public static final String META_STATUS_CODE_D26 = "-26";
+  public static final String META_STATUS_CODE_D999 = "-999";
+  public static final String META_PERCEBT = "0/0";// 订单拆单比例
+  public static final String ROUTINE_CODE_M0 = "m_0";
+  public static final String ROUTINE_CODE_MD1 = "m_-1";
+  public static final String ROUTINE_CODE_MD2 = "m_-2";
+  public static final String ROUTINE_CODE_MD3 = "m_-3";
+  public static final String ROUTINE_CODE_MD4 = "m_-4";
+  public static final String ROUTINE_CODE_MD5 = "m_-5";
+  public static final String ROUTINE_CODE_MD6 = "m_-6";
+  public static final String ROUTINE_CODE_N0 = "n_0";
+  public static final String ROUTINE_CODE_ND1 = "n_-1";
+  public static final String ROUTINE_CODE_ND2 = "n_-2";
+  public static final String ROUTINE_CODE_ND3 = "n_-3";
+  /**************************
+   * END CODE
+   *************************************************************************************************************/
+
+  /**************************
+   * START DESC
+   ***********************************************************************************************************/
+  public static final String BLANKSTR = "";
+  public static final String META_INIT_STATUS_DESC = "初始状态";// metaorder状态描述
+  public static final String META_STATUS_DESC_1 =
+      "字段externalOrder不能为空/订单号externalOrder格式必须为（大小写字母，阿拉伯数字，下划线“_”，横杠“-”的组合，如：TM0712-160998_46772）。";
+  public static final String META_STATUS_DESC_2 = "字段paidDate不能为空/付款日期格式必须为yyyy-MM-dd HH:mm:ss。";
+  public static final String META_STATUS_DESC_3 = "字段consigneeProvince不能为空。";
+  public static final String META_STATUS_DESC_4 = "字段consigneeCity不能为空。";
+  public static final String META_STATUS_DESC_5 = "字段consigneeDistrict不能为空";
+  public static final String META_STATUS_DESC_6 = "字段consigneeAddress不能为空";
+  public static final String META_STATUS_DESC_7 = "字段consigneeMobile不能为空/手机号码consigneeMobile格式不合法。";
+  public static final String META_STATUS_DESC_8 = "字段consigneeName不能为空。";
+  public static final String META_STATUS_DESC_9 = "字段payName不能为空。";
+  public static final String META_STATUS_DESC_10 = "字段idcardNumber不能为空。";
+  public static final String META_STATUS_DESC_11 = "字段paySerialNumber不能为空。";
+  public static final String STATUS_DESC_1 = "method can not be null...";
+  public static final String STATUS_DESC_2 =
+      "version can not be null/must be 1.0/2.0/3.0,default 1.0...";
+  public static final String STATUS_DESC_3 = "appid can not be null...";
+  public static final String STATUS_DESC_4 = "format can not be null...";
+  public static final String STATUS_DESC_5 = "nonce can not be null...";
+  public static final String STATUS_DESC_6 = "sign can not be null...";
+  public static final String STATUS_DESC_7 = "timestamp为空/timestamp格式错误。";
+  public static final String STATUS_DESC_8 = "调用请求的时间戳与接口提供方收到请求的时间差不在约定的范围内（60s）。";
+  public static final String STATUS_DESC_9 = "data can not be null...";
+  public static final String STATUS_DESC_10 = "count of customer mapping is not 1";
+  public static final String STATUS_DESC_11 = "no secret in customer searched by appid:";
+  public static final String STATUS_DESC_12 = "Signature verification error!";
+  public static final String STATUS_DESC_13 = "no method mapping...";
+  public static final String STATUS_DESC_14 = "批次号为空。";
+  public static final String STATUS_DESC_15 = "opt_meta_mapper插入失败。";
+  public static final String STATUS_DESC_16 = "opt_meta_commodity的Batch插入失败。";
+  public static final String STATUS_DESC_17 = "港口表中港口数据List<OptPort>的港口数量为0";
+  public static final String STATUS_DESC_18 = "库存归属只有自己/1和他人/2";
+  public static final String STATUS_DESC_19 = "生成海关报关单号失败。";
+  public static final String STATUS_DESC_20 = "港口认定方法出现问题";
+  public static final String STATUS_DESC_21 = "插入报关订单表失败";
+  public static final String STATUS_DESC_22 = "插入opt_sh订单表失败。";
+  public static final String STATUS_DESC_23 = "插入opt_hz订单表失败。";
+  public static final String STATUS_DESC_24 = "插入opt_gr订单表失败。";
+  public static final String STATUS_DESC_62 = "插入opt_tj订单表失败。";
+  public static final String STATUS_DESC_25 = "未匹配到到港口：SH/HZ/HZGR。";
+  public static final String STATUS_DESC_26 = "插入订单料号商品表失败。";
+  public static final String STATUS_DESC_27 = "插入库存流水表失败。";
+  public static final String STATUS_DESC_28 = "插入扣费流水表失败。";
+  public static final String STATUS_DESC_29 = "aos内部计算税费接口调用失败。";
+  public static final String STATUS_DESC_30 = "税费缓存获取成功。";
+  public static final String STATUS_DESC_31 = "税费计算成功。";
+  public static final String STATUS_DESC_32 = "订单已删除";
+  public static final String STATUS_DESC_33 = "更新港口订单表失败。";
+  public static final String STATUS_DESC_34 = "库存回滚：连续5次尝试回滚失败，请稍后再尝试删除库存。";
+  public static final String STATUS_DESC_35 = "库存回滚异常，请找技术部开发人员询查原因。";
+  public static final String STATUS_DESC_36 = "保证金流水记录表中存在订单扣除的流水异常记录，回滚失败。";
+  public static final String STATUS_DESC_37 = "accout_type必须是int";
+  public static final String STATUS_DESC_38 = "保证金流水记录表中存在订单扣除的流水account为负数！太可怕了... ...回滚失败。";
+  public static final String STATUS_DESC_39 = "税金回滚异常：连续5次尝试回滚失败，请稍后再尝试。";
+  public static final String STATUS_DESC_40 = "税金回滚异常，请找技术部开发人员询查原因。";
+  public static final String STATUS_DESC_41 = "SUCCESS";
+  public static final String STATUS_DESC_42 = "lambda cal wrong!";
+  public static final String STATUS_DESC_43 = "excel";
+  public static final String STATUS_DESC_44 = "By EXCEL";
+  public static final String STATUS_DESC_45 = "By API";
+  public static final String STATUS_DESC_46 = "订单信息中商品list的长度为0：list.size<1";
+  public static final String STATUS_DESC_47 = "入原始订单和原始商品表失败！";
+  public static final String STATUS_DESC_48 =
+      "SupplierID/POID/WarehouseID/thdNum/Items can not be null";
+  public static final String STATUS_DESC_49 = "MerchantProductID or Qty can not be blank!";
+  public static final String STATUS_DESC_50 = "初始库存创建失败，回滚！";
+  public static final String STATUS_DESC_51 = "toSupIdObj（object）转化为toSupId(int)失败！";
+  public static final String STATUS_DESC_52 = "字段toSupId不能为空！";
+  public static final String STATUS_DESC_53 = "字段batchMsg不能为空！";
+  public static final String STATUS_DESC_54 =
+      "batchMsgObj（object）转化为batchMsg(List<Map<String,Object>>)失败！";
+  public static final String STATUS_DESC_55 = "库存转移连续失败5次，请稍后再试。";
+  public static final String STATUS_DESC_56 = "创建库存失败，请检查。";
+  public static final String STATUS_DESC_57 = "调拨库存发生异常咯，请联系AGG技术：miki。";
+  public static final String STATUS_DESC_58 = "data报文格式有问题，请检查。";
+  public static final String STATUS_DESC_59 = "orderId必须可以转化为long";
+  public static final String STATUS_DESC_60 = "c表主键组成的list不能为null或者长度不能为0";
+  public static final String STATUS_DESC_61 = "推送中...";
+  public static final String STATUS_DESC_63 = "待合并批次的料号不都一致";
+  public static final String STATUS_DESC_64 = "批次所属客户不一致，不能合并批次。";
+  public static final String STATUS_DESC_65 = "待合并批次的类型未全部指定。";
+  public static final String STATUS_DESC_66 = "待合并批次的总数和销售数不合法，请找技术部。";
+  public static final String STATUS_DESC_67 = "不能合并类型（入仓/锁库）不一致的批次！";
+  /**************************
+   * END DESC
+   *************************************************************************************************************/
+
+  /**************************
+   * START 订单入redis队列
+   *************************************************************************************************/
+  public final static String IN_METAS = "inMetaOrders";// 入原始订单redis队列
+  public final static String CREATE_META_SET = "createMetaOrderSet:";// 原始订单创建同步排除并发set
+
+  public final static String IN_MIDS = "inMidOrders";// 入中间表订单号redis队列
+  public final static String CREATE_MID_SET = "createMidOrderSet:";// 中间表订单创建同步排除并发set
+
+  public final static String IN_FINALS = "inFinalOrders";// 入料号商品表redis队列
+  public final static String CREATE_FINAL_SET = "createFinalOrderSet:";// 入料号商品表订单创建同步排除并发set
+
+  public final static String PUSH_SET = "pushOrderSet:";// 推送订单创建同步排除并发set
+
+  public final static String Push_GRSYNS = "pushGrsynOrders";// 推送谷汝仓队列
+  public final static String Push_SHS = "pushShOrders";// 推送上海仓队列
+  public final static String Push_HZS = "pushHzOrders";// 推送上海仓队列
+  public final static String Push_TJS = "pushTjOrders";// 推送上海仓队列
+  // public final static String CREATE_MAPPING_SET = "createMappingOrderSet:";//映射订单创建同步排除并发set
+  /**************************
+   * END 订单入redis队列
+   *************************************************************************************************/
+
+  /**************************
+   * START 辅助字段
+   *******************************************************************************************************/
+  public final static String ORDER_BY_CONDITION = "create_date asc";// sql
+  public final static String ORDER_BY_CONDITION1 = "sequence asc";// sql
+  public final static String KEY_SUPPLIERID = "supplierid";
+  public final static String KEY_LIST = "list";
+  public final static String KEY_CODE = "code";
+  public final static String KEY_MSG = "msg";
+  public final static String KEY_DATA = "data";
+  public final static String KEY_EXTERNALORDER = "externalOrder";
+  public final static String KEY_PAIDDATE = "paidDate";
+  public final static String KEY_CONSIGNEEPROVINCE = "consigneeProvince";
+  public final static String KEY_CONSIGNEECITY = "consigneeCity";
+  public final static String KEY_CONSIGNEEDISTRICT = "consigneeDistrict";
+  public final static String KEY_CONSIGNEEADDRESS = "consigneeAddress";
+  public final static String KEY_CONSIGNEEMOBILE = "consigneeMobile";
+  public final static String KEY_CONSIGNEENAME = "consigneeName";
+  public final static String KEY_PAYNAME = "payName";
+  public final static String KEY_PHONENUMBER = "phoneNumber";
+  public final static String KEY_IDCARDNUMBER = "idcardNumber";
+  public final static String KEY_PAYSERIALNUMBER = "paySerialNumber";
+  public final static String KEY_SENDERCOMPANYID = "senderCompanyId";
+  public final static String KEY_METAGOODSAMOUNT = "metaGoodsAmount";
+  public final static String KEY_METAGOODSNAME = "metaGoodsName";
+  public final static String KEY_METAGOODSNO = "metaGoodsNo";
+  public final static String KEY_UNITPRICE = "unitPrice";
+  public final static String KEY_REURLFLAG = "reurlflag";
+  public final static String KEY_SUPPLIER_ID = "SupplierID";
+  public final static String KEY_POID = "POID";
+  public final static String KEY_WAREHOUSEID = "WarehouseID";
+  public final static String KEY_THDNUM = "ThdNum";
+  public final static String KEY_ITEMS = "Items";
+  public final static String KEY_MERCHANTPRODUCTID = "MerchantProductID";
+  public final static String KEY_QTY = "Qty";
+  public final static String HB = "HB_";
+  public final static String KEY_EFFECTIVEDATE = "EffectiveDate";
+  public final static String KEY_BATCHID = "batchId";
+  public final static String KEY_TOSUPID = "toSupId";
+  public final static String KEY_BATCHMSG = "batchMsg";
+  public final static String KEY_IDLIST = "IdList";
+  public final static String SUCCESS = "成功";
+  public final static String FAILUER = "失败";
+  public final static String VAL_CHINA = "中国";
+  public final static String VAL_SH = "SH";
+  public final static String VAL_HZ = "HZ";
+  public final static String VAL_HZGR = "HZGR";
+  public final static String VAL_TJ = "TJ";
+  public final static String KEY_LPLL_DATA = "logi_port_link_list_data";
+  public final static String OPT_LOGI_COM_DATA = "opt_logi_company_data";
+  public final static String KEY_PORT_DATA = "port_data";
+  public final static String KEY_PORT_RECORD_PRO_DATA = "port_record_pro_data";
+
+  // method4server
+  public final static String METHOD_ADD_META_QUESTIONS = "addMetaQuestions";//
+  public final static String METHOD_DELETE_META_QUESTIONS = "deleteMetaQuestions";//
+  public final static String METHOD_UPDATE_META_QUESTIONS = "updateMetaQuestions";//
+  public final static String METHOD_SEARCH_META_QUESTIONS = "searchMetaQuestions";//
+  public final static String METHOD_SEARCH_META_QUESTION = "searchMetaQuestion";//
+  public final static String METHOD_ADD_VOTE = "addVote";
+  public final static String METHOD_DELETE_VOTE = "deleteVote";
+  public final static String METHOD_UPDATE_VOTE = "updateVote";
+  public final static String METHOD_SEARCH_VOTES = "searchVotes";
+  public final static String METHOD_SEARCH_VOTE_DATA = "searchVoteData";
+  public final static String METHOD_ADD_ACCOUNT = "addAccount";
+  public final static String METHOD_SEARCH_VOTE_USER_RELA = "SearchVoteUserRela";
+  // method4app
+  public final static String METHOD_SEARCH_ANSWERING_COUNT = "SearchAnsweringCount";
+  public final static String METHOD_SEARCH_VOTE_ACCS = "SearchVoteAccs";
+  public final static String METHOD_PUT_QUESTIONS = "PutQuestions";
+  public final static String METHOD_GET_QUESTIONS = "GetQuestions";
+  /**************************
+   * END 辅助字段
+   *******************************************************************************************************/
+
+
+  public final static String BATCHID = "batchid:";// 批次流水缓存
+  public final static String ACCOUNTID = "accountid:";// 税金流水缓存
+
+  public final static ConcurrentHashMap<String, String> TAX_CASH = new ConcurrentHashMap<>();// sku对应税金计算缓存
+
+
+  // 网易聊天相关常量
+  public final static String APP_KEY = "99b3d70bd7fa46c474cb85af03be25ea";
+  public final static String APP_SECRET = "c0cb4143da72";
+  public final static String CHATROOM_CREAT_URL =
+      "https://api.netease.im/nimserver/chatroom/create.action";
+  public final static String USER_CREAT_URL = "https://api.netease.im/nimserver/user/create.action";
+  public final static String USER_GETUINFOS_URL =
+      "https://api.netease.im/nimserver/user/getUinfos.action";
+
+}

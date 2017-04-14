@@ -1,0 +1,55 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IGroupBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetGroupBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostGroupBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PutGroupBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetGroupBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostGroupBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PutGroupBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/*
+ * 
+ */
+
+@Controller
+@Api(value = "小组", description = "小组的相关操作(包含小组对象和小组实例的操作)")
+public class GroupController {
+	
+	@Autowired
+	IGroupBiz iGroupBiz;
+	
+	@PostMapping("/tkcGroup/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师针对某个课程进行划分小组", httpMethod = "POST", value = "添加新的小组（OK）")
+	public @ResponseBody Res4PostGroupBean postTKcGroup(@ApiParam(required = true, value = "添加新的小组") @RequestBody Req4PostGroupBean req4PostGroupBean){
+		return iGroupBiz.addGroup(req4PostGroupBean);
+	}
+	
+	@PostMapping("/tkcGroup/put")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师修改小组名称", httpMethod = "POST", value = "修改小组名称（OK）")
+	public @ResponseBody Res4PutGroupBean putTKcGroup(@ApiParam(required = true, value = "更新的小组") @RequestBody Req4PutGroupBean req4PutGroupBean){
+		return iGroupBiz.updateByGroupId(req4PutGroupBean);
+	}
+	
+	@PostMapping("/tkcGroup/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "导师查看某个课程的小组列表", httpMethod = "POST", value = "查看小组列表（OK）")
+	public @ResponseBody Res4GetGroupBean getTKcGroup(@ApiParam(required = true, value = "查询小组列表对象") @RequestBody Req4GetGroupBean req4GetGroupBean){
+		return iGroupBiz.selectByCourseId(req4GetGroupBean);
+	}
+	
+}

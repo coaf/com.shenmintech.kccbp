@@ -1,0 +1,46 @@
+package com.shenmintech.cbp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shenmintech.cbp.biz.IEmployeeBiz;
+import com.shenmintech.cbp.controller.bean.req.Req4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.req.Req4PostEmployeeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4GetEmployeeBean;
+import com.shenmintech.cbp.controller.bean.res.Res4PostEmployeeBean;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/*
+ * 
+ */
+
+@Controller
+@Api(value = "员工", description = "员工列表显示并附加小组归属")
+public class EmployeeController {
+	
+	@Autowired
+	IEmployeeBiz iEmployeeBiz;
+	
+	@PostMapping("/tkcEmployee/post")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "扫码成为员工接口", httpMethod = "POST", value = "扫码加员工（OK）")
+	public @ResponseBody Res4PostEmployeeBean postTKcEmployee(@ApiParam(required = true, value = "用户id") @RequestBody Req4PostEmployeeBean req4PostEmployeeBean){
+		return iEmployeeBiz.addEmployee(req4PostEmployeeBean);
+	}
+	
+	@PostMapping("/tkcEmployee/get")
+	@ApiResponses(value = {@ApiResponse(code = 405, message = "invalid input")})
+	@ApiOperation(notes = "查询所有当前公司下某个班级的员工，并且附加小组归属，属于综合型接口", httpMethod = "POST", value = "查询员工（包含小组归属）列表（OK）")
+	public @ResponseBody Res4GetEmployeeBean getTKcEmployee(@ApiParam(required = true, value = "用户id") @RequestBody Req4GetEmployeeBean req4GetEmployeeBean){
+		return iEmployeeBiz.getByComIdAndCouIdPages(req4GetEmployeeBean);
+	}
+	
+}
